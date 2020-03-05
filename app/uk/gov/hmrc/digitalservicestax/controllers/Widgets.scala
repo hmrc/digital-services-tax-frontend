@@ -85,9 +85,18 @@ trait Widgets {
       Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
     }{x => x: BaseType}
 
-  implicit def postcodeField    = validatedVariant(Postcode)
+  def validatedNonEmptyString(validated: ValidatedType[String])(
+    implicit baseForm: FormField[String, Html]
+  ): FormField[String @@ validated.Tag, Html] =
+    baseForm.simap{
+      case "" => Left(ErrorMsg("required").toTree)
+      case x =>
+        Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
+    }{x => x: String}
+
+  implicit def postcodeField    = validatedNonEmptyString(Postcode)
   implicit def nesField         = validatedVariant(NonEmptyString)
-  implicit def utrField         = validatedVariant(UTR)
+  implicit def utrField         = validatedNonEmptyString(UTR)
   implicit def countrycodeField = validatedVariant(CountryCode)
   implicit def emailField       = validatedVariant(Email)
   implicit def phoneField       = validatedVariant(PhoneNumber)

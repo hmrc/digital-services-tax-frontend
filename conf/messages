@@ -22,6 +22,9 @@ common.edit=Change
 common.yes=Yes
 common.no=No
 
+# Errors
+there.is.a.problem=There is a problem
+
 # time out
 time-out.title=For your security, we signed you out
 time-out.save=Your progress will saved for 30 days
@@ -35,13 +38,18 @@ check-unique-taxpayer-reference.heading=Does the company you are registering hav
   Tax Unique Taxpayer Reference?
 check-unique-taxpayer-reference.TRUE=Yes
 check-unique-taxpayer-reference.FALSE=No
+check-unique-taxpayer-reference.required=Select yes if the company you are registering has a UK Corporation Tax Unique Taxpayer Reference
 
-enter-utr.heading=What is the company's UK Corporation Tax Unique Taxpayer Reference (UTR)?
+enter-utr.heading=What is the company’s UK Corporation Tax Unique Taxpayer Reference (UTR)?
+enter-utr.required=Enter the company’s Corporation Tax Unique Taxpayer Reference
+enter-utr.invalid=Enter the company’s Corporation Tax Unique Taxpayer Reference in the correct format
 enter-utr.hint=This is 10 numbers like 12345 67890. It will be on tax returns and other letters about Self Assessment. \
   It may be called ‘reference’, ‘UTR’ or ‘official use’. \
   <a target=_blank href="https://www.gov.uk/find-lost-utr-number">Find a lost UTR (opens in a new window or tab)</a>.
 
 enter-postcode.heading=What is the postcode of the company’s Registered Office address?
+enter-postcode.required=Enter the postcode of the company’s registered office address
+enter-postcode.invalid=Enter a real postcode
 
 company-name.heading=What is the company’s name?
 
@@ -53,10 +61,12 @@ company-registered-office-address.UkAddress.county.heading=County (optional)
 company-registered-office-address.UkAddress.postcode.heading=Postcode
 
 confirm-company-details.heading=Is this the company you want to register?
+confirm-company-details.required=Select yes if this is the company you want to register
 confirm-company-details.TRUE=Yes
 confirm-company-details.FALSE=No
 
 company-contact-address.heading=Can we use this address to contact you about your Digital Services Tax?
+company-contact-address.required=Select yes if we can use this address to contact you about your Digital Services Tax
 company-contact-address.TRUE=Yes
 company-contact-address.FALSE=No - I want to enter a different address
 
@@ -77,6 +87,7 @@ alternate-contact.UkAddress.county.heading=County (optional)
 alternate-contact.UkAddress.postcode.heading=Postcode
 
 check-if-group.heading=Is the company you want to register part of a group?
+check-if-group.required=Select yes if the company you want to register is part of a group
 check-if-group.details=What we mean by a 'group'
 check-if-group.details.text=<p>For the Digital Services Tax, a group is a parent company and all its consolidated subsidiaries.</p>\
   <p>A parent company is an entity that is (one of the following):</p>\
