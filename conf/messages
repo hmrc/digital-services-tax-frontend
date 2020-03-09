@@ -100,6 +100,9 @@ check-if-group.TRUE=Yes
 check-if-group.FALSE=No
 
 ultimate-parent-company-name.heading=What is the name of the group’s ultimate global parent company?
+ultimate-parent-company-name.invalid=Enter the name of the group’s ultimate parent company
+ultimate-parent-company-name.error.length=Name of group’s ultimate global parent company must be 160 characters or fewer
+ultimate-parent-company-name.format=Name of group’s ultimate global parent company must only include letters a to z, numbers, hyphens, apostrophes, amperstands (&), and spaces
 ultimate-parent-company-name.hint=This is the name registered with an official company register, such as Companies House.
 
 ultimate-parent-company-address.heading=What is the Registered Office address of {0}?
@@ -112,11 +115,15 @@ ultimate-parent-company-address.ForeignAddress.line5.heading=Address line 5 (opt
 ultimate-parent-company-address.ForeignAddress.postalCode.heading=Postcode
 ultimate-parent-company-address.ForeignAddress.countryCode.heading=Country code
 
+ultimate-parent-company-address.required=Enter the building and street of the group’s ultimate group parent company’s registered office address
+
 ultimate-parent-company-address.UkAddress.line1.heading=Building or street
 ultimate-parent-company-address.UkAddress.line2.heading=Building or street line 2 (optional)
 ultimate-parent-company-address.UkAddress.town.heading=Town or city
 ultimate-parent-company-address.UkAddress.county.heading=County (optional)
 ultimate-parent-company-address.UkAddress.postcode.heading=Postcode
+ultimate-parent-company-address.ForeignAddress.line1.invalid=Enter Address Line 1
+ultimate-parent-company-address.ForeignAddress.countryCode.invalid=COUNTRY CODE INVALID
 
 contact-details.heading=Contact person’s details
 contact-details.intro=We will use these details if we need to discuss your Digital Services Tax.
@@ -126,6 +133,11 @@ contact-details.phoneNumber.heading= Phone number
 contact-details.phoneNumber.hint=For international numbers include the country code.
 contact-details.email.heading=Email address
 contact-details.email.hint=We will use this email address to send confirmation of your registration.
+contact-details.forename.invalid=Forename
+contact-details.forename.name=Forename name
+contact-details.surname.invalid=Surname
+contact-details.phoneNumber.invalid=Phone number
+contact-details.email.invalid=Email
 
 check-liability-date.heading=Did the company become liable for Digital Services Tax on 6 April 2020?
 check-liability-date.TRUE=Yes

@@ -104,6 +104,7 @@ trait Widgets {
   implicit def accountField     = validatedVariant(AccountNumber)
   implicit def sortCodeField    = validatedVariant(SortCode)
   implicit def ibanField        = validatedVariant(IBAN)
+  implicit def restrictField    = validatedVariant(RestrictiveString)
 
   implicit def optUtrField: FormField[Option[UTR], Html] = inlineOptionString(UTR)
 

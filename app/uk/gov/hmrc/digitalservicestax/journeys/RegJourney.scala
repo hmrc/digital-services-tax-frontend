@@ -33,10 +33,15 @@ object RegJourney {
   type RegTellTypes = Confirmation[Registration] :: CYA[Registration] :: Address :: Kickout :: Company :: Boolean :: NilTypes
   type RegAskTypes = UTR :: Postcode :: LocalDate :: ContactDetails :: String :: NonEmptyString :: Address :: UkAddress :: Boolean :: NilTypes
 
+
   private def message(key: String, args: String*) = {
     import play.twirl.api.HtmlFormat.escape
     Map(key -> Tuple2(key, args.toList.map { escape(_).toString } ))
   }
+
+  private val fnRegex = """^[a-zA-Z &`\\-\\'^]{1,35}$"""
+  private val snRegex = """^[a-zA-Z &`\\-\\'^]{1,35}$"""
+
 
   def registrationJourney[F[_] : Monad](
     interpreter: Language[F, RegTellTypes, RegAskTypes],
@@ -87,7 +92,17 @@ object RegJourney {
         ask[Boolean]("check-if-group") >>= {
           case true =>
             for {
-              parentName <- ask[NonEmptyString]("ultimate-parent-company-name")
+              parentName <- ask[NonEmptyString]("ultimate-parent-company-name",
+                validation =
+                  Rule.cond[NonEmptyString](
+                    _.length < 160,
+                    "error.length"
+                  ) followedBy
+                    Rule.cond[NonEmptyString](
+                      _.matches("""^[a-zA-Z0-9- '&\\/]{1,105}$"""),
+                      "format"
+                    )
+              )
               parentAddress <- ask[Address](
                 "ultimate-parent-company-address",
                 customContent = message("ultimate-parent-company-address.heading", parentName)
