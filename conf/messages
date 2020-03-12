@@ -139,7 +139,8 @@ contact-details.surname.invalid=Surname
 contact-details.phoneNumber.invalid=Phone number
 contact-details.email.invalid=Email
 
-check-liability-date.heading=Did the company become liable for Digital Services Tax on 6 April 2020?
+check-liability-date.heading=Was the group liable for Digital Services Tax on 1 April 2020?
+check-liability-date.required=Select yes if the group was liable for Digital Services Tax on 1 April 2020 
 check-liability-date.TRUE=Yes
 check-liability-date.FALSE=No
 
@@ -154,6 +155,13 @@ accounting-period-end-date.hint=For example, 31 7 2020.
 accounting-period-end-date.Date.day.heading=Day
 accounting-period-end-date.Date.month.heading=Month
 accounting-period-end-date.Date.year.heading=Year
+accounting-period-end-date.day-and-month-and-year.empty=Enter the end date of the group’s first accounting period for Digital Services Tax
+accounting-period-end-date.day.empty=The end date of the group’s first accounting period for Digital Services Tax must include a day
+accounting-period-end-date.month.empty=The end date of the group’s first accounting period for Digital Services Tax must include a month
+accounting-period-end-date.year.empty=The end date of the group’s first accounting period for Digital Services Tax must include a year
+accounting-period-end-date.day-and-month.empty=The end date of the group’s  first accounting period for Digital Services Tax must include a day and month
+accounting-period-end-date.day-and-year.empty=The end date of the group’s first accounting period for Digital Services Tax must include a day and year
+accounting-period-end-date.month-and-year.empty=The end date of the group’s first accounting period for Digital Services Tax must include a month and year
 
 #Reg cya
 cya.title=Check your answers before sending your application
