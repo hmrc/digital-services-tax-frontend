@@ -397,3 +397,44 @@ confirmation.what-you-do-next.title=What you must do next
 confirmation.what-you-do-next.p1=Your next return will be for 1 August 2020 to 31 July 2021.
 confirmation.what-you-do-next.p2=You must pay any Digital Services Tax you owe for your next return period by 1 April 2022 and submit a return by 31 July 2022.
 confirmation.index=Go to your Digital Services Tax details
+
+# Please see example messages below, from most specific to most general.
+# I suggest creating the most general ones first then overriding with more
+# specific ones on a case-by-case basis.
+#
+# For example, if the error message key is 'contact-details.email.required' uniform will
+# look first for 'contact-details.email.required', then 'email.required' and finally if it
+# can't find either of these it will use a message for 'required'.
+#
+# If you want to see the keys being used, open up DSTInterpreter.scala, find where the messages
+# are provided (around line 83 at present) and comment out the preferred and best-guess lines. Then
+# uncomment the 'attentionSeeker' line. Finally reload the pages and it will show the message keys.
+#
+# The content below is made up for demo purposes. Please also check above as in some
+# cases these keys already exist above.
+
+contact-details.forename.required=TO BE FULL NAME REQUIRED
+forename.required=TO BE FULL NAME REQUIRED GENERIC
+
+contact-details.forename.invalid=TO BE FULL NAME INVALID
+forename.invalid=TO BE FULL NAME INVALID GENERIC
+
+contact-details.surname.required=TO BE FULL NAME REQUIRED
+surname.required=TO BE FULL NAME REQUIRED GENERIC
+
+contact-details.surname.invalid=TO BE FULL NAME INVALID
+surname.invalid=TO BE FULL NAME INVALID GENERIC
+
+contact-details.phoneNumber.required=Enter a phone number
+phoneNumber.required=Enter a phone number
+
+contact-details.phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192
+phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192
+
+contact-details.email.required=Please enter a contact email
+email.required=Please enter an email address
+required=This is a required field
+
+contact-details.email.invalid=Please enter a valid contact email
+email.invalid=Please enter a valid email address
+invalid=Please enter a valid string

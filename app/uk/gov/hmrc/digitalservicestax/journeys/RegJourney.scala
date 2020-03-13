@@ -39,9 +39,6 @@ object RegJourney {
     Map(key -> Tuple2(key, args.toList.map { escape(_).toString } ))
   }
 
-  private val fnRegex = """^[a-zA-Z &`\\-\\'^]{1,35}$"""
-  private val snRegex = """^[a-zA-Z &`\\-\\'^]{1,35}$"""
-
   def registrationJourney[F[_] : Monad](
     interpreter: Language[F, RegTellTypes, RegAskTypes],
     backendService: DSTService[F]
