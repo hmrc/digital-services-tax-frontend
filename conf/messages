@@ -51,7 +51,9 @@ enter-postcode.heading=What is the postcode of the company’s Registered Office
 enter-postcode.required=Enter the postcode of the company’s registered office address
 enter-postcode.invalid=Enter a real postcode
 
-company-name.heading=What is the company’s name?
+company-name.heading=What is the name of the company you want to register?
+company-name.hint=This is the name registered with an official company register, such as Companies House.
+company-name.invalid=Enter the name of the company you want to register
 
 company-registered-office-address.heading=What is the company’s Registered Office address?
 company-registered-office-address.UkAddress.line1.heading=Building or street
@@ -413,17 +415,17 @@ confirmation.index=Go to your Digital Services Tax details
 # The content below is made up for demo purposes. Please also check above as in some
 # cases these keys already exist above.
 
-contact-details.forename.required=TO BE FULL NAME REQUIRED
-forename.required=TO BE FULL NAME REQUIRED GENERIC
+contact-details.forename.required=Enter the contact person’s first name
+forename.required=Enter the first name
 
-contact-details.forename.invalid=TO BE FULL NAME INVALID
-forename.invalid=TO BE FULL NAME INVALID GENERIC
+contact-details.forename.invalid=First name must only include letters a to z, hyphens, apostrophes and spaces
+forename.invalid=First name must only include letters a to z, hyphens, apostrophes and spaces
 
-contact-details.surname.required=TO BE FULL NAME REQUIRED
-surname.required=TO BE FULL NAME REQUIRED GENERIC
+contact-details.surname.required=Enter the contact person’s last name
+surname.required=Enter the last name
 
-contact-details.surname.invalid=TO BE FULL NAME INVALID
-surname.invalid=TO BE FULL NAME INVALID GENERIC
+contact-details.surname.invalid=Last name must only include letters a to z, hyphens, apostrophes and spaces
+surname.invalid=Last name must only include letters a to z, hyphens, apostrophes and spaces
 
 contact-details.phoneNumber.required=Enter a phone number
 phoneNumber.required=Enter a phone number
