@@ -53,9 +53,6 @@ class AuthorisedAction @Inject()(
     implicit val req: Request[A] = request
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
-    //I need not this, but this.
-    implicit val msg: UniformMessages[Html] = journeyController.interpreter.messages(req)
-
     val retrieval =  allEnrolments and credentialRole and internalId and affinityGroup
 
     authorised(AuthProviders(GovernmentGateway, Verify) and Organisation).retrieve(retrieval) { case enrolments ~ role ~ id ~ affinity  =>
@@ -69,6 +66,9 @@ class AuthorisedAction @Inject()(
 
     } recover {
       case ex: UnsupportedCredentialRole =>
+        import ltbs.uniform.interpreters.playframework.RichPlayMessages
+        implicit val msg = messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false);
+
         Logger.warn(
           s"unsupported credential role on account, with message ${ex.msg}, for reason ${ex.reason}",
           ex)
