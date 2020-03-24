@@ -113,7 +113,7 @@ class JourneyController @Inject()(
       Html(
         s"<p>" +
           s"<span>" +
-            s"${in.lines.map{_.escapeHtml}.mkString("</span></br><span>")}" +
+            s"${in.lines.filter(_.nonEmpty).map{_.escapeHtml}.mkString("</span></br><span>")}" +
           s"</span>" +
         "</p>"
       )
