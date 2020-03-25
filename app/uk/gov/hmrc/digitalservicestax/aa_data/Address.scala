@@ -25,7 +25,7 @@ sealed trait Address {
   def countryCode: CountryCode
   def postalCode: String
   def lines: List[String] =
-    line1 :: line2 :: line3 :: line4 :: line5 :: postalCode :: Country.name(countryCode) :: Nil
+    (line1 :: line2 :: line3 :: line4 :: line5 :: postalCode :: Country.name(countryCode) :: Nil).filter(_.nonEmpty)
 }
 
 case class UkAddress(

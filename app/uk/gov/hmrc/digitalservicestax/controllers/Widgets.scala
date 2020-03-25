@@ -183,7 +183,7 @@ trait Widgets {
       messages: UniformMessages[Html]): Html =
       views.html.helpers.country_select(
         fieldKey.mkString("."),
-        data.values.flatMap(identity).headOption,
+        data.values.flatten.headOption,
         errors.nonEmpty,
         messages
       )
