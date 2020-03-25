@@ -183,7 +183,9 @@ trait Widgets {
       messages: UniformMessages[Html]): Html =
       views.html.helpers.country_select(
         fieldKey.mkString("."),
-        data.values.flatMap(identity).headOption
+        data.values.flatMap(identity).headOption,
+        errors.nonEmpty,
+        messages
       )
 
     override def encode(in: CountryCode): Input =
