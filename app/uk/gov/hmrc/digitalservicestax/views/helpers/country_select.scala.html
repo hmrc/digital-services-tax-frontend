@@ -17,11 +17,7 @@
 @import uk.gov.hmrc.digitalservicestax.data.Country
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers.error_message
 
-
 @(path: String, selectedCode: Option[String], hasErrors: Boolean, messages: UniformMessages[Html])
-
-@inputClasses = @{if(hasErrors) "form-control form-control-error"  else "form-control"}
-
 
 <div class="country-code-wrapper form-group@if(hasErrors){ form-group-error}">
     <label class="label" for="location-autocomplete">@messages(s"$path.heading")</label>
@@ -29,7 +25,6 @@
     <select
       id="location-autocomplete"
       name="@path"
-      class="@inputClasses"
       >
       <option value="" disabled selected>@messages("countryCode.placeholder")</option>
   @for(country <- Country.countries) {
