@@ -14,20 +14,17 @@
  * limitations under the License.
  *@
 
-@(key: String)(implicit messages: UniformMessages[Html])
+@()(messages: UniformMessages[Html])
 
-<div class="kickout govuk-grid-column-two-thirds">
 
-    <h1 class="govuk-heading-xl">@messages(s"$key.kickout.heading")</h1>
-    <h2 class="govuk-heading-m">@messages(s"$key.kickout.subheading")</h2>
+<h1 class="heading-xlarge">@messages("registration.pending.title")</h1>
+<p class="govuk-body">@messages("registration.pending.send-email")</p>
+<p class="govuk-body">@messages("registration.pending.not-received")</p>
+<p class="govuk-body">
+    @messages("registration.pending.ccm-content")
+    <a href=@messages("registration.pending.ccm-email")>
+        @messages("registration.pending.ccm-link")
+    </a>.
+</p>
 
-    <p>@messages(s"$key.kickout.update-details")
-        <a href="https://www.gov.uk/file-changes-to-a-company-with-companies-house">
-            @messages(s"$key.kickout.companies-house")
-        </a>.
-    </p>
 
-    <h2 class="govuk-heading-m">@messages(s"$key.kickout.wrong-id")</h2>
-
-    <p>@messages(s"$key.kickout.sign-in-again")</p>
-</div>
