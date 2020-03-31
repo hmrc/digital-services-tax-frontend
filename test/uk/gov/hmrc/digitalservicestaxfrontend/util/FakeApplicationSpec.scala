@@ -72,8 +72,8 @@ trait FakeApplicationSpec extends PlaySpec
     ).build()
   }
 
-  lazy val mcc: MessagesControllerComponents = wire[MessagesControllerComponents]
-  lazy val authConnector: AuthConnector = wire[AuthConnector]
+  lazy val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  lazy val authConnector: AuthConnector = app.injector.instanceOf[AuthConnector]
 
   val reactiveMongoApi = new DefaultReactiveMongoApi(
     parsedUri = MongoConnection.parseURI(mongoUri).success.value,
