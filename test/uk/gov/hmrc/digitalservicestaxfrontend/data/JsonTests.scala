@@ -18,16 +18,15 @@ package uk.gov.hmrc.digitalservicestaxfrontend.data
 
 import java.time.LocalDate
 
+import com.outworkers.util.samplers._
+import enumeratum.scalacheck._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Assertion, FlatSpec, Matchers, OptionValues}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import play.api.libs.json.{Format, JsError, JsPath, JsResult, JsString, Json, JsonValidationError}
-import com.outworkers.util.samplers._
-import enumeratum.scalacheck._
-import uk.gov.hmrc.digitalservicestax.data
-import uk.gov.hmrc.digitalservicestax.data.{Activity, BackendAndFrontendJson, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, PhoneNumber, Postcode, Registration, UTR}
+import play.api.libs.json._
+import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
+import uk.gov.hmrc.digitalservicestax.data.{Activity, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, PhoneNumber, Postcode, UTR}
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
-import BackendAndFrontendJson._
 
 class JsonTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks with OptionValues {
 
@@ -135,6 +134,22 @@ class JsonTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChec
 
   it should "serialize and de-serialise an Activity instance" in {
     testJsonRoundtrip[Activity]
+  }
+
+//  it should "serialize and de-serialise a ForeignAddress instance" in {
+//    testJsonRoundtrip[ForeignAddress]
+//  }
+//
+//  it should "serialize and de-serialise a UkAddress instance" in {
+//    testJsonRoundtrip[UkAddress]
+//  }
+
+  it should "serialize and de-serialise a Company instance" in {
+    testJsonRoundtrip[Company]
+  }
+
+  it should "serialize and de-serialise a Registration instance" in {
+    //testJsonRoundtrip[Registration]
   }
 
   it should "serialize and de-serialise a Map[GroupCompany, Money]" in {
