@@ -20,7 +20,6 @@ import java.time.LocalDate
 
 import enumeratum.scalacheck._
 import cats.implicits.{none, _}
-import org.scalacheck
 import org.scalacheck.Arbitrary.{arbitrary, arbBigDecimal => _, _}
 import org.scalacheck.cats.implicits._
 import org.scalacheck.{Arbitrary, Gen, _}
@@ -30,20 +29,24 @@ import wolfendale.scalacheck.regexp.RegexpGen
 
 object TestInstances {
 
+  implicit class RichRegexValidatedString[A <: RegexValidatedString](val in: A) {
+    def gen = RegexpGen.from(in.regex).map{in.apply}
+  }
   // these characters look very suspect to me
   implicit val arbString: Arbitrary[String] = Arbitrary(
     Gen.alphaNumStr.map{_.take(255)}
     //    RegexpGen.from("""^[0-9a-zA-Z{À-˿’}\\- &`'^._|]{1,255}$""")
   )
+  // what range of values is acceptable? pennies? fractional pennies?
+  implicit val arbMoney: Arbitrary[Money] = Arbitrary(
+    Gen.choose(0L, Long.MaxValue).map{BigDecimal.apply}
+
+  )
+  implicit val arbIban: Arbitrary[IBAN] = Arbitrary(IBAN.gen)
 
   implicit val argRestrictedString: Arbitrary[RestrictiveString] = Arbitrary(
     RestrictiveString.gen
     //    RegexpGen.from("""^[0-9a-zA-Z{À-˿’}\\- &`'^._|]{1,255}$""")
-  )
-
-  // what range of values is acceptable? pennies? fractional pennies?
-  implicit val arbMoney: Arbitrary[Money] = Arbitrary(
-    Gen.choose(0L, Long.MaxValue).map{BigDecimal.apply}
   )
 
 
@@ -52,11 +55,8 @@ object TestInstances {
   }
 
   def nonEmptyString: Gen[NonEmptyString] =
-    arbitrary[String].filter(_.nonEmpty).map{NonEmptyString.apply}
+    arbitrary[RestrictiveString].filter(_.nonEmpty).map{NonEmptyString.apply}
 
-  implicit class RichRegexValidatedString[A <: RegexValidatedString](val in: A) {
-    def gen = RegexpGen.from(in.regex).map{in.apply}
-  }
 
   def genActivityPercentMap: Gen[Map[Activity, Percent]] = Gen.mapOf(
     (
@@ -164,6 +164,27 @@ object TestInstances {
       neString(20)
       ).mapN((a,b) => Email(s"${a}@${b}.co.uk"))
   }
+
+  implicit def arbForeignAddress: Arbitrary[ForeignAddress] = Arbitrary {
+    (
+      neString(40),
+      arbitrary[String].map{_.take(40)},
+      arbitrary[String].map{_.take(40)},
+      arbitrary[String].map{_.take(40)},
+      arbitrary[CountryCode]
+    ).mapN(ForeignAddress)
+  }
+
+  implicit def arbUkAddress: Arbitrary[UkAddress] = Arbitrary {
+    (
+      neString(40),
+      arbitrary[String].map{_.take(40)},
+      arbitrary[String].map{_.take(40)},
+      arbitrary[String].map{_.take(40)},
+      arbitrary[Postcode]
+    ).mapN(UkAddress.apply)
+  }
+
 
   implicit def arbAddr: Arbitrary[Address] = Arbitrary {
 

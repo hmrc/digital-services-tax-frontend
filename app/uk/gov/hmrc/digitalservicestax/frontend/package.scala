@@ -24,16 +24,16 @@ import com.ibm.icu.util.{TimeZone, ULocale}
 
 package object frontend {
   private val zone = "Europe/London"
-  private val zoneId: ZoneId = ZoneId.of(zone)
+  val zoneId: ZoneId = ZoneId.of(zone)
   private val timeFomat = "h:mma"
   def formattedTimeNow: String = LocalDateTime.now(zoneId).format(DateTimeFormatter.ofPattern(timeFomat)).toLowerCase
 
-  def formatDate(localDate: LocalDate, dateFormatPattern: String = "d MMMM yyyy"):String = {
+  def formatDate(localDate: LocalDate, dateFormatPattern: String = "d MMMM yyyy"): String = {
     val date = java.util.Date.from(localDate.atStartOfDay(zoneId).toInstant)
     createDateFormatForPattern(dateFormatPattern).format(date)
   }
 
-  private def createDateFormatForPattern(pattern: String): SimpleDateFormat = {
+  def createDateFormatForPattern(pattern: String): SimpleDateFormat = {
 //    val uLocale = new ULocale(messages.lang.code)
 //    val validLang: Boolean = ULocale.getAvailableLocales.contains(uLocale)
     val locale: ULocale = ULocale.getDefault

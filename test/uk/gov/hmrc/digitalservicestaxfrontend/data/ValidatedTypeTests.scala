@@ -36,29 +36,27 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPro
   }
 
   it should "concatenate lines in a UKAddress value" in {
+    forAll { ukAddress: UkAddress =>
+      ukAddress.lines shouldEqual List(
+        ukAddress.line1,
+        ukAddress.line2,
+        ukAddress.line3,
+        ukAddress.line4,
+        ukAddress.postalCode
+      ).filter(_.nonEmpty)
+    }
+  }
 
-    val generator = for {
-      nonEmptyLine1 <- Sample.generator[ShortString].map(ss => NonEmptyString(ss.value))
-      line2 <- Gen.alphaNumStr
-      line3 <- Gen.alphaNumStr
-      line4 <- Gen.alphaNumStr
-    } yield UkAddress(
-      nonEmptyLine1,
-      line2,
-      line3,
-      line4,
-      Postcode("E1N 4WW")
-    )
 
-    forAll(generator) { ukAddress =>
-//      ukAddress.lines shouldEqual List(
-//        ukAddress.line1,
-//        ukAddress.line2,
-//        ukAddress.line3,
-//        ukAddress.line4,
-//        ukAddress.postalCode,
-//        ""
-//      ).init
+  it should "concatenate lines in a ForeignAddress value" in {
+    forAll { foreignAddress: ForeignAddress =>
+      foreignAddress.lines shouldEqual List(
+        foreignAddress.line1,
+        foreignAddress.line2,
+        foreignAddress.line3,
+        foreignAddress.line4,
+        Country.name(foreignAddress.countryCode)
+      ).filter(_.nonEmpty)
     }
   }
 
@@ -97,6 +95,13 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPro
 
     val comparison = LocalDate.now.plusDays(1) compare LocalDate.now()
     comparison shouldEqual 1
+  }
+
+  it should "encode an Activity as a URL" in {
+    forAll(Gen.oneOf(Activity.values)) { a =>
+      val expected = a.toString.replaceAll("(^[A-Z].*)([A-Z])", "$1-$2").toLowerCase
+      Activity.toUrl(a) shouldEqual expected
+    }
   }
 }
 

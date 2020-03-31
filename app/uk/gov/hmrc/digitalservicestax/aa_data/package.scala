@@ -61,7 +61,7 @@ package object data extends SimpleJson {
 
   type RestrictiveString = String @@ RestrictiveString.Tag
   object RestrictiveString extends RegexValidatedString(
-    """^[a-zA-Z &`\\-\\'^]{1,35}$"""
+    """^[a-zA-Z&^]{1,35}$"""
   )
 
   type CountryCode = String @@ CountryCode.Tag
@@ -93,7 +93,7 @@ package object data extends SimpleJson {
 
   type IBAN = String @@ IBAN.Tag
   object IBAN extends RegexValidatedString(
-    """^[0-9]"{4,50}""", // TODO
+    """^[0-9]{8}$""", // TODO
     _.filter(_.isDigit)
   )
 

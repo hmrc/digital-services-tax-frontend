@@ -18,8 +18,10 @@ package uk.gov.hmrc.digitalservicestax.data
 
 import cats.implicits._
 import enumeratum.EnumFormats
+import ltbs.uniform.interpreters.playframework.DB
 import play.api.libs.json._
 import shapeless.tag.@@
+import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.Wrapper
 
 trait SimpleJson {
 
@@ -143,19 +145,22 @@ object BackendAndFrontendJson extends SimpleJson {
 
   implicit val periodFormat: OFormat[Period] = Json.format[Period]
 
-  val readCompanyReg = new Reads[CompanyRegWrapper] {
-    override def reads(json: JsValue): JsResult[CompanyRegWrapper] = {
-      println(Json.prettyPrint(json))
-      JsSuccess(CompanyRegWrapper (
-        Company(
-          {json \ "organisation" \ "organisationName"}.as[NonEmptyString],
-          {json \ "address"}.as[Address]
-        ),
-        safeId = SafeId(
-          {json \ "safeId"}.as[String]
-        ).some
-      ))
+  implicit val formatMap: OFormat[DB] = new OFormat[DB] {
+    def writes(o: DB) = JsObject ( o.map {
+      case (k,v) => (k.mkString("/"), JsString(v))
+    }.toSeq )
+
+    def reads(json: JsValue): JsResult[DB] = json match {
+      case JsObject(data) => JsSuccess(data.map {
+        case (k, JsString(v)) => (k.split("/").toList, v)
+        case e => throw new IllegalArgumentException(s"cannot parse $e")
+      }.toMap)
+      case e => JsError(s"expected an object, got $e")
     }
+
   }
+  implicit val formatWrapper = Json.format[Wrapper]
+
+  implicit val readsUnit = Reads[Unit] { _ => JsSuccess(()) }
 
 }

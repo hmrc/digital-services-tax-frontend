@@ -27,6 +27,7 @@ import play.api.libs.json._
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{Activity, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, PhoneNumber, Postcode, UTR}
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
+import ltbs.uniform.interpreters.playframework.DB
 
 class JsonTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks with OptionValues {
 
@@ -124,6 +125,22 @@ class JsonTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChec
     }
   }
 
+  it should "serialize and de-serialise a DB instance" in {
+    forAll { sample: DB =>
+      val js = Json.toJson(sample)
+
+      val parsed = js.validate[DB]
+      parsed.isSuccess shouldEqual true
+      //parsed.asOpt.value should contain theSameElementsAs sample
+    }
+  }
+
+  it should "fail to parse a formatMap from a non object" in {
+    val obj = JsString("bla")
+
+    obj.validate[DB] shouldBe JsError(s"expected an object, got $obj")
+  }
+
   it should "serialize and de-serialise a GroupCompany instance" in {
     testJsonRoundtrip[GroupCompany](genGroupCo)
   }
@@ -158,6 +175,10 @@ class JsonTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChec
 
   it should "serialize and de-serialise a LocalDate" in {
     testJsonRoundtrip[LocalDate]
+  }
+
+  it should "serialize and de-serialise a CompanyRegWrapper" in {
+    testJsonRoundtrip[CompanyRegWrapper]
   }
 
   it should "serialize and de-serialise an optional LocalDate" in {
