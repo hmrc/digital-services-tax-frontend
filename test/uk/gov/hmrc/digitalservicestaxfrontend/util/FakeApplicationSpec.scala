@@ -27,10 +27,12 @@ import play.api.i18n.MessagesApi
 import play.api.inject.DefaultApplicationLifecycle
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
+import play.api.mvc.MessagesControllerComponents
 import play.api.{Application, ApplicationLoader}
 import play.core.DefaultWebCommands
 import play.modules.reactivemongo.DefaultReactiveMongoApi
 import reactivemongo.api.MongoConnection
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence
 import uk.gov.hmrc.digitalservicestax.test.TestConnector
 import uk.gov.hmrc.mongo.MongoSpecSupport
@@ -69,6 +71,9 @@ trait FakeApplicationSpec extends PlaySpec
       )
     ).build()
   }
+
+  lazy val mc: MessagesControllerComponents = wire[MessagesControllerComponents]
+  lazy val authConnector: AuthConnector = wire[AuthConnector]
 
   val reactiveMongoApi = new DefaultReactiveMongoApi(
     parsedUri = MongoConnection.parseURI(mongoUri).success.value,

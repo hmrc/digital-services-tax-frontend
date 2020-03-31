@@ -17,7 +17,7 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "simple-reactivemongo"     % "7.26.0-play-26",
     "org.reactivemongo"       %% "play2-reactivemongo"      % "0.18.6-play26",
     "uk.gov.hmrc"             %% "auth-client"              % "2.35.0-play-26",
-    "uk.gov.hmrc"             %% "play-language"            % "4.1.0",
+    "uk.gov.hmrc"             %% "play-language"            % "4.2.0-play-26",
     "commons-validator"       % "commons-validator"         % "1.6",
     "uk.gov.hmrc"             %% "bootstrap-play-26"        % "1.5.0"
 
