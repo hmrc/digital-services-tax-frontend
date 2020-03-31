@@ -24,12 +24,16 @@ object AppDependencies {
 
   val test = Seq(
     "uk.gov.hmrc"             %% "bootstrap-play-26"        % "1.5.0" % Test classifier "tests",
-    "org.scalatest"           %% "scalatest"                % "3.0.8"                 % "test",
-    "org.jsoup"               %  "jsoup"                    % "1.10.2"                % "test",
-    "com.typesafe.play"       %% "play-test"                % current                 % "test",
-    "org.scalacheck"          %% "scalacheck"               % "1.14.0"                % "test",
-    "uk.gov.hmrc"             %% "stub-data-generator"      % "0.5.3"                 % "test",
-    "org.typelevel"           %% "cats-core"                % "2.0.0"                 % "test",
+    "org.scalatest"           %% "scalatest"                % "3.0.8"                 % Test,
+    "org.jsoup"               %  "jsoup"                    % "1.10.2"                % Test,
+    "com.typesafe.play"       %% "play-test"                % current                 % Test,
+    "org.scalacheck"          %% "scalacheck"               % "1.14.0"                % Test,
+    "uk.gov.hmrc"             %% "stub-data-generator"      % "0.5.3"                 % Test,
+    "org.typelevel"           %% "cats-core"                % "2.0.0"                 % Test,
+    "io.chrisdavenport"       %% "cats-scalacheck"          % "0.2.0"                 % Test,
+    "com.beachape"            %% "enumeratum-scalacheck"    % "1.5.16"                % Test,
+    "wolfendale"              %% "scalacheck-gen-regexp"    % "0.1.2"                 % Test,
+    "com.outworkers"          %% "util-samplers"            % "0.57.0"                % Test,
     "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % "test, it",
     "org.scalatestplus.play"  %% "scalatestplus-play"       % "3.1.2"                 % "test, it"
   )

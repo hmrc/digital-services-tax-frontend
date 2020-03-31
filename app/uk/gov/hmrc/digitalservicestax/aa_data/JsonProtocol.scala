@@ -109,13 +109,12 @@ object BackendAndFrontendJson extends SimpleJson {
   implicit val groupCompanyMapFormat: OFormat[Map[GroupCompany, Money]] = new OFormat[Map[GroupCompany, Money]] {
     override def reads(json: JsValue): JsResult[Map[GroupCompany, Money]] = {
       JsSuccess(json.as[Map[String, JsNumber]].map { case (k, v) =>
-
-        val Array(name, utrS) = k.split(":")
-        val utr = utrS match {
-          case "" => None
-          case x => Some(UTR(x))
+        k.split(":") match {
+          case Array(name, utrS) =>
+            GroupCompany(NonEmptyString(name), Some(UTR(utrS))) -> v.value
+          case Array(name) =>
+            GroupCompany(NonEmptyString(name), None) -> v.value
         }
-        GroupCompany(NonEmptyString(name), utr) -> v.value
       })
     }
 
@@ -125,6 +124,16 @@ object BackendAndFrontendJson extends SimpleJson {
       })
     }
   }
+
+  implicit def optFormatter[A](implicit innerFormatter: Format[A]): Format[Option[A]] =
+    new Format[Option[A]] {
+      def reads(json: JsValue): JsResult[Option[A]] = json match {
+        case JsNull => JsSuccess(none[A])
+        case a      => innerFormatter.reads(a).map{_.some}
+      }
+      def writes(o: Option[A]): JsValue =
+        o.map{innerFormatter.writes}.getOrElse(JsNull)
+    }
 
   implicit val domesticBankAccountFormat: OFormat[DomesticBankAccount] = Json.format[DomesticBankAccount]
   implicit val foreignBankAccountFormat: OFormat[ForeignBankAccount] = Json.format[ForeignBankAccount]
