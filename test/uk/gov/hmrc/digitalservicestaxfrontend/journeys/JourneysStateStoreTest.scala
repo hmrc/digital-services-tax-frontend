@@ -20,6 +20,9 @@ import com.outworkers.util.domain.ShortString
 import uk.gov.hmrc.digitalservicestax.repo.{JourneyState, JourneyStateStoreImpl}
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import com.outworkers.util.samplers._
+import play.api.libs.json.{JsObject, JsString, Json}
+import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class JourneysStateStoreTest extends FakeApplicationSpec {
@@ -42,6 +45,39 @@ class JourneysStateStoreTest extends FakeApplicationSpec {
     whenReady(chain) { res =>
       res mustEqual state
     }
+  }
+
+  "should fail to retrieve a non existing state" in {
+    val user = gen[ShortString].value
+
+    val chain = for {
+      res <- store.getState(user)
+    } yield res
+
+    whenReady(chain) { res =>
+      res mustEqual JourneyState()
+    }
+  }
+
+  "throw an error if the JSON format is invalid" in {
+    val user = gen[ShortString].value
+    val state = gen[JourneyState]
+
+
+    val chain = for {
+      _ <- store.cacheRepository
+        .createOrUpdate(
+          user,
+          store.cacheRepositoryKey,
+          Json.toJson(JsObject(Seq("Invalid layering" -> JsString(state.test))))
+        ).map(_=> ())
+      beforeDelete <- store.getState(user)
+    } yield beforeDelete
+
+    whenReady(chain) { res =>
+      res mustEqual JourneyState()
+    }
+
   }
 
   "should store a journey state and remove it" in {

@@ -22,6 +22,7 @@ import ltbs.uniform.interpreters.playframework.DB
 import play.api.libs.json._
 import shapeless.tag.@@
 import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.Wrapper
+import uk.gov.hmrc.digitalservicestax.repo.JourneyState
 
 trait SimpleJson {
 
@@ -93,6 +94,7 @@ object BackendAndFrontendJson extends SimpleJson {
   implicit val registrationFormat: OFormat[Registration] = Json.format[Registration]
   implicit val activityFormat: Format[Activity] = EnumFormats.formats(Activity)
   implicit val groupCompanyFormat: Format[GroupCompany] = Json.format[GroupCompany]
+  implicit lazy val journeyStateFormatter: Format[JourneyState] = Json.format[JourneyState]
 
   implicit val activityMapFormat: Format[Map[Activity, Percent]] = new Format[Map[Activity, Percent]] {
     override def reads(json: JsValue): JsResult[Map[Activity, Percent]] = {

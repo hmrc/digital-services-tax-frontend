@@ -17,13 +17,18 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.actions
 
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlEqualTo}
+import com.outworkers.util.domain.ShortString
 import play.api.http.Status
 import play.api.mvc.Results
 import play.api.test.FakeRequest
+import uk.gov.hmrc.digitalservicestax.config.ErrorHandler
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import com.outworkers.util.samplers._
+import ltbs.uniform.UniformMessages
+import play.twirl.api.Html
+
 class ActionsTest extends FakeApplicationSpec {
 
   "it should test an application" in {
@@ -51,5 +56,32 @@ class ActionsTest extends FakeApplicationSpec {
 //    whenReady(req) { res =>
 //      res.header.status mustEqual Status.OK
 //    }
+  }
+
+
+  "it should produce an error template using the error handler function" in {
+    val handler = app.injector.instanceOf[ErrorHandler]
+    val page = gen[ShortString].value
+    val heading = gen[ShortString].value
+    val message = gen[ShortString].value
+
+    implicit val req = FakeRequest()
+
+    val msg = handler.standardErrorTemplate(
+      page,
+      heading,
+      message
+    )
+    import ltbs.uniform.interpreters.playframework._
+
+    implicit val messages: UniformMessages[Html] = {
+      messagesApi.preferred(req).convertMessagesTwirlHtml()
+    }
+
+    implicit val conf = appConfig
+
+    import uk.gov.hmrc.digitalservicestax.views
+
+    msg mustEqual views.html.error_template(page, heading, message)
   }
 }
