@@ -31,6 +31,7 @@ import play.api._, mvc._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import reactivemongo.play.json._, collection._
+import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 
 object MongoPersistence {
   case class Wrapper(
@@ -49,7 +50,7 @@ case class MongoPersistence[A <: Request[AnyContent]] (
   import MongoPersistence.Wrapper
   import reactiveMongoApi.database
 
-  def killDate = LocalDateTime.now.minusNanos(expireAfter.toNanos)
+  def killDate: LocalDateTime = LocalDateTime.now.minusNanos(expireAfter.toNanos)
 
   def reaver: Future[Unit] = {
     val selector = Json.obj(
@@ -83,14 +84,12 @@ case class MongoPersistence[A <: Request[AnyContent]] (
         Future.sequence(List(
           im.ensure(sessionIndex),
           im.ensure(timestamp)
-        )).map { case _ => c }
+        )).map(_ => c)
       } else {
-        im.ensure(sessionIndex).map { case _ => c }
+        im.ensure(sessionIndex).map(_ => c)
       }
     }
   }
-
-  import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 
   def apply(request: A)(f: DB => Future[(DB, Result)]): Future[Result] = {
     val selector = Json.obj("session" -> getSession(request))
