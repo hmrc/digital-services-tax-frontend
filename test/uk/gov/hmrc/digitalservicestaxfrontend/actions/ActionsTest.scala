@@ -16,12 +16,40 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.actions
 
-import org.scalatest.FlatSpec
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlEqualTo}
+import play.api.http.Status
+import play.api.mvc.Results
+import play.api.test.FakeRequest
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 class ActionsTest extends FakeApplicationSpec {
 
   "it should test an application" in {
-    //val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
+
+    val authURL = "http://localhost:8500/"
+    val localEndpoint = "http://localhost:8080/"
+
+    val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
+//
+//    val req = action.invokeBlock(FakeRequest(), {
+//      _: AuthorisedRequest[_] => Future.successful(Results.Ok)
+//    })
+//
+//
+//    stubFor(
+//      post(urlEqualTo(s"$authURL/auth/authorise"))
+//        .willReturn(aResponse().withStatus(200).withBody("{}")))
+//
+//
+//    stubFor(
+//      post(urlEqualTo(s"$localEndpoint"))
+//        .willReturn(aResponse().withStatus(200).withBody("{}")))
+//
+//
+//    whenReady(req) { res =>
+//      res.header.status mustEqual Status.OK
+//    }
   }
 }
