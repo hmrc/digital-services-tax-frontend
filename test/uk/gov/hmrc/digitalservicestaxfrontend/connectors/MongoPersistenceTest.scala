@@ -50,6 +50,12 @@ class MongoPersistenceTest extends FakeApplicationSpec with ScalaCheckDrivenProp
     persistence.killDate mustEqual expected
   }
 
+  "should trigger reaver method to perform a delete" in {
+    whenReady(persistence.reaver) { res =>
+      info("Reaver method invoked")
+    }
+  }
+
   "should generate a kill date and store it in Mongo for an authorised Request" in {
     forAll { (user: InternalId, enrolments: Enrolments) =>
       val req = AuthorisedRequest[AnyContent](user, enrolments, FakeRequest())
@@ -62,8 +68,6 @@ class MongoPersistenceTest extends FakeApplicationSpec with ScalaCheckDrivenProp
         res.header.status mustBe Status.OK
       }
     }
-
-
   }
 
 
