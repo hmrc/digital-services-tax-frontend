@@ -21,7 +21,6 @@ import java.time.Clock
 
 import com.softwaremill.macwire.wire
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector

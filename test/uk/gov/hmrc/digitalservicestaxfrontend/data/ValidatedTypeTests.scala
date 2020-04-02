@@ -24,6 +24,9 @@ import org.scalacheck.Gen
 import org.scalatest.{FlatSpec, Matchers}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import cats.implicits._
+import fr.marcwrobel.jbanking.iban.Iban
+import org.apache.commons.validator.routines.IBANValidator
+import org.scalactic.anyvals.PosInt
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
@@ -46,6 +49,13 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPro
       ).filter(_.nonEmpty)
     }
   }
+
+  it should "validate IBAN numbers from a series of concrete examples" in {
+    forAll(Gen.oneOf(ibanList), minSuccessful(PosInt(86))) { source: String =>
+      IBAN.of(source) shouldBe defined
+    }
+  }
+
 
 
   it should "concatenate lines in a ForeignAddress value" in {

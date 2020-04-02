@@ -34,8 +34,6 @@ package object frontend {
   }
 
   def createDateFormatForPattern(pattern: String): SimpleDateFormat = {
-//    val uLocale = new ULocale(messages.lang.code)
-//    val validLang: Boolean = ULocale.getAvailableLocales.contains(uLocale)
     val locale: ULocale = ULocale.getDefault
     val sdf = new SimpleDateFormat(pattern, locale)
     sdf.setTimeZone(TimeZone.getTimeZone(zone))

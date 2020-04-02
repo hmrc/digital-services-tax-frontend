@@ -19,8 +19,8 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "auth-client"              % "2.35.0-play-26",
     "uk.gov.hmrc"             %% "play-language"            % "4.2.0-play-26",
     "commons-validator"       % "commons-validator"         % "1.6",
-    "uk.gov.hmrc"             %% "bootstrap-play-26"        % "1.5.0"
-
+    "uk.gov.hmrc"             %% "bootstrap-play-26"        % "1.5.0",
+    "fr.marcwrobel"           % "jbanking"                  % "2.0.0"
   )
 
   val test = Seq(

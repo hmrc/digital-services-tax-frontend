@@ -17,6 +17,7 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.util
 
 
+
 import akka.actor.ActorSystem
 import com.softwaremill.macwire.wire
 import org.scalatest.TryValues
@@ -31,12 +32,10 @@ import play.api.{Application, ApplicationLoader}
 import play.core.DefaultWebCommands
 import play.modules.reactivemongo.DefaultReactiveMongoApi
 import reactivemongo.api.MongoConnection
-import uk.gov.hmrc.auth.core.PlayAuthConnector
-import uk.gov.hmrc.digitalservicestax.config.AppConfig
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence
 import uk.gov.hmrc.digitalservicestax.test.TestConnector
 import uk.gov.hmrc.mongo.MongoSpecSupport
-import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -49,7 +48,6 @@ trait FakeApplicationSpec extends PlaySpec
   with MongoSpecSupport
   with ScalaFutures
   with TestWiring {
-
   protected[this] val context: ApplicationLoader.Context = ApplicationLoader.Context(
     environment,
     sourceMapper = None,
@@ -57,20 +55,6 @@ trait FakeApplicationSpec extends PlaySpec
     configuration,
     new DefaultApplicationLifecycle
   )
-
-  override def fakeApplication(): Application = {
-    GuiceApplicationBuilder(environment = environment).configure(
-      Map(
-        "tax-enrolments.enabled" -> "true",
-        "services.auth.port" -> 11111
-      )
-    ).build()
-  }
-
-
-  lazy val servicesConfig: ServicesConfig = wire[ServicesConfig]
-
-  lazy val appConfig: AppConfig = wire[AppConfig]
 
   implicit lazy val actorSystem: ActorSystem = app.actorSystem
 
@@ -80,7 +64,16 @@ trait FakeApplicationSpec extends PlaySpec
 
   val testConnector: TestConnector = new TestConnector(httpClient, environment, configuration, servicesConfig)
 
+  override def fakeApplication(): Application = {
+    GuiceApplicationBuilder(environment = environment).configure(
+      Map(
+        "tax-enrolments.enabled" -> "true"
+      )
+    ).build()
+  }
+
   lazy val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  lazy val authConnector: AuthConnector = app.injector.instanceOf[AuthConnector]
 
   val reactiveMongoApi = new DefaultReactiveMongoApi(
     parsedUri = MongoConnection.parseURI(mongoUri).success.value,

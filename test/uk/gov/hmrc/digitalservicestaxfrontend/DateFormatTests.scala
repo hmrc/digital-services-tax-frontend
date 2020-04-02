@@ -30,9 +30,8 @@ class DateFormatTests extends FlatSpec with ScalaCheckDrivenPropertyChecks with 
   }
 
   it should "create a date string for a date pattern" in {
-    forAll { date: LocalDate =>
-      formatDate(date) shouldEqual formatDate(date)
-    }
+    val localDt = LocalDate.of(2020, 3, 1)
+    formatDate(localDt) shouldEqual "1 March 2020"
   }
 
 }
