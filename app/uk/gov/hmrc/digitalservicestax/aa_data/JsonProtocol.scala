@@ -108,6 +108,7 @@ object BackendAndFrontendJson extends SimpleJson {
     }
   }
 
+
   implicit val groupCompanyMapFormat: OFormat[Map[GroupCompany, Money]] = new OFormat[Map[GroupCompany, Money]] {
     override def reads(json: JsValue): JsResult[Map[GroupCompany, Money]] = {
       JsSuccess(json.as[Map[String, JsNumber]].map { case (k, v) =>
@@ -143,7 +144,27 @@ object BackendAndFrontendJson extends SimpleJson {
   implicit val repaymentDetailsFormat: OFormat[RepaymentDetails] = Json.format[RepaymentDetails]
   implicit val returnFormat: OFormat[Return] = Json.format[Return]
 
+  implicit val wrapperFormat = Json.format[Wrapper]
   implicit val periodFormat: OFormat[Period] = Json.format[Period]
+
+  val readCompanyReg = new Reads[CompanyRegWrapper] {
+    override def reads(json: JsValue): JsResult[CompanyRegWrapper] = {
+      JsSuccess(CompanyRegWrapper(
+        Company(
+          {
+            json \ "organisation" \ "organisationName"
+          }.as[NonEmptyString], {
+            json \ "address"
+          }.as[Address]
+        ),
+        safeId = SafeId(
+          {
+            json \ "safeId"
+          }.as[String]
+        ).some
+      ))
+    }
+  }
 
   implicit val formatMap: OFormat[DB] = new OFormat[DB] {
     def writes(o: DB) = JsObject ( o.map {
@@ -157,10 +178,6 @@ object BackendAndFrontendJson extends SimpleJson {
       }.toMap)
       case e => JsError(s"expected an object, got $e")
     }
-
   }
-  implicit val formatWrapper = Json.format[Wrapper]
-
-  implicit val readsUnit = Reads[Unit] { _ => JsSuccess(()) }
 
 }

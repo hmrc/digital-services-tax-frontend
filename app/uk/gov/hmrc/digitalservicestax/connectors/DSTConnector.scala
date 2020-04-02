@@ -21,7 +21,7 @@ import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.http.{HeaderCarrier, OptionHttpReads}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
+import BackendAndFrontendJson._
 import scala.concurrent.{ExecutionContext, Future}
 
 class DSTConnector (
