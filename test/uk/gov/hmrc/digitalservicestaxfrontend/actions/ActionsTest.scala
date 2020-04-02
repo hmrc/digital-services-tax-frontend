@@ -28,7 +28,7 @@ import ltbs.uniform.UniformMessages
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.http.Status
-import play.api.libs.json.{JsArray, JsObject, JsString, Json}
+import play.api.libs.json.{JsArray, JsObject, JsResultException, JsString, Json}
 import play.api.mvc.Results
 import play.api.test.FakeRequest
 import play.twirl.api.Html
@@ -104,7 +104,10 @@ class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with Scala
 
       stubFor(
         post(urlPathEqualTo(s"/auth/authorise"))
-          .willReturn(aResponse().withStatus(200).withBody(Json.toJson(jsonResponse).toString())
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(Json.toJson(jsonResponse).toString())
           )
       )
 
@@ -115,6 +118,31 @@ class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with Scala
       whenReady(req.failed) { res =>
         res.getMessage mustEqual "No internal ID for user"
         res mustBe an [RuntimeException]
+      }
+    }
+  }
+
+  "it should throw an exception in AuthorisedAction if the affinity group is not support" in {
+    forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole)  =>
+      val jsonResponse = JsObject(Seq(
+        Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
+        Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
+        Retrievals.internalId.propertyNames.head -> JsString(id),
+        Retrievals.affinityGroup.propertyNames.head -> JsString(gen[ShortString].value)
+      ))
+
+      stubFor(
+        post(urlPathEqualTo(s"/auth/authorise"))
+          .willReturn(aResponse().withStatus(200).withBody(Json.toJson(jsonResponse).toString())
+          )
+      )
+
+      val req = action.invokeBlock(FakeRequest(), {
+        _: AuthorisedRequest[_] => Future.successful(Results.Ok)
+      })
+
+      whenReady(req.failed) { res =>
+        res mustBe an [JsResultException]
       }
     }
   }
