@@ -34,7 +34,7 @@ import play.api.test.FakeRequest
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AffinityGroup, CredentialRole, Enrolments, PlayAuthConnector}
-import uk.gov.hmrc.digitalservicestax.config.ErrorHandler
+import uk.gov.hmrc.digitalservicestax.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
@@ -62,10 +62,9 @@ class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with Scala
     wireMockServer.stop()
   }
 
+  lazy val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
 
   "it should test an authorised action against auth connector retrievals" in {
-    val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
-
     forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole, ag: AffinityGroup) =>
       val jsonResponse = JsObject(Seq(
         Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
@@ -90,9 +89,11 @@ class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with Scala
     }
   }
 
+  "it should use a standard body parser for actions" in {
+    action.parser.getClass mustBe mcc.parsers.anyContent.getClass
+  }
 
   "it should throw an exception in AuthorisedAction if internalId is missing from the retrieval" in {
-    val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
 
     forAll { (enrolments: Enrolments, role: CredentialRole, ag: AffinityGroup) =>
       val jsonResponse = JsObject(Seq(
@@ -119,8 +120,6 @@ class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with Scala
   }
 
   "it should throw an exception in AuthorisedAction if an invalid internal ID is returned from the retrieval" in {
-    val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
-
     forAll { (enrolments: Enrolments, role: CredentialRole, ag: AffinityGroup) =>
       val jsonResponse = JsObject(Seq(
         Retrievals.internalId.propertyNames.head -> JsString("___bla"),
@@ -166,7 +165,7 @@ class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with Scala
       messagesApi.preferred(req).convertMessagesTwirlHtml()
     }
 
-    implicit val conf = appConfig
+    implicit val conf: AppConfig = appConfig
 
     import uk.gov.hmrc.digitalservicestax.views
 
