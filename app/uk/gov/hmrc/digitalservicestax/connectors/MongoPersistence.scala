@@ -32,7 +32,6 @@ import play.api.libs.functional.syntax._
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import play.api.libs.json._
 import reactivemongo.play.json._, collection._
-import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 
 object MongoPersistence {
   case class Wrapper(

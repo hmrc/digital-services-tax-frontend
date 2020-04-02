@@ -175,8 +175,6 @@ object BackendAndFrontendJson extends SimpleJson {
     }
 
   }
-  implicit val formatWrapper = Json.format[Wrapper]
-
   implicit val formatMap: OFormat[DB] = new OFormat[DB] {
     def writes(o: DB) = JsObject ( o.map {
       case (k,v) => (k.mkString("/"), JsString(v))
