@@ -84,6 +84,8 @@ trait SimpleJson {
 
 object BackendAndFrontendJson extends SimpleJson {
 
+  implicit val readsUnit: Reads[Unit] = Reads[Unit] { _ => JsSuccess(()) }
+
   implicit val foreignAddressFormat: OFormat[ForeignAddress] = Json.format[ForeignAddress]
   implicit val ukAddressFormat: OFormat[UkAddress] = Json.format[UkAddress]
   implicit val addressFormat: OFormat[Address] = Json.format[Address]

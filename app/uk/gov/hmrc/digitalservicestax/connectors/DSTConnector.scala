@@ -18,7 +18,7 @@ package uk.gov.hmrc.digitalservicestax.connectors
 
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.http.{HeaderCarrier, OptionHttpReads}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import BackendAndFrontendJson._
