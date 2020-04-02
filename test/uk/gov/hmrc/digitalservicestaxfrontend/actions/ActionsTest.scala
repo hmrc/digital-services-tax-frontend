@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.actions
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlEqualTo}
+import java.net.{InetAddress, URI}
+
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlEqualTo, urlPathEqualTo}
 import com.outworkers.util.domain.ShortString
 import play.api.http.Status
 import play.api.mvc.Results
@@ -27,35 +30,125 @@ import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.outworkers.util.samplers._
 import ltbs.uniform.UniformMessages
+import org.scalatest.BeforeAndAfterEach
 import play.twirl.api.Html
+import uk.gov.hmrc.digitalservicestaxfrontend.connectors.WiremockSpec
 
-class ActionsTest extends FakeApplicationSpec {
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import play.api.libs.json.{JsArray, JsObject, JsString, Json}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.auth.core.{AffinityGroup, CredentialRole, Enrolment, Enrolments, PlayAuthConnector}
+import uk.gov.hmrc.digitalservicestax.data.InternalId
+import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 
-  "it should test an application" in {
+import scala.collection.JavaConverters._
+import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
-    val authURL = "http://localhost:8500/"
-    val localEndpoint = "http://localhost:8080/"
+class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with ScalaCheckDrivenPropertyChecks {
 
+  lazy val authConnector: PlayAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig)
+
+  // Run wiremock server on local machine with specified port.
+  val inet = new URI(authConnector.serviceUrl)
+  val wireMockServer = new WireMockServer(wireMockConfig().port(inet.getPort))
+
+  WireMock.configureFor(inet.getHost, inet.getPort)
+
+  override def beforeEach {
+    wireMockServer.start()
+  }
+
+  override def afterEach {
+    wireMockServer.stop()
+  }
+
+
+  "it should test an authorised action against auth connector retrievals" in {
     val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
-//
-//    val req = action.invokeBlock(FakeRequest(), {
-//      _: AuthorisedRequest[_] => Future.successful(Results.Ok)
-//    })
-//
-//
-//    stubFor(
-//      post(urlEqualTo(s"$authURL/auth/authorise"))
-//        .willReturn(aResponse().withStatus(200).withBody("{}")))
-//
-//
-//    stubFor(
-//      post(urlEqualTo(s"$localEndpoint"))
-//        .willReturn(aResponse().withStatus(200).withBody("{}")))
-//
-//
-//    whenReady(req) { res =>
-//      res.header.status mustEqual Status.OK
-//    }
+
+    forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole, ag: AffinityGroup) =>
+      val jsonResponse = JsObject(Seq(
+        Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
+        Retrievals.internalId.propertyNames.head -> JsString(id),
+        Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
+        Retrievals.affinityGroup.propertyNames.head -> Json.toJson(ag)
+      ))
+
+      stubFor(
+        post(urlPathEqualTo(s"/auth/authorise"))
+          .willReturn(aResponse().withStatus(200).withBody(Json.toJson(jsonResponse).toString())
+          )
+      )
+
+      val req = action.invokeBlock(FakeRequest(), {
+        _: AuthorisedRequest[_] => Future.successful(Results.Ok)
+      })
+
+      whenReady(req) { res =>
+        res.header.status mustEqual Status.OK
+      }
+    }
+  }
+
+
+  "it should throw an exception in AuthorisedAction if internalId is missing from the retrieval" in {
+    val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
+
+    forAll { (enrolments: Enrolments, role: CredentialRole, ag: AffinityGroup) =>
+      val jsonResponse = JsObject(Seq(
+        Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
+        Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
+        Retrievals.affinityGroup.propertyNames.head -> Json.toJson(ag)
+      ))
+
+      stubFor(
+        post(urlPathEqualTo(s"/auth/authorise"))
+          .willReturn(aResponse().withStatus(200).withBody(Json.toJson(jsonResponse).toString())
+          )
+      )
+
+      val req = action.invokeBlock(FakeRequest(), {
+        _: AuthorisedRequest[_] => Future.successful(Results.Ok)
+      })
+
+      whenReady(req.failed) { res =>
+        res.getMessage mustEqual "No internal ID for user"
+        res mustBe an [RuntimeException]
+      }
+    }
+  }
+
+  "it should throw an exception in AuthorisedAction if an invalid internal ID is returned from the retrieval" in {
+    val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
+
+    forAll { (enrolments: Enrolments, role: CredentialRole, ag: AffinityGroup) =>
+      val jsonResponse = JsObject(Seq(
+        Retrievals.internalId.propertyNames.head -> JsString("___bla"),
+        Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
+        Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
+        Retrievals.affinityGroup.propertyNames.head -> Json.toJson(ag)
+      ))
+
+      stubFor(
+        post(urlPathEqualTo(s"/auth/authorise"))
+          .willReturn(aResponse().withStatus(200).withBody(Json.toJson(jsonResponse).toString())
+          )
+      )
+
+      val req = action.invokeBlock(FakeRequest(), {
+        _: AuthorisedRequest[_] => Future.successful(Results.Ok)
+      })
+
+      whenReady(req.failed) { res =>
+        res.getMessage mustEqual "Invalid internal ID"
+        res mustBe an [IllegalStateException]
+      }
+    }
   }
 
 

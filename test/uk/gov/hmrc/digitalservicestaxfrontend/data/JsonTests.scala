@@ -28,6 +28,7 @@ import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{Activity, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, PhoneNumber, Postcode, UTR}
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import ltbs.uniform.interpreters.playframework.DB
+import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.digitalservicestax.repo.JourneyState
 
 class JsonTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks with OptionValues {
@@ -181,6 +182,11 @@ class JsonTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChec
 
   it should "serialize and de-serialise an optional LocalDate" in {
     testJsonRoundtrip[Option[LocalDate]]
+  }
+
+
+  it should "serialize and de-serialise a set of Enrolments" in {
+    testJsonRoundtrip[Set[Enrolment]]
   }
 
   it should "serialize and de-serialise a Map[Activity, Percent]" in {

@@ -38,13 +38,16 @@ trait TestWiring {
 
   lazy val auditConnector: AuditConnector = wire[DefaultAuditConnector]
   lazy val httpAuditing: HttpAuditing = wire[DefaultHttpAuditing]
-  lazy val configuration: Configuration = Configuration.load(environment, Map("auditing.enabled" -> "false"))
+  lazy val configuration: Configuration = Configuration.load(environment, Map(
+    "auditing.enabled" -> "false",
+    "services.auth.port" -> "11111"
+  ))
   lazy val runMode: RunMode = wire[RunMode]
   lazy val environment: Environment = Environment.simple(new File("."))
   lazy val mode = environment.mode
 
   implicit def clock: Clock = Clock.systemDefaultZone()
-  lazy val appConfig: AppConfig = wire[AppConfig]
-  val servicesConfig: ServicesConfig = wire[ServicesConfig]
+
+
 
 }
