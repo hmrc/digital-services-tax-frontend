@@ -24,6 +24,7 @@ import org.scalacheck.Gen
 import org.scalatest.{FlatSpec, Matchers}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import cats.implicits._
+import org.apache.commons.validator.routines.IBANValidator
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
@@ -47,6 +48,11 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPro
     }
   }
 
+  it should "validate IBAN numbers from a series of concrete examples" in {
+    forAll { iban: IBAN =>
+      IBANValidator.getInstance().isValid(iban) shouldEqual true
+    }
+  }
 
   it should "concatenate lines in a ForeignAddress value" in {
     forAll { foreignAddress: ForeignAddress =>
