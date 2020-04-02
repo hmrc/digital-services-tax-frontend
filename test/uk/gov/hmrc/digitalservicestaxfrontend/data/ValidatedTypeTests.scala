@@ -51,12 +51,12 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPro
   }
 
   it should "validate IBAN numbers from a series of concrete examples" in {
-    forAll(minSuccessful(PosInt(86))) { iban: IBAN =>
-      val isValid = Iban.isValid(iban)
-      isValid shouldEqual true
-      info(s"$iban is valid $isValid")
+    forAll(Gen.oneOf(ibanList), minSuccessful(PosInt(86))) { source: String =>
+      IBAN.of(source) shouldBe defined
     }
   }
+
+
 
   it should "concatenate lines in a ForeignAddress value" in {
     forAll { foreignAddress: ForeignAddress =>

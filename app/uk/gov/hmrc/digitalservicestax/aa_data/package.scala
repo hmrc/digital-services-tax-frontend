@@ -98,7 +98,7 @@ package object data extends SimpleJson {
   type IBAN = String @@ IBAN.Tag
   object IBAN extends ValidatedType[String] {
     override def validateAndTransform(in: String): Option[String] = {
-      Some(in).filter(Iban.isValid)
+      Some(in).map(_.replaceAll("\\s+","")).filter(Iban.isValid)
     }
   }
 
