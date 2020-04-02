@@ -24,7 +24,9 @@ import org.scalacheck.Gen
 import org.scalatest.{FlatSpec, Matchers}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import cats.implicits._
+import fr.marcwrobel.jbanking.iban.Iban
 import org.apache.commons.validator.routines.IBANValidator
+import org.scalactic.anyvals.PosInt
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
@@ -49,8 +51,10 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPro
   }
 
   it should "validate IBAN numbers from a series of concrete examples" in {
-    forAll { iban: IBAN =>
-      IBANValidator.getInstance().isValid(iban) shouldEqual true
+    forAll(minSuccessful(PosInt(86))) { iban: IBAN =>
+      val isValid = Iban.isValid(iban)
+      isValid shouldEqual true
+      info(s"$iban is valid $isValid")
     }
   }
 

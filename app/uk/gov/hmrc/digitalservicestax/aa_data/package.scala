@@ -23,6 +23,7 @@ import cats.kernel.Monoid
 import play.api.i18n.Messages
 import java.time.LocalDate
 
+import fr.marcwrobel.jbanking.iban.Iban
 import org.apache.commons.validator.routines.{EmailValidator, IBANValidator}
 import org.apache.commons.validator.routines.checkdigit.IBANCheckDigit
 
@@ -97,7 +98,7 @@ package object data extends SimpleJson {
   type IBAN = String @@ IBAN.Tag
   object IBAN extends ValidatedType[String] {
     override def validateAndTransform(in: String): Option[String] = {
-      Some(in).filter(IBANValidator.getInstance().isValid)
+      Some(in).filter(Iban.isValid)
     }
   }
 
