@@ -16,38 +16,33 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.actions
 
-import java.net.{InetAddress, URI}
+import java.net.URI
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlEqualTo, urlPathEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlPathEqualTo}
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.outworkers.util.domain.ShortString
-import play.api.http.Status
-import play.api.mvc.Results
-import play.api.test.FakeRequest
-import uk.gov.hmrc.digitalservicestax.config.ErrorHandler
-import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import com.outworkers.util.samplers._
 import ltbs.uniform.UniformMessages
 import org.scalatest.BeforeAndAfterEach
-import play.twirl.api.Html
-import uk.gov.hmrc.digitalservicestaxfrontend.connectors.WiremockSpec
-
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import play.api.http.Status
 import play.api.libs.json.{JsArray, JsObject, JsString, Json}
+import play.api.mvc.Results
+import play.api.test.FakeRequest
+import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.{AffinityGroup, CredentialRole, Enrolment, Enrolments, PlayAuthConnector}
+import uk.gov.hmrc.auth.core.{AffinityGroup, CredentialRole, Enrolments, PlayAuthConnector}
+import uk.gov.hmrc.digitalservicestax.config.ErrorHandler
+import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
+import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
+import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 
-import scala.collection.JavaConverters._
-import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with ScalaCheckDrivenPropertyChecks {
 
