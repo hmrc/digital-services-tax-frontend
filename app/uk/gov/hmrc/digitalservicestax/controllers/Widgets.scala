@@ -140,11 +140,11 @@ trait Widgets {
     )(_.toString)
 
 
-  implicit val twirlBoolField = new FormField[Boolean, Html] {
-    val True = true.toString.toUpperCase
-    val False = false.toString.toUpperCase
+  implicit val twirlBoolField: FormField[Boolean, Html] = new FormField[Boolean, Html] {
+    val True: String = true.toString.toUpperCase
+    val False: String = false.toString.toUpperCase
 
-    override def stats = FormFieldStats(children = 2)
+    override def stats: FormFieldStats = FormFieldStats(children = 2)
 
     def decode(out: Input): Either[ErrorTree, Boolean] =
       out.toField[Boolean](
@@ -231,8 +231,9 @@ trait Widgets {
     }
 
       def encode(in: LocalDate): Input = Map(
-        List("year") → in.getYear(),
-        List("month") → in.getMonthValue(),
+        List("year") → in.getYear,
+        List("month") → in.getMon
+          thValue(),
         List("day") → in.getDayOfMonth()
       ).mapValues(_.toString.pure[List])
 
@@ -325,7 +326,7 @@ trait Widgets {
 
   implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A]): FormField[Set[A], Html] =
     new FormField[Set[A], Html] {
-      override def stats = new FormFieldStats(children = enum.values.length)
+      override def stats: FormFieldStats = FormFieldStats(children = enum.values.length)
 
       def decode(out: Input): Either[ErrorTree,Set[A]] = {
         val i: List[String] = out.valueAtRoot.getOrElse(Nil)

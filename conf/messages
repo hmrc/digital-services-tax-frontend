@@ -78,7 +78,7 @@ company-registered-office-address.ForeignAddress.line4.heading=Address line 4 (o
 company-registered-office-address.ForeignAddress.countryCode.heading=Country
 company-registered-office-address.ForeignAddress.countryCode.invalid=Enter a country from the list
 
-confirm-company-details.heading=Is this the company you want to register?
+confirm-company-details.heading=Is this the company you want to register as the responsible member?
 confirm-company-details.intro=If you are registering a group, this company must be the responsible member who will represent the group to HMRC.
 confirm-company-details.required=Select yes if this is the company you want to register
 confirm-company-details.TRUE=Yes
@@ -116,7 +116,7 @@ check-if-group.details.text=<p>For the Digital Services Tax, a group is a parent
     <li>a member of a Generally Accepted Accounting Principles (GAAP) group and not a consolidated subsidiary of another entity</li>\
     <li>not a member of a GAAP group</li>\
   </ul>\
-  <p>We use the meaning of 'group', 'entity' and 'consolidated subsidiary' given by UK GAAP, US GAAP or International Accounting Standards (IAS).</p>
+  <p>You can find a list of acceptable GAAP in the <a href="" target="_blank">Digital Services Tax Manual(opens in a new window tab)</p>
 check-if-group.TRUE=Yes
 check-if-group.FALSE=No
 
@@ -188,7 +188,7 @@ accounting-period-end-date.month-and-year.empty=The end date of the group’s fi
 
 #Reg cya
 cya.title=Check your answers before sending your application
-cya.company.title=Your company details
+cya.company.title=Responsible member details
 
 cya.check-if-group.question=Is the company you are registering part of a group?
 cya.check-if-group.change=if the company you are registering is part of a group
@@ -280,9 +280,9 @@ landing.balance=View your balance and transactions history
 #returns
 manage-companies-add-add.heading=Company details
 manage-companies.required=Select yes if you need to add another company to your group
-manage-companies.listing.heading=Confirm your group’s companies
+manage-companies.listing.heading=Confirm the companies in your group that have a Digital Services Tax liability
 manage-companies.radio.heading=Do you need to add another company to your group?
-manage-companies.radio.hint=You must tell us about all the companies in your group that are liable for Digital Services Tax.
+manage-companies.radio.hint=You must tell us about all the companies in your group that have a Digital Services Tax liability for this return period.
 manage-companies.Add=Yes
 manage-companies.Continue=No
 remove-company=Remove company
