@@ -33,7 +33,7 @@ not-a-date=Enter a real date
 
 # time out
 time-out.title=For your security, we signed you out
-time-out.save=Your progress will saved for 30 days
+time-out.save=Your progress will be saved for 30 days
 
 #Registration
 check-unique-taxpayer-reference.heading=Does the company you are registering have a UK Corporation \
@@ -80,7 +80,7 @@ company-registered-office-address.ForeignAddress.countryCode.invalid=Enter a cou
 
 confirm-company-details.heading=Is this the company you want to register as the responsible member?
 confirm-company-details.intro=If you are registering a group, this company must be the responsible member who will represent the group to HMRC.
-confirm-company-details.required=Select yes if this is the company you want to register
+confirm-company-details.required=Select yes if this is the company you want to register as the responsible member
 confirm-company-details.TRUE=Yes
 confirm-company-details.FALSE=No
 
@@ -116,7 +116,9 @@ check-if-group.details.text=<p>For the Digital Services Tax, a group is a parent
     <li>a member of a Generally Accepted Accounting Principles (GAAP) group and not a consolidated subsidiary of another entity</li>\
     <li>not a member of a GAAP group</li>\
   </ul>\
-  <p>You can find a list of acceptable GAAP in the <a href="" target="_blank">Digital Services Tax Manual(opens in a new window tab)</p>
+  <p>You can find a list of acceptable GAAP in the \
+    <a href="https://www.gov.uk/hmrc-internal-manuals/digital-services-tax" target="_blank">Digital Services Tax Manual (opens in a new window or tab)</a>\
+  </p>
 check-if-group.TRUE=Yes
 check-if-group.FALSE=No
 
@@ -135,8 +137,6 @@ ultimate-parent-company-address.ForeignAddress.line2.heading=Address line 2 (opt
 ultimate-parent-company-address.ForeignAddress.line3.heading=Address line 3 (optional)
 ultimate-parent-company-address.ForeignAddress.line4.heading=Address line 4 (optional)
 ultimate-parent-company-address.ForeignAddress.countryCode.heading=Country
-
-ultimate-parent-company-address.ForeignAddress.line1.invalid=Enter Address Line 1
 ultimate-parent-company-address.ForeignAddress.countryCode.invalid=Start typing and enter a country from the list
 
 ultimate-parent-company-address.required=Select if the registered office address is in the UK or outside the UK
@@ -156,11 +156,6 @@ contact-details.phoneNumber.heading= Phone number
 contact-details.phoneNumber.hint=For international numbers include the country code.
 contact-details.email.heading=Email address
 contact-details.email.hint=We will use this email address to send confirmation of your registration.
-contact-details.forename.invalid=Forename
-contact-details.forename.name=Forename name
-contact-details.surname.invalid=Surname
-contact-details.phoneNumber.invalid=Phone number
-contact-details.email.invalid=Email
 
 check-liability-date.heading=Was the group liable for Digital Services Tax on 1 April 2020?
 check-liability-date.required=Select yes if the group was liable for Digital Services Tax on 1 April 2020 
@@ -187,43 +182,50 @@ accounting-period-end-date.day-and-year.empty=The end date of the group’s firs
 accounting-period-end-date.month-and-year.empty=The end date of the group’s first accounting period for Digital Services Tax must include a month and year
 
 #Reg cya
-cya.title=Check your answers before sending your application
-cya.company.title=Responsible member details
+check-your-answers.reg.title=Check your answers before sending your application
+check-your-answers.reg.company.title=Responsible member details
 
-cya.check-if-group.question=Is the company you are registering part of a group?
-cya.check-if-group.change=if the company you are registering is part of a group
+check-your-answers.reg.check-if-group.question=Is the company you are registering part of a group?
+check-your-answers.reg.check-if-group.change=if the company you are registering is part of a group
 
-cya.company-name-and-reg-address.question=Company name Registered Office address
-cya.company-name-and-reg-address.change=Company name and Registered Office address
+check-your-answers.reg.company-name-and-reg-address.question=Company name Registered Office address
+check-your-answers.reg.company-name-and-reg-address.change=Company name and Registered Office address
 
-cya.ultimate-parent-company.title=Ultimate global parent company details
-cya.ultimate-parent-company-name.question=Company name
-cya.ultimate-parent-company-name.change=company name
+check-your-answers.reg.ultimate-parent-company.title=Ultimate global parent company details
+check-your-answers.reg.ultimate-parent-company-name.question=Company name
+check-your-answers.reg.ultimate-parent-company-name.change=company name
 
-cya.ultimate-parent-company-address.question=Registered Office address
-cya.ultimate-parent-company-address.change=Registered Office address
+check-your-answers.reg.ultimate-parent-company-address.question=Registered Office address
+check-your-answers.reg.ultimate-parent-company-address.change=Registered Office address
 
-cya.contact-details.title=Contact person’s details
-cya.contact-details-name.question=Full name
-cya.contact-details.change.name=full name
-cya.contact-details-phone-number.question=Phone number
-cya.contact-details.change.phone-number=phone number
-cya.contact-details-email.question=Email address
-cya.contact-details.change.email=email
+check-your-answers.reg.contact-details.title=Contact person’s details
+check-your-answers.reg.contact-details-name.question=Full name
+check-your-answers.reg.contact-details.change.name=full name
+check-your-answers.reg.contact-details-phone-number.question=Phone number
+check-your-answers.reg.contact-details.change.phone-number=phone number
+check-your-answers.reg.contact-details-email.question=Email address
+check-your-answers.reg.contact-details.change.email=email
 
-cya.liability-date.title=Accounting period details
-cya.liability-start-date.question=Liability start date
-cya.check-liability-date.change=Change the date the company become liable for Digital Services Tax
-cya.liability-start-date.change=liability start date
+check-your-answers.reg.liability-date.title=Accounting period details
+check-your-answers.reg.liability-start-date.question=Liability start date
+check-your-answers.reg.check-liability-date.change=Change the date the company become liable for Digital Services Tax
+check-your-answers.reg.liability-start-date.change=liability start date
 
-cya.accounting-end-date.question=First accounting period end date
-cya.accounting-end-date.change=first accounting period end date
-cya.accounting-period-end-date.change=Change the end date of the company’s first accounting period for Digital Services Tax
+check-your-answers.reg.accounting-end-date.question=First accounting period end date
+check-your-answers.reg.accounting-end-date.change=first accounting period end date
+check-your-answers.reg.accounting-period-end-date.change=Change the end date of the company’s first accounting period for Digital Services Tax
 
-cya.submission.title=Send your details
-cya.submission-notice=By submitting this notification you are confirming that, to the best of your knowledge, \
+check-your-answers.reg.submission.title=Send your details
+check-your-answers.reg.submission-notice=By submitting this notification you are confirming that, to the best of your knowledge, \
   the details you are providing are correct.
-cya.warning.body=You could be prosecuted if you deliberately submit false or misleading information.
+check-your-answers.reg.warning.body=You could be prosecuted if you deliberately submit false or misleading information.
+
+check-your-answers.reg.submission.group=By submitting this notification, you are confirming that:
+
+check-your-answers.reg.submission.group.list.1={0} is authorised to act on behalf of {1} as the group's responsible member
+check-your-answers.reg.submission.group.list.2={0} has agreed to provide the information and resources that {1} needs to comply with its Digital Services Tax obligations
+check-your-answers.reg.submission.group.list.3=to the best of your knowledge, the details you are providing are correct and complete
+check-your-answers.save-continue=Accept and send
 
 #Reg complete
 registration-sent.heading=Registration sent
@@ -281,8 +283,9 @@ landing.balance=View your balance and transactions history
 manage-companies-add-add.heading=Company details
 manage-companies.required=Select yes if you need to add another company to your group
 manage-companies.listing.heading=Confirm the companies in your group that have a Digital Services Tax liability
+manage-companies.radio.hint=You must tell us about all the companies in your group that have a Digital Services Tax \
+  liability for this return period.
 manage-companies.radio.heading=Do you need to add another company to your group?
-manage-companies.radio.hint=You must tell us about all the companies in your group that have a Digital Services Tax liability for this return period.
 manage-companies.Add=Yes
 manage-companies.Continue=No
 remove-company=Remove company
@@ -421,8 +424,23 @@ repayment.required=Select yes if you need to be repaid any Digital Services Tax 
 repayment.TRUE=Yes
 repayment.FALSE=No
 
+bank-details.accountName.heading=Account name
+bank-details.accountName.required=Enter the account name
+bank-details.accountName.invalid=Account name must only include letters a to z
+bank-details.accountName.length.exceeded=Account name must be 35 characters or fewer
+bank-details.bankAccount.heading.large.label=Is this a UK bank account?
+bank-details.bankAccount.required=Select yes if this is a UK bank account
+bank-details.bankAccount.DomesticBankAccount=Yes
+bank-details.bankAccount.ForeignBankAccount=No
+
+bank-details.bankAccount.DomesticBankAccount.sortCode.heading=Sort code
+bank-details.bankAccount.DomesticBankAccount.sortCode.required=Enter the sort code
+bank-details.bankAccount.DomesticBankAccount.sortCode.invalid=Enter the sort code in the correct format, like 123456
+bank-details.bankAccount.DomesticBankAccount.buildingSocietyNumber.heading=Building society roll number (if you have one)
+bank-details.bankAccount.DomesticBankAccount.buildingSocietyNumber.hint=You can find it on your card, statement or passbook
+bank-details.bankAccount.ForeignBankAccount.iban.heading=International Bank Account Number (IBAN)
+
 bank-details-type.heading=Your bank details for repayment
-bank-details-type.invalid=Hey
 bank-details-type._1.heading=Account Name
 bank-details-type._2.required=Select yes if this is a UK bank account
 bank-details-type._2.TRUE=Yes
@@ -431,11 +449,15 @@ bank-details-type._2.heading.large=Is this a UK bank account?
 
 bank-details-type-domestic.heading=What are your UK bank account details?
 bank-details-domestic.sortCode.heading.large.label=Sort code
-bank-details-domestic.accountNo.heading.large.label=Account number
+bank-details.bankAccount.DomesticBankAccount.accountNo.heading=Account number
+bank-details.bankAccount.DomesticBankAccount.accountNo.required=Enter the account number
+bank-details.bankAccount.DomesticBankAccount.accountNo.invalid=Enter the account number in the correct format, like 123456 or 12345678
+bank-details.bankAccount.DomesticBankAccount.accountNo.length.exceeded=Enter the account number in the correct format, like 123456 or 12345678
 bank-details-domestic.buildingSocietyNumber.heading.large.label=Building society roll number (if you have one)
 
 bank-details-foreign.listing.heading=What are your bank account details?
 bank-details-foreign.iban.heading.large.label=International Bank Account Number (IBAN)
+bank-details.bankAccount.ForeignBankAccount.iban.invalid=Enter the International Bank Account Number (IBAN)
 
 #Returns cya
 check-your-answers.ret.title=Check your answers before sending your return for 1 April 2020 to July 2020
@@ -523,11 +545,13 @@ phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or +
 
 contact-details.email.required=Please enter a contact email
 email.required=Please enter an email address
-required=This is a required field
+# DO NOT MERGE UNCOMMENT BELOW
+#required=This is a required field
 
 contact-details.email.invalid=Please enter a valid contact email
 email.invalid=Please enter a valid email address
-invalid=Please enter a valid string
+# DO NOT MERGE UNCOMMENT BELOW
+#invalid=Please enter a valid string
 
 accessibility-statement.title=Accessibility Statement - Digital Services Tax
 accessibility-statement.heading=Accessibility statement for Digital Services Tax
