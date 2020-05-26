@@ -18,26 +18,79 @@ package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
 import cats.implicits._
 import ltbs.uniform.interpreters.logictable._
-import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.digitalservicestax.data._, SampleData._
 import uk.gov.hmrc.digitalservicestax.journeys.ReturnJourney
 import org.scalatest.{FlatSpec, Matchers}
+import uk.gov.hmrc.digitalservicestax.data.Activity.SocialMedia
+
+import scala.util.matching.Regex
 
 class ReturnJourneySpec extends FlatSpec with Matchers {
+
+  val lossKeys: Regex = {s"^report-(" + Activity.values.map(Activity.toUrl).mkString("|") + ")-loss"}.r
 
   implicit val sampleMoneyAsk = instances[Money](sampleMoney)
   implicit val sampleActivitySetAsk = instances(sampleActivitySet)
   implicit val sampleRepaymentDetailsAsk = instances(sampleRepaymentDetails)
   implicit val samplePercentAsk = instances(samplePercent)
-  implicit val sampleBooleanAsk = instances(true)
   implicit val sampleGroupCompanyListAsk = instances(sampleGroupCompanyList)
+  implicit val sampleBooleanAsk = instancesF {
+    case lossKeys(_) => List(false)
+    case _ => List(true)
+  }
 
   val defaultInterpreter = new TestReturnInterpreter
 
-  "when foo" should "bar" in {
-    val r = ReturnJourney.returnJourney(
-      defaultInterpreter).value.run.asReturn(true)
-
-    1 shouldBe 1
+  "Return.alternativeCharge length" should "be the same as length of reported activities" in {
+    implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
+    val ret:Return = ReturnJourney.returnJourney(
+      new TestReturnInterpreter).value.run.asReturn()
+    ret.alternateCharge.size shouldBe 1
   }
+
+  "Return.alternateCharge " should "be empty when no alternate charge is reported" in {
+    implicit val sampleBooleanAsk = instancesF {
+      case "report-alternative-charge" => List(false)
+      case _ => List(true)
+    }
+    val ret:Return = ReturnJourney.returnJourney(
+      new TestReturnInterpreter).value.run.asReturn()
+    ret.alternateCharge  should be ('empty)
+  }
+
+  "Return.alternateCharge " should "not be empty when an alternate charge is reported" in {
+    val ret:Return = ReturnJourney.returnJourney(
+      defaultInterpreter).value.run.asReturn()
+
+    ret.alternateCharge  should be ('nonEmpty)
+  }
+
+  "Return.crossBorderReliefAmount" should "be zero when report-cross-border-transaction-relief is false" in {
+    implicit val sampleBooleanAsk = instancesF {
+      case "report-cross-border-transaction-relief" => List(false)
+      case _ => List(true)
+    }
+    val ret:Return = ReturnJourney.returnJourney(
+      new TestReturnInterpreter).value.run.asReturn()
+
+    ret.crossBorderReliefAmount shouldEqual BigDecimal(0)
+  }
+
+  "Return.repayment" should "be nonEmpty when the user has asked for a repayment" in {
+    val ret:Return = ReturnJourney.returnJourney(
+      defaultInterpreter).value.run.asReturn()
+
+    ret.repayment  should be ('nonEmpty)
+  }
+
+  "Return.repayment" should "be empty when the user has not asked for a repayment" in {
+    implicit val sampleBooleanAsk = instancesF {
+      case "repayment" => List(false)
+      case _ => List(true)
+    }
+    val ret:Return = ReturnJourney.returnJourney(
+      new TestReturnInterpreter).value.run.asReturn(true)
+    ret.repayment  should be ('empty)
+  }
+
 }
