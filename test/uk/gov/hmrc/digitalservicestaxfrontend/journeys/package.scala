@@ -18,8 +18,9 @@ package uk.gov.hmrc.digitalservicestaxfrontend
 
 import ltbs.uniform.interpreters.logictable._
 import uk.gov.hmrc.digitalservicestax.connectors.DSTService
-import uk.gov.hmrc.digitalservicestax.data.Registration
+import uk.gov.hmrc.digitalservicestax.data.{Registration, Return}
 import uk.gov.hmrc.digitalservicestax.journeys.RegJourney.{RegAskTypes, RegTellTypes}
+import uk.gov.hmrc.digitalservicestax.journeys.ReturnJourney.{ReturnAskTypes, ReturnTellTypes}
 import uk.gov.hmrc.digitalservicestaxfrontend.util.TestDstService
 
 package object journeys {
@@ -35,9 +36,22 @@ package object journeys {
   }
 
   type TestRegInterpreter = LogicTableInterpreter[RegTellTypes, RegAskTypes]
+  type TestReturnInterpreter = LogicTableInterpreter[ReturnTellTypes, ReturnAskTypes]
 
   implicit class RichRegJourney (in: List[(List[_], Either[_, Registration])]) {
     def asReg(debug: Boolean = false): Registration = {
+      if (debug) {
+        in.foreach { case (messages, outcome) =>
+          println(messages.mkString("\n"))
+          println(s"   => $outcome")
+        }
+      }
+      in.head._2.right.get
+    }
+  }
+
+  implicit class RichReturnJourney (in: List[(List[_], Either[_, Return])]) {
+    def asReturn(debug: Boolean = false): Return = {
       if (debug) {
         in.foreach { case (messages, outcome) =>
           println(messages.mkString("\n"))

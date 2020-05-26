@@ -19,7 +19,6 @@ package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 import java.time.LocalDate
 
 import cats.implicits._
-import ltbs.uniform.{NonEmptyString => _}
 import ltbs.uniform.interpreters.logictable._
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.digitalservicestax.data._, SampleData._
@@ -111,7 +110,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
       RegJourney.registrationJourney(new TestRegInterpreter, testService).value.run
     }
 
-    assert(caught.getMessage.indexOf("Journey end at details-not-correct") > -1)
+    assert(caught.getMessage.contains("Journey end at details-not-correct"))
   }
 
   "when there is no Company from sign in, and none found for a supplied UTR we" should "be kicked out" in {
@@ -125,7 +124,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
       ).value.run.asReg(true)
     }
 
-    assert(caught.getMessage.indexOf("Journey end at cannot-find-company") > -1)
+    assert(caught.getMessage.contains("Journey end at cannot-find-company"))
   }
 
   "when there is no Company from sign in, and the one found by UTR is rejected by the user we" should "be kicked out" in {
@@ -143,7 +142,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
       ).value.run.asReg(true)
     }
 
-    assert(caught.getMessage.indexOf("Journey end at details-not-correct") > -1)
+    assert(caught.getMessage.contains("Journey end at details-not-correct"))
   }
 
   "the Registration" should "have an alternativeContact when user elected to provide one" in {
