@@ -44,7 +44,7 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
   "Return.alternativeCharge length" should "be the same as length of reported activities" in {
     implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
     val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter).value.run.asReturn()
+      new TestReturnInterpreter).value.run.asOutcome()
     ret.alternateCharge.size shouldBe 1
   }
 
@@ -54,13 +54,13 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
     val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter).value.run.asReturn()
+      new TestReturnInterpreter).value.run.asOutcome()
     ret.alternateCharge  should be ('empty)
   }
 
   "Return.alternateCharge " should "not be empty when an alternate charge is reported" in {
     val ret:Return = ReturnJourney.returnJourney(
-      defaultInterpreter).value.run.asReturn()
+      defaultInterpreter).value.run.asOutcome()
 
     ret.alternateCharge  should be ('nonEmpty)
   }
@@ -71,14 +71,14 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
     val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter).value.run.asReturn()
+      new TestReturnInterpreter).value.run.asOutcome()
 
     ret.crossBorderReliefAmount shouldEqual BigDecimal(0)
   }
 
   "Return.repayment" should "be nonEmpty when the user has asked for a repayment" in {
     val ret:Return = ReturnJourney.returnJourney(
-      defaultInterpreter).value.run.asReturn()
+      defaultInterpreter).value.run.asOutcome()
 
     ret.repayment  should be ('nonEmpty)
   }
@@ -89,7 +89,7 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
     val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter).value.run.asReturn(true)
+      new TestReturnInterpreter).value.run.asOutcome()
     ret.repayment  should be ('empty)
   }
 

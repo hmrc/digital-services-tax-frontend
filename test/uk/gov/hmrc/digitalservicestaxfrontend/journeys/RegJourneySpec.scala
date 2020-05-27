@@ -45,7 +45,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
   "when there is a Company from sign in accepting this" should "give you a Registration for that Company " in {
     val reg: Registration = RegJourney.registrationJourney(
       defaultInterpreter,
-      testService).value.run.asReg()
+      testService).value.run.asOutcome()
 
     reg.companyReg.company shouldBe sampleCompany
   }
@@ -58,7 +58,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
       new TestDstService {
         override def lookupCompany(): Option[CompanyRegWrapper] = None
       }.get
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.companyReg.company.name shouldBe "Supplied company name"
   }
@@ -71,7 +71,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
       new TestDstService {
         override def lookupCompany(): Option[CompanyRegWrapper] = None
       }.get
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.companyReg.company.address shouldBe a[ForeignAddress]
   }
@@ -87,7 +87,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
       new TestDstService {
         override def lookupCompany(): Option[CompanyRegWrapper] = None
       }.get
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.companyReg.company.address shouldBe a[UkAddress]
   }
@@ -98,7 +98,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
       new TestDstService {
         override def lookupCompany(): Option[CompanyRegWrapper] = None
       }.get
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.companyReg.company.name shouldBe utrLookupCompanyName
   }
@@ -121,7 +121,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
           override def lookupCompany(): Option[CompanyRegWrapper] = None
           override def lookupCompany(utr: UTR, postcode: Postcode): Option[CompanyRegWrapper] = None
         }.get
-      ).value.run.asReg(true)
+      ).value.run.asOutcome()
     }
 
     assert(caught.getMessage.contains("Journey end at cannot-find-company"))
@@ -139,7 +139,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
         new TestDstService {
           override def lookupCompany(): Option[CompanyRegWrapper] = None
         }.get
-      ).value.run.asReg(true)
+      ).value.run.asOutcome()
     }
 
     assert(caught.getMessage.contains("Journey end at details-not-correct"))
@@ -154,7 +154,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
     val reg: Registration = RegJourney.registrationJourney(
       new TestRegInterpreter,
       testService
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.alternativeContact should be ('defined)
   }
@@ -163,7 +163,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
     val reg: Registration = RegJourney.registrationJourney(
       new TestRegInterpreter,
       testService
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.alternativeContact should be ('empty)
   }
@@ -172,7 +172,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
     val reg: Registration = RegJourney.registrationJourney(
       defaultInterpreter,
       testService
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.ultimateParent should be ('defined)
   }
@@ -186,7 +186,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
     val reg: Registration = RegJourney.registrationJourney(
       new TestRegInterpreter,
       testService
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.ultimateParent should be ('empty)
   }
@@ -195,7 +195,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
     val reg: Registration = RegJourney.registrationJourney(
       defaultInterpreter,
       testService
-    ).value.run.asReg()
+    ).value.run.asOutcome()
 
     reg.dateLiable shouldBe LocalDate.of(2020,4, 1)
   }
