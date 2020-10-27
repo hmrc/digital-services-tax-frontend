@@ -21,6 +21,8 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import BackendAndFrontendJson._
+import play.api.libs.json.JsValue
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class DSTConnector (
@@ -66,4 +68,5 @@ class DSTConnector (
 
   case class MicroServiceConnectionException(msg: String) extends Exception(msg)
 
+  def doDebug() = http.GET[JsValue](s"$backendURL/do-debug")
 }
