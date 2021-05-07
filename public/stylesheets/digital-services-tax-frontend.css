@@ -455,6 +455,30 @@ fieldset__legend--s {
     white-space: normal;
 }
 
+.govuk-fieldset__legend {
+    font-family: "GDS Transport",arial,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.25;
+    color: #0b0c0c;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table;
+    max-width: 100%;
+    margin-bottom: 10px;
+    padding: 0;
+    white-space: normal;
+}
+
+@media (min-width: 40.0625em) {
+    .govuk-fieldset__legend {
+        font-size: 19px;
+        line-height: 1.31579;
+    }
+}
+
 .radios__item {
     font-family: "nta",Arial,sans-serif;
     -webkit-font-smoothing: antialiased;
