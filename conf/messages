@@ -316,7 +316,7 @@ registration-sent.help-using-this-service.p1=For help with payments and returns,
 registration-sent.help-using-this-service.list.title=Contact your HMRC Customer Compliance Manager (CCM) if you:
 registration-sent.help-using-this-service.list.1=do not receive your registration number
 registration-sent.help-using-this-service.list.2=need to change your registered details
-registration-sent.ccm-email=If you do not know who your CCM is, or do not have one, {0}.
+registration-sent.ccm-email=If you do not know who your CCM is, or do not have one, email: {0}.
 
 #reg kickout
 cannot-find-company.kickout.heading=We could not find your company
