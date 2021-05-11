@@ -590,7 +590,7 @@ utr.invalid=Enter the company’s Corporation Tax Unique Taxpayer Reference in t
 
 #Select activities
 select-activities.heading=Which activities are you reporting in this return?
-select-activities.heading.hint=Select all that apply.
+select-activities.hint=Select all that apply.
 select-activities.SocialMedia=Social media
 select-activities.SearchEngine=Search engine
 select-activities.OnlineMarketplace=Online marketplace
