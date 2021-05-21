@@ -23,9 +23,11 @@ import cats.implicits.{none, _}
 import org.scalacheck.Arbitrary.{arbitrary, arbBigDecimal => _, _}
 import org.scalacheck.cats.implicits._
 import org.scalacheck.{Arbitrary, Gen, _}
-import uk.gov.hmrc.digitalservicestax.data._
+import shapeless.tag.@@
+import uk.gov.hmrc.digitalservicestax.data.{Period, _}
 import wolfendale.scalacheck.regexp.RegexpGen
 import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.digitalservicestax.data
 
 object TestInstances {
 
@@ -237,12 +239,23 @@ object TestInstances {
     date(LocalDate.of(2010, 1, 1), LocalDate.of(2020, 1, 1))
   )
 
-  implicit def periodArb: Arbitrary[Period] = Arbitrary((
+  implicit def periodKey: Arbitrary[@@[String, Period.Key.Tag]] = {
+    val g = for {
+      n <- Gen.chooseNum(1, 4)
+      c <- Gen.alphaChar
+      l <- Gen.listOfN(n, c)
+    } yield Period.Key.apply(l.mkString)
+    Arbitrary(g)
+  }
+
+  implicit def periodArb: Arbitrary[Period] = {
+    Arbitrary((
     arbitrary[LocalDate],
     arbitrary[LocalDate],
     arbitrary[LocalDate],
-    arbitrary[NonEmptyString].map{_.take(4)}.map{Period.Key(_)}
+    arbitrary[Period.Key]
     ).mapN(Period.apply))
+  }
 
   implicit def financialDetailsArd: Arbitrary[FinancialTransaction] = Arbitrary((
     arbitrary[LocalDate],
