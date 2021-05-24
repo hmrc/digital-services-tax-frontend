@@ -72,6 +72,7 @@ class SimpleCachingTest extends FlatSpec
         invkoke <- fut
       } yield invkoke
 
+      // minor edit to check PR builder
       whenReady(chain) { res =>
         res shouldEqual storedValue
         counter.get() shouldEqual 1
