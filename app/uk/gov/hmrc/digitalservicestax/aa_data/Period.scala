@@ -18,7 +18,6 @@ package uk.gov.hmrc.digitalservicestax.data
 
 import java.time.LocalDate
 
-import cats.kernel.Order
 import shapeless.tag.@@
 
 case class Period(
@@ -36,12 +35,6 @@ case class Period(
 
 
 object Period {
-
-  implicit val periodOrdering: Ordering[Period] = (x: Period, y: Period) => {
-    x.end compareTo y.end
-  }
-
-  implicit val periodOrder: Order[Period] = cats.Order.fromOrdering(periodOrdering)
 
   type Key = String @@ Key.Tag
   object Key extends ValidatedType[String]{

@@ -70,11 +70,11 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPro
 
   it should "return an appropriate paymentDue date" in {
     forAll { (p1:Period, p2:Period) =>
-      List(p1,p2).sorted shouldEqual List(p1, p2).sortBy(_.paymentDue)
+      List(p1,p2).sortBy(_.end) shouldEqual List(p1, p2).sortBy(_.paymentDue)
     }
     forAll { p:Period =>
-      p.paymentDue.isAfter(p.end.plusMonths(9)) &&
-        p.paymentDue.isBefore(p.end.plusMonths(10).withDayOfMonth(2)) shouldBe true
+      p.paymentDue > p.end.plusMonths(9) &&
+        p.paymentDue < p.end.plusMonths(10).withDayOfMonth(2) shouldBe true
     }
   }
 
