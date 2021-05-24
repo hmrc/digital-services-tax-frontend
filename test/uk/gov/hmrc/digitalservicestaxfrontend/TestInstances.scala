@@ -18,16 +18,15 @@ package uk.gov.hmrc.digitalservicestaxfrontend
 
 import java.time.LocalDate
 
-import enumeratum.scalacheck._
 import cats.implicits.{none, _}
+import enumeratum.scalacheck._
 import org.scalacheck.Arbitrary.{arbitrary, arbBigDecimal => _, _}
 import org.scalacheck.cats.implicits._
-import org.scalacheck.{Arbitrary, Gen, _}
+import org.scalacheck.{Arbitrary, Gen}
 import shapeless.tag.@@
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.digitalservicestax.data.{Period, _}
 import wolfendale.scalacheck.regexp.RegexpGen
-import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.digitalservicestax.data
 
 object TestInstances {
 
@@ -43,8 +42,6 @@ object TestInstances {
   implicit val arbMoney: Arbitrary[Money] = Arbitrary(
     Gen.choose(0L, 1000000000000L).map(b => Money(BigDecimal(b).setScale(2)))
   )
-
-
 
   val ibanList = List(
     "AD9179714843548170724658",
@@ -280,7 +277,9 @@ object TestInstances {
   implicit def arbUTR: Arbitrary[UTR] = Arbitrary(UTR.gen)
   implicit def arbAddressLine: Arbitrary[AddressLine] = Arbitrary(AddressLine.gen)
   implicit def arbCompanyName: Arbitrary[CompanyName] = Arbitrary(CompanyName.gen)
-  implicit val arbInternalId: Arbitrary[InternalId] = Arbitrary(InternalId.gen)
+  implicit val arbInternalId: Arbitrary[InternalId] = Arbitrary{
+    Gen.choose(1,Int.MaxValue).map{x => InternalId(s"Int-$x")}
+  }
 
   // note this does NOT check all RFC-compliant email addresses (e.g. '"luke tebbs"@company.co.uk')
   implicit def arbEmail: Arbitrary[Email] = Arbitrary{

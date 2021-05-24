@@ -26,7 +26,6 @@ import com.outworkers.util.domain.ShortString
 import com.outworkers.util.samplers._
 import ltbs.uniform.UniformMessages
 import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.http.Status
 import play.api.libs.json.{JsArray, JsObject, JsResultException, JsString, Json}
 import play.api.mvc.Results
@@ -37,6 +36,7 @@ import uk.gov.hmrc.auth.core.{AffinityGroup, CredentialRole, Enrolments, PlayAut
 import uk.gov.hmrc.digitalservicestax.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
+import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
@@ -44,7 +44,7 @@ import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with ScalaCheckDrivenPropertyChecks {
+class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with ConfiguredPropertyChecks {
 
   lazy val authConnector: PlayAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig)
 

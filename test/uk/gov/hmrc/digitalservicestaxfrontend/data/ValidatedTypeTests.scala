@@ -26,11 +26,10 @@ import org.scalatest.{FlatSpec, Matchers}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.frontend._
+import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
-class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks {
-
-//  implicit val numberSuccessfulTests = PropertyCheckConfiguration(100000)
+class ValidatedTypeTests extends FlatSpec with Matchers with ConfiguredPropertyChecks {
 
   it should "fail to parse a validated tagged type using an of method" in {
     intercept[IllegalArgumentException] {
