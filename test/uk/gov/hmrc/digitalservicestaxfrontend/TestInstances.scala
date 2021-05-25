@@ -18,14 +18,15 @@ package uk.gov.hmrc.digitalservicestaxfrontend
 
 import java.time.LocalDate
 
-import enumeratum.scalacheck._
 import cats.implicits.{none, _}
+import enumeratum.scalacheck._
 import org.scalacheck.Arbitrary.{arbitrary, arbBigDecimal => _, _}
 import org.scalacheck.cats.implicits._
-import org.scalacheck.{Arbitrary, Gen, _}
-import uk.gov.hmrc.digitalservicestax.data._
-import wolfendale.scalacheck.regexp.RegexpGen
+import org.scalacheck.{Arbitrary, Gen}
+import shapeless.tag.@@
 import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.digitalservicestax.data.{Period, _}
+import wolfendale.scalacheck.regexp.RegexpGen
 
 object TestInstances {
 
@@ -41,8 +42,6 @@ object TestInstances {
   implicit val arbMoney: Arbitrary[Money] = Arbitrary(
     Gen.choose(0L, 1000000000000L).map(b => Money(BigDecimal(b).setScale(2)))
   )
-
-
 
   val ibanList = List(
     "AD9179714843548170724658",
@@ -237,12 +236,23 @@ object TestInstances {
     date(LocalDate.of(2010, 1, 1), LocalDate.of(2020, 1, 1))
   )
 
-  implicit def periodArb: Arbitrary[Period] = Arbitrary((
+  implicit def periodKey: Arbitrary[@@[String, Period.Key.Tag]] = {
+    val g = for {
+      n <- Gen.chooseNum(1, 4)
+      c <- Gen.alphaChar
+      l <- Gen.listOfN(n, c)
+    } yield Period.Key.apply(l.mkString)
+    Arbitrary(g)
+  }
+
+  implicit def periodArb: Arbitrary[Period] = {
+    Arbitrary((
     arbitrary[LocalDate],
     arbitrary[LocalDate],
     arbitrary[LocalDate],
-    arbitrary[NonEmptyString].map{_.take(4)}.map{Period.Key(_)}
+    arbitrary[Period.Key]
     ).mapN(Period.apply))
+  }
 
   implicit def financialDetailsArd: Arbitrary[FinancialTransaction] = Arbitrary((
     arbitrary[LocalDate],
@@ -267,7 +277,9 @@ object TestInstances {
   implicit def arbUTR: Arbitrary[UTR] = Arbitrary(UTR.gen)
   implicit def arbAddressLine: Arbitrary[AddressLine] = Arbitrary(AddressLine.gen)
   implicit def arbCompanyName: Arbitrary[CompanyName] = Arbitrary(CompanyName.gen)
-  implicit val arbInternalId: Arbitrary[InternalId] = Arbitrary(InternalId.gen)
+  implicit val arbInternalId: Arbitrary[InternalId] = Arbitrary{
+    Gen.choose(1,Int.MaxValue).map{x => InternalId(s"Int-$x")}
+  }
 
   // note this does NOT check all RFC-compliant email addresses (e.g. '"luke tebbs"@company.co.uk')
   implicit def arbEmail: Arbitrary[Email] = Arbitrary{

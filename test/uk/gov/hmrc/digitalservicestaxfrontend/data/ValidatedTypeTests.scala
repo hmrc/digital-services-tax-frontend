@@ -18,17 +18,18 @@ package uk.gov.hmrc.digitalservicestaxfrontend.data
 
 import java.time.LocalDate
 
+import cats.implicits._
 import cats.kernel.Monoid
 import org.scalacheck.Gen
+import org.scalactic.anyvals.PosInt
 import org.scalatest.{FlatSpec, Matchers}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import cats.implicits._
-import org.scalactic.anyvals.PosInt
-import uk.gov.hmrc.digitalservicestax.frontend._
 import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.digitalservicestax.frontend._
+import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
-class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class ValidatedTypeTests extends FlatSpec with Matchers with ConfiguredPropertyChecks {
 
   it should "fail to parse a validated tagged type using an of method" in {
     intercept[IllegalArgumentException] {
@@ -66,9 +67,13 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ScalaCheckDrivenPro
     }
   }
 
-  it should "correctly add 9 months and one day to a period" in {
-    forAll { period: Period =>
-      period.paymentDue shouldEqual period.end.plusMonths(9).plusDays(1)
+  it should "return an appropriate paymentDue date" in {
+    forAll { (p1:Period, p2:Period) =>
+      List(p1,p2).sortBy(_.end) shouldEqual List(p1, p2).sortBy(_.paymentDue)
+    }
+    forAll { p:Period =>
+      p.paymentDue > p.end.plusMonths(9) &&
+        p.paymentDue < p.end.plusMonths(10).withDayOfMonth(2) shouldBe true
     }
   }
 

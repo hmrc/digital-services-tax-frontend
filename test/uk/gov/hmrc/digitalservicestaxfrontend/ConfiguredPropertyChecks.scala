@@ -16,22 +16,9 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend
 
-import java.time.LocalDate
-
-import org.scalatest.{FlatSpec, Matchers}
-import uk.gov.hmrc.digitalservicestax.frontend._
-import TestInstances._
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class DateFormatTests extends FlatSpec with ConfiguredPropertyChecks with Matchers {
-
-  it should "create a formatter for the time right now" in {
-    formattedTimeNow.nonEmpty shouldEqual true
-  }
-
-  it should "create a date string for a date pattern" in {
-    val localDt = LocalDate.of(2020, 3, 1)
-    formatDate(localDt) shouldEqual "1 March 2020"
-  }
-
+trait ConfiguredPropertyChecks extends ScalaCheckDrivenPropertyChecks {
+  implicit val numberSuccessfulTests: PropertyCheckConfiguration = PropertyCheckConfiguration(10)
 }
+

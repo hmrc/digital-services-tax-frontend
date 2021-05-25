@@ -18,6 +18,16 @@
 
 @formatter = @{java.time.format.DateTimeFormatter.ofPattern("d MMM YYYY")}
 @cash = @{java.text.NumberFormat.getInstance.format(_: BigDecimal)}
+
+<style> 
+  .responsive-table td:nth-of-type(1):before { content: "@messages("financial-details.table.date")"; }
+  .responsive-table td:nth-of-type(2):before { content: "@messages("financial-details.table.transaction")"; }
+  .responsive-table td:nth-of-type(3):before { content: "@messages("financial-details.table.credits")"; }
+  .responsive-table td:nth-of-type(4):before { content: "@messages("financial-details.table.debits")"; }
+  .responsive-table td:nth-of-type(5):before { content: "@messages("financial-details.table.balance")"; }
+</style>
+
+
 <div class="govuk-grid-column-full">
 
   <a href="javascript:history.back();" class="govuk link-back">@messages("common.back")</a>
@@ -34,33 +44,37 @@
 
   <p>@messages("financial-details.delay", 3)</p>
 
-  <table class="govuk-table" style="margin-bottom: 30px;">
-    <caption class="govuk-table__caption"></caption>
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-	<th scope="col" class="govuk-table__header app-custom-class">@messages("financial-details.table.date")</th>
-	<th scope="col" class="govuk-table__header app-custom-class">@messages("financial-details.table.transaction")</th>
-	<th scope="col" class="govuk-table__header app-custom-class">@messages("financial-details.table.credits")</th>
-	<th scope="col" class="govuk-table__header app-custom-class">@messages("financial-details.table.debits")</th>
-	<th scope="col" class="govuk-table__header app-custom-class">@messages("financial-details.table.balance")</th>
+  <table class="responsive-table">
+    <thead>
+      <tr>
+        <th scope="col">@messages("financial-details.table.date")</th>
+        <th scope="col">@messages("financial-details.table.transaction")</th>
+        <th scope="col" class="numeric">@messages("financial-details.table.credits")</th>
+        <th scope="col" class="numeric">@messages("financial-details.table.debits")</th>
+        <th scope="col" class="numeric">@messages("financial-details.table.balance")</th>
       </tr>
     </thead>
-    <tbody class="govuk-table__body">
+    <tbody>
       @withRunningTotal = @{lineItems zip lineItems.map(_.amount).inits.toList.init.map{_.sum}.reverse}
       @withRunningTotal.map { case (FinancialTransaction(date, desc, amt), running) => 
-      <tr class="govuk-table__row">
-	<th scope="row" class="govuk-table__header">@{date.format(formatter)}</th>
-	<td class="govuk-table__cell">
-	  @* Check to see if there is a message overriding the supplied description,
-	   * if not strip 'DST' from the beginning of the description, if present.
- 	   *@
-
-	  @messages.get("financial-details.line-item." ++ desc.toLowerCase.replaceAll("[^a-z0-9]+", "-")).getOrElse(desc.replaceFirst("^DST ", ""))
-	</td>
-	<td class="govuk-table__cell">@{Option(amt) collect { case x if x > 0 => cash(amt) }}</td>
-	<td class="govuk-table__cell">@{Option(amt) collect { case x if x < 0 => cash(amt) }}</td>	
-	<td class="govuk-table__cell">@{cash(running)}</td>
-      </tr>
+        <tr>
+	        <td style="">@{date.format(formatter)}</td>
+	        <td>
+	          @* Check to see if there is a message overriding the supplied description,
+	          * if not strip 'DST' from the beginning of the description, if present.
+ 	          *@
+	          @messages.get("financial-details.line-item." ++ desc.toLowerCase.replaceAll("[^a-z0-9]+", "-")).getOrElse(desc.replaceFirst("^DST ", ""))
+	        </td>
+	        <td class="numeric">@{amt match { 
+            case x if x > 0 => cash(amt)
+            case x => Html("&nbsp;")
+          }}</td> 
+	        <td class="numeric">@{amt match { 
+            case x if x < 0 => cash(amt)
+            case x => Html("&nbsp;")
+            }}</td>	
+	        <td class="numeric">@{cash(running)}</td>
+        </tr>
       }.reverse
     </tbody>
   </table>

@@ -30,8 +30,9 @@ import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import ltbs.uniform.interpreters.playframework.DB
 import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.digitalservicestax.repo.JourneyState
+import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 
-class JsonTests extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks with OptionValues {
+class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
 
   def testJsonRoundtrip[T : Arbitrary : Format]: Assertion = {
     forAll { sample: T =>

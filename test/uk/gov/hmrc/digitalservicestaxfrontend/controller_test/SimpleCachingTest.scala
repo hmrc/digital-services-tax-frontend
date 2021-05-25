@@ -20,27 +20,29 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.outworkers.util.samplers._
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.prop.Configuration
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import uk.gov.hmrc.digitalservicestax.controllers.SimpleCaching
 import uk.gov.hmrc.digitalservicestax.data.InternalId
+import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+
 class SimpleCachingTest extends FlatSpec
   with Matchers
   with OptionValues
   with ScalaFutures
-  with ScalaCheckDrivenPropertyChecks {
-
+  with ConfiguredPropertyChecks
+{
 
   it should "add an element to the cache" in {
     val cache = SimpleCaching[InternalId]()
-
     forAll { (internalId: InternalId, checksumKey: String, storedValue: String) =>
-      val chain = for {
+      def chain = for {
         _ <- cache.apply[String](internalId, Seq(checksumKey)) {
           Future.successful(storedValue)
         }
@@ -50,7 +52,7 @@ class SimpleCachingTest extends FlatSpec
       whenReady(chain) { res =>
         res shouldBe defined
         res.value shouldEqual storedValue
-      }
+        }
     }
   }
 
@@ -82,7 +84,7 @@ class SimpleCachingTest extends FlatSpec
 
   it should "update the value of an element in the cache" in {
     val cache = SimpleCaching[InternalId]()
-    
+
     forAll { (internalId: InternalId, checksumKey: String, oldValue: String, newValue: String) =>
       val chain = for {
         _ <- cache.apply[String](internalId, checksumKey) {

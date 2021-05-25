@@ -25,6 +25,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence
 import uk.gov.hmrc.digitalservicestax.data.InternalId
+import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 
@@ -33,7 +34,7 @@ import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import scala.concurrent.Future
 
-class MongoPersistenceTest extends FakeApplicationSpec with ScalaCheckDrivenPropertyChecks {
+class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyChecks {
 
   val persistence = MongoPersistence[AuthorisedRequest[AnyContent]](
      reactiveMongoApi = reactiveMongoApi,

@@ -24,10 +24,11 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{CompanyRegWrapper, FinancialTransaction, Period, Postcode, Registration, Return, UTR}
+import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import uk.gov.hmrc.http.HeaderCarrier
 
-class DSTConnectorTest extends WiremockSpec with ScalaCheckDrivenPropertyChecks {
+class DSTConnectorTest extends WiremockSpec with ConfiguredPropertyChecks {
 
   implicit override val generatorDrivenConfig =
     PropertyCheckConfiguration(minSize = 1, minSuccessful = PosInt(1))
