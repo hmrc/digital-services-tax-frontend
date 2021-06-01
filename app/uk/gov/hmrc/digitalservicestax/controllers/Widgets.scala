@@ -111,7 +111,9 @@ trait Widgets {
       case x => Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
     }{x => x: BigDecimal}
 
-  implicit def postcodeField                  = validatedString(Postcode)
+  implicit def postcodeField                  = validatedString(Postcode)(twirlStringFields(
+    customRender = views.html.uniform.string(_,_,_,_,_,"form-control form-control-1-4")
+  ))
   implicit def nesField                       = validatedVariant(NonEmptyString)
   implicit def utrField                       = validatedString(UTR)
   implicit def emailField                     = validatedString(Email, 132)
