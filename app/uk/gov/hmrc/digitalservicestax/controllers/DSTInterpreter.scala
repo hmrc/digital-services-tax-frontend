@@ -80,8 +80,8 @@ trait DSTInterpreter
   override def pageChrome(
     keyList: List[String],
     errors: ErrorTree,
-    tell: Html,
-    ask: Html,
+    tell: Option[Html],
+    ask: Option[Html],
     breadcrumbs: List[String],
     request: Request[AnyContent],
     messages: UniformMessages[Html]): Html = {
@@ -92,7 +92,7 @@ trait DSTInterpreter
     def isKickout: Boolean = tell.toString.contains("""<div class="kickout""")
 
     val content: Html = if (isKickout) {
-      tell
+      tell.getOrElse(throw new Exception("missing tell")) // TODO - review
     } else {
       views.html.form_wrapper(
         keyList,

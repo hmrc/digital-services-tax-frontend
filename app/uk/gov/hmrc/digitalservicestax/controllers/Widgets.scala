@@ -60,10 +60,10 @@ trait Widgets {
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
-    ): Html = {
+    ): Option[Html] = {
       val existingValue: String = data.valueAtRoot.flatMap{_.headOption}.getOrElse("")
 
-      customRender(fieldKey, existingValue, errors, messages, autoFields)
+      customRender(fieldKey, existingValue, errors, messages, autoFields).some
     }
   }
 
@@ -193,14 +193,14 @@ trait Widgets {
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
-    ): Html = {
+    ): Option[Html] = {
       val options = if (pageKey.contains("about-you") || pageKey.contains("user-employed")) List(False, True) else List(True, False)
       val existingValue = data.toStringField().toOption
       views.html.uniform.radios(fieldKey,
         options,
         existingValue,
         errors,
-        messages)
+        messages).some
     }
   }
 
@@ -212,13 +212,13 @@ trait Widgets {
       breadcrumbs: Breadcrumbs,
       data: Input,
       errors: ErrorTree,
-      messages: UniformMessages[Html]): Html =
+      messages: UniformMessages[Html]): Option[Html] =
       views.html.helpers.country_select(
         fieldKey.mkString("."),
         data.values.flatten.headOption,
         errors.nonEmpty,
         messages
-      )
+      ).some
 
     override def encode(in: CountryCode): Input =
       validatedVariant(CountryCode).encode(in)
@@ -274,13 +274,13 @@ trait Widgets {
         data: Input,
         errors: ErrorTree,
         messages: UniformMessages[Html]
-      ): Html = {
+      ): Option[Html] = {
         views.html.uniform.date(
           fieldKey,
           data,
           errors,
           messages
-        )
+        ).some
       }
     }
 
@@ -299,7 +299,7 @@ trait Widgets {
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
-    ): Html = {
+    ): Option[Html] = {
       // TODO pass thru fieldKey
       views.html.uniform.address(
         fieldKey,
@@ -307,7 +307,7 @@ trait Widgets {
         errors,
         messages,
         "UkAddress"
-      )
+      ).some
     }
   }
 
@@ -326,13 +326,13 @@ trait Widgets {
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
-    ): Html = {
+    ): Option[Html] = {
       views.html.uniform.address(
         fieldKey,
         data,
         errors,
         messages
-      )
+      ).some
     }
   }
 
@@ -352,7 +352,7 @@ trait Widgets {
         data: Input,
         errors: ErrorTree,
         messages: UniformMessages[Html]
-      ): Html = {
+      ): Option[Html] = {
         val options = enum.values.map{_.entryName}
         val existingValue = decode(data).map{_.entryName}.toOption
         views.html.uniform.radios(
@@ -361,7 +361,7 @@ trait Widgets {
           existingValue,
           errors,
           messages
-        )
+        ).some
       }
     }
 
@@ -389,7 +389,7 @@ trait Widgets {
         data: Input,
         errors: ErrorTree,
         messages: UniformMessages[Html]
-      ): Html = {
+      ): Option[Html] = {
         val options = enum.values.map{_.entryName}
         val existingValues: Set[String] = decode(data).map{_.map{_.entryName}}.getOrElse(Set.empty)
         views.html.uniform.checkboxes(
@@ -398,7 +398,7 @@ trait Widgets {
           existingValues,
           errors,
           messages
-        )
+        ).some
       }
 
     }
