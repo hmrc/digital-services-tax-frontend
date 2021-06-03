@@ -37,8 +37,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import ltbs.uniform.common.web.ListingTell
-import ltbs.uniform.common.web.ListingTellRow
 import play.api.data.Form
 import play.api.data.Forms._
 import play.twirl.api.HtmlFormat
@@ -58,17 +56,18 @@ class ReturnsController @Inject()(
     with I18nSupport
     with AuthorisedFunctions
     with FrontendHeaderCarrierProvider
+    with DSTInterpreter
 {
 
-  val interpreter = DSTInterpreter(appConfig, this, messagesApi)
+//  val interpreter = DSTInterpreter(appConfig, this, messagesApi)
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
-  private implicit def autoGroupListingTell = new ListingTell[Html, GroupCompany] {
-    def apply(rows: List[ListingTellRow[GroupCompany]], messages: UniformMessages[Html]): Html =
-      views.html.uniform.listing(rows.map {
-        case ListingTellRow(value, editLink, deleteLink) => (HtmlFormat.escape(value.name), editLink, deleteLink)
-      }, messages)
-  }
+  // private implicit def autoGroupListingTell = new ListingTell[Html, GroupCompany] {
+  //   def apply(rows: List[ListingTellRow[GroupCompany]], messages: UniformMessages[Html]): Html =
+  //     views.html.uniform.listing(rows.map {
+  //       case ListingTellRow(value, editLink, deleteLink) => (HtmlFormat.escape(value.name), editLink, deleteLink)
+  //     }, messages)
+  // }
 
   private implicit val cyaRetTell = new GenericWebTell[CYA[(Return, Period, CompanyName)], Html] {
     override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Html =
@@ -91,7 +90,7 @@ class ReturnsController @Inject()(
 
   def showAmendments(): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
-      implicit val msg: UniformMessages[Html] = interpreter.messages(request)
+      implicit val msg: UniformMessages[Html] = messages(request)
 
       implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
         MongoPersistence[AuthorisedRequest[AnyContent]](
@@ -119,7 +118,7 @@ class ReturnsController @Inject()(
 
   def postAmendments(): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
-    implicit val msg: UniformMessages[Html] = interpreter.messages(request)
+    implicit val msg: UniformMessages[Html] = messages(request)
       backend.lookupAmendableReturns().flatMap { outstandingPeriods =>
         outstandingPeriods.toList match {
           case Nil =>
@@ -148,8 +147,7 @@ class ReturnsController @Inject()(
 
   def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
-      implicit val msg: UniformMessages[Html] = interpreter.messages(request)
-    import interpreter.{appConfig => _, _}
+      implicit val msg: UniformMessages[Html] = messages(request)
     import journeys.ReturnJourney._
 
     val periodKey = Period.Key(periodKeyString)
@@ -168,23 +166,29 @@ class ReturnsController @Inject()(
           periods.find(_.key == periodKey) match {
             case None => Future.successful(NotFound)
             case Some(period) =>
-              val playProgram = returnJourney[WM](
-                create[ReturnTellTypes, ReturnAskTypes](messages(request)),
-                period,
-                reg
-              )
-              playProgram.run(targetId, purgeStateUponCompletion = true, config = JourneyConfig(askFirstListItem = true)) { ret =>
+              interpret(returnJourney(period, reg)).run(targetId){ ret =>
                 backend.submitReturn(period, ret).map{ _ =>
                   Redirect(routes.ReturnsController.returnComplete(periodKeyString))
                 }
               }
+
+              // val playProgram = returnJourney[WM](
+              //   create[ReturnTellTypes, ReturnAskTypes](messages(request)),
+              //   period,
+              //   reg
+              // )
+              // playProgram.run(targetId, purgeStateUponCompletion = true, config = JourneyConfig(askFirstListItem = true)) { ret =>
+              //   backend.submitReturn(period, ret).map{ _ =>
+              //     Redirect(routes.ReturnsController.returnComplete(periodKeyString))
+              //   }
+              // }
           }
         }
     } 
   }
 
   def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = authorisedAction.async { implicit request =>
-    implicit val msg: UniformMessages[Html] = interpreter.messages(request)
+    implicit val msg: UniformMessages[Html] = messages(request)
     val submittedPeriodKey = Period.Key(submittedPeriodKeyString)
 
     for {

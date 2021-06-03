@@ -26,15 +26,12 @@ import cats.implicits._
 import java.time.LocalDate
 
 import uk.gov.hmrc.digitalservicestax.frontend._
-import ltbs.uniform.{NonEmptyString => _, _}
+import ltbs.uniform._
 import ltbs.uniform.validation._
 import ltbs.uniform.validation.Rule._
+import izumi.reflect.TagK
 
 object RegJourney {
-
-  type RegTellTypes = Confirmation[Registration] :: CYA[Registration] :: Address :: Kickout :: Company :: Boolean :: NilTypes
-  type RegAskTypes = UTR :: Postcode :: LocalDate :: ContactDetails :: UkAddress :: ForeignAddress :: Boolean :: CompanyName :: NilTypes
-
 
   private def message(key: String, args: String*) = {
     import play.twirl.api.HtmlFormat.escape
@@ -43,30 +40,27 @@ object RegJourney {
 
   def nameCheck(name: CompanyName): Boolean = name.toString.matches("""^[a-zA-Z0-9 '&-]{1,105}$""")
 
-  def registrationJourney[F[_] : Monad](
-    interpreter: Language[F, RegTellTypes, RegAskTypes],
+  def registrationJourney[F[_] : Monad : TagK](
     backendService: DSTService[F]
-  ): F[Registration] = {
-    import interpreter._
+  ) = {
 
     for {
       globalRevenues <- ask[Boolean]("global-revenues")
-      _ <- if (!globalRevenues) { end("global-revenues-not-eligible", Kickout("global-revenues-not-eligible")) } else { (()).pure[F] }
+      _ <- if (!globalRevenues) { end("global-revenues-not-eligible", Kickout("global-revenues-not-eligible")) } else { pure(()) }
       ukRevenues <- ask[Boolean]("uk-revenues")
-      _ <- if (!ukRevenues) { end("uk-revenues-not-eligible", Kickout("uk-revenues-not-eligible")) } else { (()).pure[F] }
-
-      companyRegWrapper <- backendService.lookupCompany() >>= { // gets a CompanyRegWrapper but converts to a company
+      _ <- if (!ukRevenues) { end("uk-revenues-not-eligible", Kickout("uk-revenues-not-eligible")) } else { pure(()) }
+      companyRegWrapper <- convert(backendService.lookupCompany()) flatMap { // gets a CompanyRegWrapper but converts to a company
 
         // found a matching company
         case Some(companyRW) =>
           for {
-            confirmCompany <- interact[Company, Boolean]("confirm-company-details", companyRW.company)
+            confirmCompany <- interact[Boolean]("confirm-company-details", companyRW.company)
             //TODO Here we need to sign the user out
-            _ <- if (!confirmCompany) { end("details-not-correct", Kickout("details-not-correct")) } else { (()).pure[F] }
+            _ <- if (!confirmCompany) { end("details-not-correct", Kickout("details-not-correct")) } else { pure(()) }
           } yield companyRW // useSafeId is false, no utr or safeId sent
 
         // no matching company found
-        case None => ask[Boolean]("check-company-registered-office-address") >>= {
+        case None => ask[Boolean]("check-company-registered-office-address") flatMap {
           case false =>
             for {
               companyName <- ask[CompanyName](
@@ -82,7 +76,7 @@ object RegJourney {
           case true =>
             for {
               postcode <- ask[Postcode]("company-registered-office-postcode")
-              companyWrapper <- ask[Boolean]("check-unique-taxpayer-reference") >>= {
+              companyWrapper <- ask[Boolean]("check-unique-taxpayer-reference") flatMap {
                 case false =>
                   for {
                     companyName <- ask[CompanyName](
@@ -98,7 +92,7 @@ object RegJourney {
                 case true =>
                   for {
                     utr <- ask[UTR]("enter-utr")
-                    companyOpt <- backendService.lookupCompany(utr, postcode) >>= {
+                    companyOpt <- convert(backendService.lookupCompany(utr, postcode)) flatMap {
                       case None =>
                         for {
                           companyName <- ask[CompanyName](
@@ -112,11 +106,11 @@ object RegJourney {
                         } yield CompanyRegWrapper(Company(companyName, companyAddress), useSafeId = true)
                       case Some(crw) =>
                         for {
-                          confirmCompany <- interact[Company, Boolean]("confirm-company-details", crw.company)
+                          confirmCompany <- interact[Boolean]("confirm-company-details", crw.company)
                           _ <- if (!confirmCompany) {
                             end("details-not-correct", Kickout("details-not-correct"))
                           } else {
-                            (()).pure[F]
+                            pure(())
                           }
                         } yield CompanyRegWrapper(crw.company, utr.some, crw.safeId)
                     }
@@ -128,9 +122,9 @@ object RegJourney {
 
       registration <- {
         for {
-          companyRegWrapper <- companyRegWrapper.pure[F]
+          companyRegWrapper <- pure(companyRegWrapper)
           contactAddress <- (
-            ask[Boolean]("check-contact-address") >>=[Address] {
+            ask[Boolean]("check-contact-address") flatMap {
               case true =>
                 ask[UkAddress](
                   "contact-uk-address"
@@ -140,7 +134,7 @@ object RegJourney {
                   "contact-international-address"
                 ).map(identity)
             }
-            ) when interact[Address, Boolean]("company-contact-address", companyRegWrapper.company.address).map{x => !x}
+            ) unless interact[Boolean]("company-contact-address", companyRegWrapper.company.address)
           isGroup <- ask[Boolean]("check-if-group")
           ultimateParent <- if(isGroup){
             for {
@@ -152,7 +146,7 @@ object RegJourney {
                      message("check-ultimate-parent-company-address.heading", parentName) ++
                        message("check-ultimate-parent-company-address.required", parentName)
                      )
-                 ) >>=[Address] {
+                 ) flatMap {
                    case true =>
                      ask[UkAddress](
                        "ultimate-parent-company-uk-address",
@@ -167,7 +161,7 @@ object RegJourney {
                  }
              } yield Company(parentName, parentAddress).some
            } else {
-             Option.empty[Company].pure[F]
+            pure(Option.empty[Company])
            }
           contactDetails <- ask[ContactDetails]("contact-details")
           groupMessage = if(isGroup) "group" else "company"
@@ -175,7 +169,7 @@ object RegJourney {
             "check-liability-date",
             customContent = message("check-liability-date.required", groupMessage)
           ) flatMap {
-              case true => LocalDate.of(2020, 4, 1).pure[F]
+              case true => pure(LocalDate.of(2020, 4, 1))
               case false =>
                 ask[LocalDate]("liability-start-date",
                   validation =
@@ -216,7 +210,7 @@ object RegJourney {
               message("accounting-period-end-date.day-and-year.empty", groupMessage) ++
               message("accounting-period-end-date.month-and-year.empty", groupMessage)
           )
-          emptyRegNo <- None.pure[F]
+          emptyRegNo <- pure(None)
         } yield Registration(companyRegWrapper, contactAddress , ultimateParent, contactDetails, liabilityDate, periodEndDate, emptyRegNo)
       }
 

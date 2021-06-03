@@ -22,11 +22,11 @@ import cats.data.Validated
 import cats.implicits._
 import enumeratum._
 import ltbs.uniform.common.web.GenericWebTell
-import ltbs.uniform.common.web.{FormField, FormFieldStats}
+import ltbs.uniform.common.web.FormField
 import ltbs.uniform.interpreters.playframework.Breadcrumbs
 import ltbs.uniform.validation.Rule._
 import ltbs.uniform.validation._
-import ltbs.uniform.{NonEmptyString => _, _}
+import ltbs.uniform._
 import play.twirl.api.Html
 import play.twirl.api.HtmlFormat.Appendable
 import shapeless.tag, tag.{@@}
@@ -62,6 +62,7 @@ trait Widgets {
       messages: UniformMessages[Html]
     ): Html = {
       val existingValue: String = data.valueAtRoot.flatMap{_.headOption}.getOrElse("")
+
       customRender(fieldKey, existingValue, errors, messages, autoFields)
     }
   }
@@ -111,7 +112,9 @@ trait Widgets {
       case x => Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
     }{x => x: BigDecimal}
 
-  implicit def postcodeField                  = validatedString(Postcode)
+  implicit def postcodeField                  = validatedString(Postcode)(twirlStringFields(
+    customRender = views.html.uniform.string(_,_,_,_,_,"form-control postcode")
+  ))
   implicit def nesField                       = validatedVariant(NonEmptyString)
   implicit def utrField                       = validatedString(UTR)
   implicit def emailField                     = validatedString(Email, 132)
@@ -175,8 +178,6 @@ trait Widgets {
     val True = true.toString.toUpperCase
     val False = false.toString.toUpperCase
 
-    override def stats = FormFieldStats(children = 2)
-
     def decode(out: Input): Either[ErrorTree, Boolean] =
       out.toField[Boolean](
         x => nonEmpty[String].apply(x) andThen ( y => Validated.catchOnly[IllegalArgumentException](y.toBoolean)
@@ -229,9 +230,8 @@ trait Widgets {
 
   implicit val twirlDateField: FormField[LocalDate, Html] =
     new FormField[LocalDate, Html] {
-    override def stats = FormFieldStats(children = 3)
 
-    def decode(out: Input): Either[ErrorTree, LocalDate] = {
+      def decode(out: Input): Either[ErrorTree, LocalDate] = {
 
       def stringAtKey(key: String): Validated[List[String], String] =
         Validated.fromOption(
@@ -289,8 +289,6 @@ trait Widgets {
     ffhlist: FormField[T, Html]
   ): FormField[UkAddress, Html] = new FormField[UkAddress, Html] {
 
-    override def stats = FormFieldStats(children = 5)
-
     def decode(out: Input): Either[ErrorTree, UkAddress] = ffhlist.decode(out).map(gen.from)
     def encode(in: UkAddress): Input = ffhlist.encode(gen.to(in))
 
@@ -318,8 +316,6 @@ trait Widgets {
     ffhlist: FormField[T, Html]
   ): FormField[ForeignAddress, Html] = new FormField[ForeignAddress, Html] {
 
-    override def stats = FormFieldStats(children = 5)
-
     def decode(out: Input): Either[ErrorTree, ForeignAddress] = ffhlist.decode(out).map(gen.from)
     def encode(in: ForeignAddress): Input = ffhlist.encode(gen.to(in))
 
@@ -342,8 +338,6 @@ trait Widgets {
 
   implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): FormField[A, Html] =
     new FormField[A, Html] {
-
-      override def stats = new FormFieldStats(children = enum.values.length)
 
       def decode(out: Input): Either[ErrorTree,A] = {out.toField[A](x =>
         nonEmpty[String].apply(x) andThen
@@ -373,7 +367,6 @@ trait Widgets {
 
   implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A]): FormField[Set[A], Html] =
     new FormField[Set[A], Html] {
-      override def stats = new FormFieldStats(children = enum.values.length)
 
       def decode(out: Input): Either[ErrorTree,Set[A]] = {
         val i: List[String] = out.valueAtRoot.getOrElse(Nil)

@@ -17,38 +17,31 @@
 package uk.gov.hmrc.digitalservicestax
 package journeys
 
-import scala.language.higherKinds
 import data._
 import frontend.formatDate
-import cats.Monad
 import cats.implicits._
-import ltbs.uniform.{NonEmptyString => _, _}
+import ltbs.uniform._
 import ltbs.uniform.validation._
 import uk.gov.hmrc.digitalservicestax.data.Activity.OnlineMarketplace
 
 object ReturnJourney {
-
-  type ReturnTellTypes = Confirmation[(Return, CompanyName, Period, Period)] :: CYA[(Return, Period, CompanyName)] :: GroupCompany :: NilTypes
-  type ReturnAskTypes = Set[Activity] :: Money :: RepaymentDetails :: Percent :: Boolean :: List[GroupCompany] :: NilTypes
 
   private def message(key: String, args: String*) = {
     import play.twirl.api.HtmlFormat.escape
     Map(key -> Tuple2(key, args.toList.map { escape(_).toString } ))
   }
 
-  def returnJourney[F[_] : Monad](
-    interpreter: Language[F, ReturnTellTypes, ReturnAskTypes],
+  def returnJourney(
     period: Period,
     registration: Registration
-  ): F[Return] = {
-    import interpreter._
+  ) = {
 
     val isGroup = registration.ultimateParent.isDefined
     val isGroupMessage = if(isGroup) "group" else "company"
 
-    def askAlternativeCharge(applicableActivities: Set[Activity]): F[Map[Activity, Percent]] = {
+    def askAlternativeCharge(applicableActivities: Set[Activity]) = {
 
-      def askActivityReduced(actType: Activity): F[Percent] =
+      def askActivityReduced(actType: Activity) =
         { ask[Percent](
           s"report-${Activity.toUrl(actType)}-operating-margin",
           customContent =
@@ -63,7 +56,7 @@ object ReturnJourney {
               message(s"report-${Activity.toUrl(actType)}-loss.required", isGroupMessage)
           ).map { x => !x }}
 
-      def askActivity(actType: Activity): F[Option[Percent]] = 
+      def askActivity(actType: Activity) = 
         { ask[Percent](
             s"report-${Activity.toUrl(actType)}-operating-margin",
             customContent =
@@ -78,7 +71,7 @@ object ReturnJourney {
               message(s"report-${Activity.toUrl(actType)}-loss.required", isGroupMessage)
         ).map { x => !x }} when ask[Boolean](s"report-${Activity.toUrl(actType)}-alternative-charge")
       
-      val allEntries: List[F[(Activity, Option[Percent])]] =
+      val allEntries =
         if(applicableActivities.size == 1) {
           applicableActivities.toList.map { actType =>
             askActivityReduced(actType).map { percent =>
@@ -93,25 +86,34 @@ object ReturnJourney {
           }
         }
 
-      allEntries.sequence.map { _.collect {
+      implicit val gApp: cats.Applicative[Uniform[Needs.Ask[Percent] with Needs.Ask[Boolean], ?, Unit]] = Uniform.uniformMonadInstance
+
+      val step1 = allEntries.sequence[Uniform[Needs.Ask[Percent] with Needs.Ask[Boolean], ?, Unit], (Activity, Option[Percent])]
+
+      step1.map { _.collect {
         case (a, Some(x)) => a -> x
       }.toMap }
     } emptyUnless ask[Boolean]("report-alternative-charge")
 
+    def askAmountForCompanies(companies: Option[List[GroupCompany]]) = {
+      companies.fold(pure(Map.empty[GroupCompany, Money]): Uniform[ltbs.uniform.Needs.Ask[Money] with Needs.Tell[GroupCompany],Map[GroupCompany,Money],GroupCompany]){x =>
 
-    def askAmountForCompanies(companies: Option[List[GroupCompany]]): F[Map[GroupCompany, Money]] = {
-      companies.fold(Map.empty[GroupCompany, Money].pure[F]){_.zipWithIndex.map{ case (co, i) =>
-        interact[GroupCompany, Money](
+        val z = x.zipWithIndex
+
+        val w: List[Uniform[Needs.Ask[Money] with Needs.Tell[GroupCompany],(GroupCompany, Money),GroupCompany]] = z.map{ case (co, i) =>
+        interact[Money](
           s"company-liabilities-$i",
           co,
           customContent =
             message(s"company-liabilities-$i.heading", co.name, formatDate(period.start), formatDate(period.end)) ++
-            message(s"company-liabilities-$i.required", co.name) ++
-            message(s"company-liabilities-$i.not-a-number", co.name) ++
-            message(s"company-liabilities-$i.length.exceeded", co.name) ++
-            message(s"company-liabilities-$i.invalid", co.name)
+              message(s"company-liabilities-$i.required", co.name) ++
+              message(s"company-liabilities-$i.not-a-number", co.name) ++
+              message(s"company-liabilities-$i.length.exceeded", co.name) ++
+              message(s"company-liabilities-$i.invalid", co.name)
         ).map{(co, _)}
-      }.sequence.map{_.toMap}}
+        }
+
+        w.sequence[Uniform[Needs.Ask[Money] with Needs.Tell[GroupCompany],?,GroupCompany],(GroupCompany, Money)].map{_.toMap}}
     }
 
     for {
@@ -120,9 +122,9 @@ object ReturnJourney {
 
       dstReturn <- (
         askAlternativeCharge(activities),
-        ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) >>= {
+        ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) flatMap {
           case Some(true) => ask[Money]("relief-deducted")
-          case _ => Money(BigDecimal(0).setScale(2)).pure[F]
+          case _ => pure(Money(BigDecimal(0).setScale(2)))
         },
         askAmountForCompanies(groupCos) emptyUnless isGroup,
         ask[Money](

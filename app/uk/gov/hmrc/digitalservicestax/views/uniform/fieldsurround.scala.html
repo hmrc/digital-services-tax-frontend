@@ -14,9 +14,7 @@
  * limitations under the License.
  *@
 
-@import ltbs.uniform.common.web.FormFieldStats
-
-@(key: String, content: Html, isCompoundField: Boolean, hasHint: Boolean, hasErrors: Boolean, hasIntro: Boolean, stats: FormFieldStats)(implicit messages: UniformMessages[Html])
+@(key: String, content: Html, isCompoundField: Boolean, hasHint: Boolean, hasErrors: Boolean, hasIntro: Boolean)(implicit messages: UniformMessages[Html])
 
 @describedByClass = @{
     val ariaHint = if(hasHint) Some(s"$key-hint") else None
@@ -27,7 +25,7 @@
 }
 
     @* There are more than one fieldset/formgroup on the page *@
-    @if(stats.compoundChildren >= 2) {
+    @if(true /*FIXME stats.compoundChildren >= 2*/) {
         <h1 class="heading-xlarge @if(key == "loan-amount"){margin-bottom-20}">
             @messages.get(s"$key.heading.hint").map { headHint =>
                 <span class="govuk-caption-xl@if(hasErrors){ flush--top}">

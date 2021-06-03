@@ -5,10 +5,10 @@ import sbt._
 
 object AppDependencies {
 
-  val uniformVersion = "4.10.0"
+  val uniformVersion = "4.10.1-29-db367b5-SNAPSHOT"
 
   val compile = Seq(
-
+    "com.chuusai"             %% "shapeless"                % "2.3.3",
     "uk.gov.hmrc"             %% "govuk-template"           % "5.54.0-play-26",
     "uk.gov.hmrc"             %% "play-ui"                  % "8.21.0-play-26",
     "com.beachape"            %% "enumeratum-play-json"     % "1.6.0",
