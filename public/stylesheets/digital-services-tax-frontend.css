@@ -1343,3 +1343,7 @@ only screen and (max-width: 760px),
         content: "" !important;
     }
 }
+
+.jsonly {
+    display: none;
+}
