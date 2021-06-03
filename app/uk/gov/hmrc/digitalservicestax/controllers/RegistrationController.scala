@@ -20,16 +20,16 @@ package controllers
 import data._
 import config.AppConfig
 import connectors.{DSTConnector, MongoPersistence}
-
 import javax.inject.Inject
-import ltbs.uniform.UniformMessages
+import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
-import scala.concurrent.{Future, ExecutionContext}
+
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{AuthorisedAction, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,6 +37,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import cats.instances.future._
+import ltbs.uniform.validation.Rule
 
 class RegistrationController @Inject()(
   authorisedAction: AuthorisedAction,
@@ -114,5 +115,40 @@ class RegistrationController @Inject()(
           )(views.html.end.confirmation("registration-sent", reg.companyReg.company.name, reg.contact.email)(msg)))
         )
     }
-  }  
+  }
+
+  // Members declared in ltbs.uniform.common.web.AutoListingPage
+  def renderListPage[A](
+    pageKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    existingEntries: List[ListingRow[Html]],
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    validation: Rule[List[A]]): Html = ???
+
+  // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
+  def unitAsk: WebInteraction[Unit, Html] = ???
+  def unitTell: GenericWebTell[Unit,Html] = ???
+  // Members declared in ltbs.uniform.common.web.InferFormFields
+  def renderAnd(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    members: Seq[(String, Html)]): Html = ???
+  def renderOr(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    alternatives: Seq[(String, Option[Html])],
+    selected: Option[String]): Html = ???
+  // Members declared in uk.gov.hmrc.digitalservicestax.controllers.Widgets
+  def appConfig: AppConfig = ???
+
 }

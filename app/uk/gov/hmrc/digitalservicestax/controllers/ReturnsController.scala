@@ -22,9 +22,10 @@ import config.AppConfig
 import connectors.{DSTConnector, MongoPersistence}
 import cats.implicits.catsKernelOrderingForOrder
 import javax.inject.Inject
-import ltbs.uniform.UniformMessages
-import ltbs.uniform.common.web.{GenericWebTell, JourneyConfig}
+import ltbs.uniform.{ErrorTree, Input, UniformMessages}
+import ltbs.uniform.common.web.{GenericWebTell, JourneyConfig, ListingRow, WebInteraction}
 import ltbs.uniform.interpreters.playframework.{PersistenceEngine, tellTwirlUnit}
+import ltbs.uniform.validation.Rule
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -41,6 +42,8 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
+import ltbs.uniform.common.web.Breadcrumbs
+
 
 class ReturnsController @Inject()(
   authorisedAction: AuthorisedAction,
@@ -50,7 +53,6 @@ class ReturnsController @Inject()(
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi  
 )(implicit
-  appConfig: AppConfig,
   ec: ExecutionContext
 ) extends ControllerHelpers
     with I18nSupport
@@ -59,7 +61,41 @@ class ReturnsController @Inject()(
     with DSTInterpreter
 {
 
-//  val interpreter = DSTInterpreter(appConfig, this, messagesApi)
+  // Members declared in ltbs.uniform.common.web.AutoListingPage
+  def renderListPage[A](
+    pageKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    existingEntries: List[ListingRow[Html]],
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    validation: Rule[List[A]]): Html = ???
+  // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
+  def unitAsk: WebInteraction[Unit, Html] = ???
+  def unitTell: GenericWebTell[Unit, Html] = ???
+  // Members declared in ltbs.uniform.common.web.InferFormFields
+  def renderAnd(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    members: Seq[(String, Html)]): Html = ???
+  def renderOr(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    alternatives: Seq[(String, Option[Html])],
+    selected: Option[String]): Html = ???
+  // Members declared in uk.gov.hmrc.digitalservicestax.controllers.Widgets
+  implicit def appConfig: AppConfig = ???
+
+
+  //  val interpreter = DSTInterpreter(appConfig, this, messagesApi)
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   // private implicit def autoGroupListingTell = new ListingTell[Html, GroupCompany] {
@@ -214,5 +250,6 @@ class ReturnsController @Inject()(
       }
     }
   }
+
 
 }
