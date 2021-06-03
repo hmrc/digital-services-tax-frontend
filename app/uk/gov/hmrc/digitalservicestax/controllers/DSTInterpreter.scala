@@ -17,15 +17,12 @@
 package uk.gov.hmrc.digitalservicestax.controllers
 
 import cats.syntax.semigroup._
-import ltbs.uniform.TreeLike.ops._
 import ltbs.uniform.common.web._
-import ltbs.uniform.interpreters.playframework.{Breadcrumbs, PlayInterpreter2 => PlayInterpreter, RichPlayMessages}
-import ltbs.uniform.{ErrorTree, Input, UniformMessages}
+import ltbs.uniform.interpreters.playframework.{PlayInterpreter2 => PlayInterpreter, RichPlayMessages}
+import ltbs.uniform.{ErrorTree, UniformMessages}
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.views
-import uk.gov.hmrc.digitalservicestax.views.html.uniform.radios
 
 trait DSTInterpreter
     extends PlayInterpreter[Html]

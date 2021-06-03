@@ -120,36 +120,36 @@ object ReturnJourney {
       groupCos <- ask[List[GroupCompany]]("manage-companies", validation = Rule.minLength(1)) when isGroup
       activities <- ask[Set[Activity]]("select-activities", validation = Rule.minLength(1))
 
-      dstReturn <- (
-        askAlternativeCharge(activities),
-        ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) flatMap {
+      dstReturn <- for {
+        a <- askAlternativeCharge(activities)
+        b <- ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) flatMap {
           case Some(true) => ask[Money]("relief-deducted")
           case _ => pure(Money(BigDecimal(0).setScale(2)))
-        },
-        askAmountForCompanies(groupCos) emptyUnless isGroup,
-        ask[Money](
+        }
+        c <- askAmountForCompanies(groupCos) emptyUnless isGroup
+        d <- ask[Money](
           "allowance-deducted",
           validation =
             Rule.cond[Money]({
               case money: Money if money <= 25000000 => true
               case _ => false
             }, "max-money")
-        ),
-        ask[Money]("group-liability",
+        )
+        e <- ask[Money]("group-liability",
           customContent =
             message("group-liability.heading", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
             message("group-liability.required", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
             message("group-liability.not-a-number", isGroupMessage) ++
             message("group-liability.length.exceeded", isGroupMessage) ++
             message("group-liability.invalid", isGroupMessage)
-        ),
-        ask[RepaymentDetails]("bank-details") when ask[Boolean](
+        )
+        f <- ask[RepaymentDetails]("bank-details") when ask[Boolean](
             "repayment",
             customContent =
             message("repayment.heading", formatDate(period.start), formatDate(period.end)) ++
             message("repayment.required", formatDate(period.start), formatDate(period.end))
         )
-      ).mapN(Return.apply)
+      } yield Return(a,b,c,d,e,f)
       displayName = registration.ultimateParent.fold(registration.companyReg.company.name)(_.name)
       _ <- tell("check-your-answers", CYA((dstReturn, period, displayName)))
     } yield dstReturn

@@ -20,11 +20,13 @@ import javax.inject.Inject
 import ltbs.uniform.UniformMessages
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.twirl.api.Html
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import ltbs.uniform.interpreters.playframework._
+import cats.syntax.semigroup._
 
 import scala.concurrent.ExecutionContext
+import play.twirl.api.HtmlFormat
 
 class AuthenticationController @Inject()(mcc: MessagesControllerComponents)
   (implicit appConfig: AppConfig, ec: ExecutionContext)
@@ -43,10 +45,7 @@ class AuthenticationController @Inject()(mcc: MessagesControllerComponents)
   }
 
   def timeOut: Action[AnyContent] = Action { implicit request =>
-    lazy val interpreter = DSTInterpreter(appConfig, this, messagesApi)
-    implicit val msg: UniformMessages[Html] = interpreter.messages(request)
-
+    implicit val msg = messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+| UniformMessages.bestGuess.map(HtmlFormat.escape)
     Ok(uk.gov.hmrc.digitalservicestax.views.html.end.time_out()).withNewSession
   }
 }
-

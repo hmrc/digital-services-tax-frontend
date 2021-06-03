@@ -23,8 +23,8 @@ import connectors.{DSTConnector, MongoPersistence}
 
 import javax.inject.Inject
 import ltbs.uniform.UniformMessages
-import ltbs.uniform.common.web.GenericWebTell
-import ltbs.uniform.interpreters.playframework.{PersistenceEngine, tellTwirlUnit}
+import ltbs.uniform.common.web._
+import ltbs.uniform.interpreters.playframework._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -36,6 +36,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import cats.instances.future._
 
 class RegistrationController @Inject()(
   authorisedAction: AuthorisedAction,
@@ -51,9 +52,12 @@ class RegistrationController @Inject()(
     with I18nSupport
     with AuthorisedFunctions
     with FrontendHeaderCarrierProvider
+    with DSTInterpreter
 {
 
-  val interpreter = DSTInterpreter(config, this, messagesApi)
+  /// TODO: Make Luke fix rerunOnPriorStateChange
+  implicit val futureAdapter = FutureAdapter[Html].alwaysRerun
+
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   private def hod(id: InternalId)(implicit hc: HeaderCarrier) =
@@ -72,8 +76,9 @@ class RegistrationController @Inject()(
   }
 
   def registerAction(targetId: String): Action[AnyContent] = authorisedAction.async { implicit request: AuthorisedRequest[AnyContent] =>
-    import interpreter._
     import journeys.RegJourney._
+
+    implicit val msg: UniformMessages[Html] = messages(request)
 
     implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
       MongoPersistence[AuthorisedRequest[AnyContent]](
@@ -84,13 +89,9 @@ class RegistrationController @Inject()(
 
     backend.lookupRegistration().flatMap {
       case None =>
-        val playProgram = registrationJourney[WM](
-          create[RegTellTypes, RegAskTypes](messages(request)),
-          hod(request.internalId)
-        )
-        playProgram.run(targetId, purgeStateUponCompletion = true) {
-          backend.submitRegistration(_).map { _ => Redirect(routes.RegistrationController.registrationComplete) }
-      }
+        interpret(registrationJourney(backend)).run(targetId) { ret => 
+          backend.submitRegistration(ret).map { _ => Redirect(routes.RegistrationController.registrationComplete) }
+        }
 
       case Some(_) =>
         Future.successful(Redirect(routes.JourneyController.index))
@@ -98,7 +99,7 @@ class RegistrationController @Inject()(
   }
 
   def registrationComplete: Action[AnyContent] = authorisedAction.async { implicit request =>
-    implicit val msg: UniformMessages[Html] = interpreter.messages(request)
+    implicit val msg: UniformMessages[Html] = messages(request)
 
     backend.lookupRegistration().flatMap {
       case None =>
