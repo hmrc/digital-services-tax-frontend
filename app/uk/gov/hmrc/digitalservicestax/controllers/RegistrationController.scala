@@ -47,7 +47,7 @@ class RegistrationController @Inject()(
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi  
 )(implicit
-  config: AppConfig,
+  val appConfig: AppConfig,
   ec: ExecutionContext
 ) extends ControllerHelpers
     with I18nSupport
@@ -85,7 +85,7 @@ class RegistrationController @Inject()(
       MongoPersistence[AuthorisedRequest[AnyContent]](
         mongo,
         collectionName = "uf-registrations",
-        config.mongoJourneyStoreExpireAfter        
+        appConfig.mongoJourneyStoreExpireAfter
       )(_.internalId)
 
     backend.lookupRegistration().flatMap {
@@ -116,39 +116,4 @@ class RegistrationController @Inject()(
         )
     }
   }
-
-  // Members declared in ltbs.uniform.common.web.AutoListingPage
-  def renderListPage[A](
-    pageKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    existingEntries: List[ListingRow[Html]],
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    validation: Rule[List[A]]): Html = ???
-
-  // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
-  def unitAsk: WebInteraction[Unit, Html] = ???
-  def unitTell: GenericWebTell[Unit,Html] = ???
-  // Members declared in ltbs.uniform.common.web.InferFormFields
-  def renderAnd(
-    pageKey: List[String],
-    fieldKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    members: Seq[(String, Html)]): Html = ???
-  def renderOr(
-    pageKey: List[String],
-    fieldKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    alternatives: Seq[(String, Option[Html])],
-    selected: Option[String]): Html = ???
-  // Members declared in uk.gov.hmrc.digitalservicestax.controllers.Widgets
-  def appConfig: AppConfig = ???
-
 }

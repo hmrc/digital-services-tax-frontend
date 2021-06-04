@@ -17,12 +17,12 @@
 package uk.gov.hmrc.digitalservicestax
 package journeys
 
-import data._
-import frontend.formatDate
 import cats.implicits._
 import ltbs.uniform._
 import ltbs.uniform.validation._
 import uk.gov.hmrc.digitalservicestax.data.Activity.OnlineMarketplace
+import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.digitalservicestax.frontend.formatDate
 
 object ReturnJourney {
 
@@ -86,70 +86,64 @@ object ReturnJourney {
           }
         }
 
-      implicit val gApp: cats.Applicative[Uniform[Needs.Ask[Percent] with Needs.Ask[Boolean], ?, Unit]] = Uniform.uniformMonadInstance
-
-      val step1 = allEntries.sequence[Uniform[Needs.Ask[Percent] with Needs.Ask[Boolean], ?, Unit], (Activity, Option[Percent])]
-
-      step1.map { _.collect {
+      allEntries.sequence.map { _.collect {
         case (a, Some(x)) => a -> x
       }.toMap }
     } emptyUnless ask[Boolean]("report-alternative-charge")
 
     def askAmountForCompanies(companies: Option[List[GroupCompany]]) = {
-      companies.fold(pure(Map.empty[GroupCompany, Money]): Uniform[ltbs.uniform.Needs.Ask[Money] with Needs.Tell[GroupCompany],Map[GroupCompany,Money],GroupCompany]){x =>
-
-        val z = x.zipWithIndex
-
-        val w: List[Uniform[Needs.Ask[Money] with Needs.Tell[GroupCompany],(GroupCompany, Money),GroupCompany]] = z.map{ case (co, i) =>
-        interact[Money](
-          s"company-liabilities-$i",
-          co,
-          customContent =
-            message(s"company-liabilities-$i.heading", co.name, formatDate(period.start), formatDate(period.end)) ++
-              message(s"company-liabilities-$i.required", co.name) ++
-              message(s"company-liabilities-$i.not-a-number", co.name) ++
-              message(s"company-liabilities-$i.length.exceeded", co.name) ++
-              message(s"company-liabilities-$i.invalid", co.name)
-        ).map{(co, _)}
-        }
-
-        w.sequence[Uniform[Needs.Ask[Money] with Needs.Tell[GroupCompany],?,GroupCompany],(GroupCompany, Money)].map{_.toMap}}
+      companies.fold(pure(Map.empty[GroupCompany, Money]): Uniform[Needs.Ask[Money] with Needs.Tell[GroupCompany],GroupCompany,Map[GroupCompany,Money]]) {
+        _.zipWithIndex.map { case (co, i) =>
+          interact[Money](
+            s"company-liabilities-$i",
+            co,
+            customContent =
+              message(s"company-liabilities-$i.heading", co.name, formatDate(period.start), formatDate(period.end)) ++
+                message(s"company-liabilities-$i.required", co.name) ++
+                message(s"company-liabilities-$i.not-a-number", co.name) ++
+                message(s"company-liabilities-$i.length.exceeded", co.name) ++
+                message(s"company-liabilities-$i.invalid", co.name)
+          ).map {
+            (co, _)
+          }
+        }.sequence.map{_.toMap}
+      }
     }
 
     for {
       groupCos <- ask[List[GroupCompany]]("manage-companies", validation = Rule.minLength(1)) when isGroup
       activities <- ask[Set[Activity]]("select-activities", validation = Rule.minLength(1))
 
-      dstReturn <- for {
-        a <- askAlternativeCharge(activities)
-        b <- ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) flatMap {
+      dstReturn <- (
+        askAlternativeCharge(activities),
+        ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) flatMap {
           case Some(true) => ask[Money]("relief-deducted")
           case _ => pure(Money(BigDecimal(0).setScale(2)))
-        }
-        c <- askAmountForCompanies(groupCos) emptyUnless isGroup
-        d <- ask[Money](
+        },
+        askAmountForCompanies(groupCos) emptyUnless isGroup,
+        ask[Money](
           "allowance-deducted",
           validation =
             Rule.cond[Money]({
               case money: Money if money <= 25000000 => true
               case _ => false
             }, "max-money")
-        )
-        e <- ask[Money]("group-liability",
+        ),
+        ask[Money]("group-liability",
           customContent =
             message("group-liability.heading", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
             message("group-liability.required", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
             message("group-liability.not-a-number", isGroupMessage) ++
             message("group-liability.length.exceeded", isGroupMessage) ++
             message("group-liability.invalid", isGroupMessage)
-        )
-        f <- ask[RepaymentDetails]("bank-details") when ask[Boolean](
+        ),
+        ask[RepaymentDetails]("bank-details") when ask[Boolean](
             "repayment",
             customContent =
             message("repayment.heading", formatDate(period.start), formatDate(period.end)) ++
             message("repayment.required", formatDate(period.start), formatDate(period.end))
         )
-      } yield Return(a,b,c,d,e,f)
+      ).mapN(Return.apply)
       displayName = registration.ultimateParent.fold(registration.companyReg.company.name)(_.name)
       _ <- tell("check-your-answers", CYA((dstReturn, period, displayName)))
     } yield dstReturn

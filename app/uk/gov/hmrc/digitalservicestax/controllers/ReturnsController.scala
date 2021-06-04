@@ -53,6 +53,7 @@ class ReturnsController @Inject()(
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi  
 )(implicit
+  val appConfig: AppConfig,
   ec: ExecutionContext
 ) extends ControllerHelpers
     with I18nSupport
@@ -61,41 +62,6 @@ class ReturnsController @Inject()(
     with DSTInterpreter
 {
 
-  // Members declared in ltbs.uniform.common.web.AutoListingPage
-  def renderListPage[A](
-    pageKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    existingEntries: List[ListingRow[Html]],
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    validation: Rule[List[A]]): Html = ???
-  // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
-  def unitAsk: WebInteraction[Unit, Html] = ???
-  def unitTell: GenericWebTell[Unit, Html] = ???
-  // Members declared in ltbs.uniform.common.web.InferFormFields
-  def renderAnd(
-    pageKey: List[String],
-    fieldKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    members: Seq[(String, Html)]): Html = ???
-  def renderOr(
-    pageKey: List[String],
-    fieldKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    alternatives: Seq[(String, Option[Html])],
-    selected: Option[String]): Html = ???
-  // Members declared in uk.gov.hmrc.digitalservicestax.controllers.Widgets
-  implicit def appConfig: AppConfig = ???
-
-
-  //  val interpreter = DSTInterpreter(appConfig, this, messagesApi)
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   // private implicit def autoGroupListingTell = new ListingTell[Html, GroupCompany] {
@@ -207,17 +173,6 @@ class ReturnsController @Inject()(
                   Redirect(routes.ReturnsController.returnComplete(periodKeyString))
                 }
               }
-
-              // val playProgram = returnJourney[WM](
-              //   create[ReturnTellTypes, ReturnAskTypes](messages(request)),
-              //   period,
-              //   reg
-              // )
-              // playProgram.run(targetId, purgeStateUponCompletion = true, config = JourneyConfig(askFirstListItem = true)) { ret =>
-              //   backend.submitReturn(period, ret).map{ _ =>
-              //     Redirect(routes.ReturnsController.returnComplete(periodKeyString))
-              //   }
-              // }
           }
         }
     } 

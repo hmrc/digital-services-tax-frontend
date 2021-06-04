@@ -21,23 +21,23 @@ import java.time.LocalDate
 import cats.data.Validated
 import cats.implicits._
 import enumeratum._
-import ltbs.uniform.common.web.GenericWebTell
-import ltbs.uniform.common.web.FormField
+import ltbs.uniform.common.web.{FormField, GenericWebTell, ListingRow, WebInteraction}
 import ltbs.uniform.interpreters.playframework.Breadcrumbs
 import ltbs.uniform.validation.Rule._
 import ltbs.uniform.validation._
 import ltbs.uniform._
 import play.twirl.api.Html
 import play.twirl.api.HtmlFormat.Appendable
-import shapeless.tag, tag.{@@}
+import shapeless.tag
+import tag.@@
 import uk.gov.hmrc.digitalservicestax._
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.frontend.{RichAddress, Kickout}
+import uk.gov.hmrc.digitalservicestax.frontend.{Kickout, RichAddress}
 
 trait Widgets {
 
-  def appConfig: AppConfig
+  implicit val appConfig: AppConfig
 
   implicit val twirlStringField: FormField[String, Html] = twirlStringFields()
 
@@ -438,4 +438,40 @@ trait Widgets {
     override def render(in: Boolean, key: String, messages: UniformMessages[Html]): Html =
       Html(in.toString)
   }
+
+
+  // TODO implement twirl versions
+  // Members declared in ltbs.uniform.common.web.AutoListingPage
+  def renderListPage[A](
+    pageKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    existingEntries: List[ListingRow[Html]],
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    validation: Rule[List[A]]): Html = ???
+  // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
+  def unitAsk: WebInteraction[Unit, Html] = ???
+  def unitTell: GenericWebTell[Unit, Html] = ???
+  // Members declared in ltbs.uniform.common.web.InferFormFields
+  def renderAnd(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    members: Seq[(String, Html)]): Html = ???
+  def renderOr(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    alternatives: Seq[(String, Option[Html])],
+    selected: Option[String]): Html = ???
+
+
+
 }
