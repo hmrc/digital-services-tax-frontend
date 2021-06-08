@@ -439,39 +439,4 @@ trait Widgets {
       Html(in.toString)
   }
 
-
-  // TODO implement twirl versions
-  // Members declared in ltbs.uniform.common.web.AutoListingPage
-  def renderListPage[A](
-    pageKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    existingEntries: List[ListingRow[Html]],
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    validation: Rule[List[A]]): Html = ???
-  // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
-  def unitAsk: WebInteraction[Unit, Html] = ???
-  def unitTell: GenericWebTell[Unit, Html] = ???
-  // Members declared in ltbs.uniform.common.web.InferFormFields
-  def renderAnd(
-    pageKey: List[String],
-    fieldKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    members: Seq[(String, Html)]): Html = ???
-  def renderOr(
-    pageKey: List[String],
-    fieldKey: List[String],
-    breadcrumbs: Breadcrumbs,
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    alternatives: Seq[(String, Option[Html])],
-    selected: Option[String]): Html = ???
-
-
-
 }

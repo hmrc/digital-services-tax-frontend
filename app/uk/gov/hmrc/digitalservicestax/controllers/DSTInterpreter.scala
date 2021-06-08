@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.digitalservicestax.controllers
 
-import cats.syntax.semigroup._
+import cats.implicits._
 import ltbs.uniform.common.web._
-import ltbs.uniform.interpreters.playframework.{PlayInterpreter2 => PlayInterpreter, RichPlayMessages}
-import ltbs.uniform.{ErrorTree, UniformMessages}
+import ltbs.uniform.interpreters.playframework.{RichPlayMessages, PlayInterpreter2 => PlayInterpreter, mon}
+import ltbs.uniform._
+import ltbs.uniform.validation.Rule
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.digitalservicestax.views
+import uk.gov.hmrc.digitalservicestax.views.html.uniform.radios
 
 trait DSTInterpreter
     extends PlayInterpreter[Html]
@@ -32,40 +34,71 @@ trait DSTInterpreter
 
   def messagesApi: play.api.i18n.MessagesApi
 
-  // def renderProduct[A](
-  //   pageKey: List[String],
-  //   fieldKey: List[String],    
-  //   path: Breadcrumbs,
-  //   values: Input,
-  //   errors: ErrorTree,
-  //   messages: UniformMessages[Html],
-  //   pfl: ProductFieldList[A, Html]
-  // ): Html = Html(
-  //   pfl.inner.map { case (subFieldId, f) =>
-  //     f(pageKey, fieldKey :+ subFieldId, path, values / subFieldId, errors / subFieldId, messages).toString
-  //   }.mkString
-  // )
+  // TODO implement twirl versions
+  // Members declared in ltbs.uniform.common.web.AutoListingPage
+  def renderListPage[A](
+    pageKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    existingEntries: List[ListingRow[Html]],
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    validation: Rule[List[A]]): Html = ???
 
-  // def renderCoproduct[A](
-  //   pageKey: List[String],
-  //   fieldKey: List[String],    
-  //   path: Breadcrumbs,
-  //   values: Input,
-  //   errors: ErrorTree,
-  //   messages: UniformMessages[Html],
-  //   cfl: CoproductFieldList[A,Html]): Html = {
-  //   val value: Option[String] = values.valueAtRoot.flatMap {_.headOption}
-  //   radios(
-  //     fieldKey,
-  //     cfl.inner.map{_._1}.orderYesNoRadio,
-  //     value,
-  //     errors,
-  //     messages,
-  //     cfl.inner.map{
-  //       case(subkey,f) => subkey -> f(pageKey, fieldKey :+ subkey, path, {values / subkey}, errors / subkey, messages)
-  //     }.filter(_._2.toString.trim.nonEmpty).toMap
-  //   )
-  // }
+  // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
+  def unitAsk: WebInteraction[Unit, Html] = new FormField[Unit, Html] {
+    override def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = None
+
+    override def encode(in: Unit): Input = Input.empty
+
+    override def decode(out: Input): Either[ErrorTree, Unit] = Right(())
+  }
+
+  def unitTell: GenericWebTell[Unit, Html] = new GenericWebTell[Unit, Html] {
+    def render(in: Unit, key: String, messages: UniformMessages[Html]): Html = Html("")
+  }
+
+   def renderAnd(
+     pageKey: List[String],
+     fieldKey: List[String],
+     breadcrumbs: Breadcrumbs,
+     data: Input,
+     errors: ErrorTree,
+     messages: UniformMessages[Html],
+     members: Seq[(String, Html)]
+   ): Html = Html(
+     members.map { x =>
+       x._2.toString
+     }.mkString
+   )
+
+  def renderOr(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    alternatives: Seq[(String, Option[Html])],
+    selected: Option[String]): Html = {
+      radios(
+        fieldKey,
+        alternatives.map{_._1},
+        selected,
+        errors,
+        messages,
+        alternatives.collect {
+          case (name, Some(html)) => name -> html
+        }.toMap
+      )
+  }
 
   // def blankTell: Html = Html("")
 
@@ -97,7 +130,7 @@ trait DSTInterpreter
       views.html.form_wrapper(
         keyList,
         errors,
-        Html(tell.toString + ask.toString),
+        List(tell, ask).flatten.combineAll,
         List(breadcrumbs.drop(1))
       )(messages, request)
     }
