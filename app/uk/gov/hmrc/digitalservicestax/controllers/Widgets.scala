@@ -39,7 +39,7 @@ trait Widgets {
 
   implicit val appConfig: AppConfig
 
-  implicit val twirlStringField: FormField[String, Html] = twirlStringFields()
+  implicit val twirlStringField: FormField[Html, String] = twirlStringFields()
 
   type CustomStringRenderer =
     (List[String], String, ErrorTree, UniformMessages[Html], Option[String]) => Appendable
@@ -47,7 +47,7 @@ trait Widgets {
   def twirlStringFields(
     autoFields: Option[String] = None,
     customRender: CustomStringRenderer = views.html.uniform.string.apply(_,_,_,_,_)
-  ): FormField[String, Html] = new FormField[String, Html] {
+  ): FormField[Html, String] = new FormField[Html, String] {
     def decode(out: Input): Either[ErrorTree, String] =
       out.toStringField().toEither
 
@@ -68,8 +68,8 @@ trait Widgets {
   }
 
   def validatedVariant[BaseType](validated: ValidatedType[BaseType])(
-    implicit baseForm: FormField[BaseType, Html]
-  ): FormField[BaseType @@ validated.Tag, Html] =
+    implicit baseForm: FormField[Html, BaseType]
+  ): FormField[Html, BaseType @@ validated.Tag] =
     baseForm.simap{x =>
       Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
     }{x => x: BaseType}
@@ -78,8 +78,8 @@ trait Widgets {
     validated: ValidatedType[String],
     maxLen: Int = Integer.MAX_VALUE
   )(
-    implicit baseForm: FormField[String, Html]
-  ): FormField[String @@ validated.Tag, Html] =
+    implicit baseForm: FormField[Html, String]
+  ): FormField[Html, String @@ validated.Tag] =
     baseForm.simap{
       case x if x.trim.isEmpty => Left(ErrorMsg("required").toTree)
       case l if l.length > maxLen => Left(ErrorMsg("length.exceeded").toTree)
@@ -89,7 +89,7 @@ trait Widgets {
   def inlineOptionString(
     validated: ValidatedType[String],
     maxLen: Int = Integer.MAX_VALUE
-  ): FormField[Option[String @@ validated.Tag], Html] =
+  ): FormField[Html, Option[String @@ validated.Tag]] =
     twirlStringField.simap{
       case "" => Right(None)
       case l if l.length > maxLen => Left(ErrorMsg("length.exceeded").toTree)
@@ -105,8 +105,8 @@ trait Widgets {
     validated: ValidatedType[BigDecimal],
     maxLen: Int = Integer.MAX_VALUE
   )(
-    implicit baseForm: FormField[BigDecimal, Html]
-  ): FormField[BigDecimal @@ validated.Tag, Html] =
+    implicit baseForm: FormField[Html, BigDecimal]
+  ): FormField[Html, BigDecimal @@ validated.Tag] =
     baseForm.simap{
       case l if l.precision > maxLen => Left(ErrorMsg("length.exceeded").toTree)
       case x => Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
@@ -136,9 +136,9 @@ trait Widgets {
   implicit def optAddressField                = inlineOptionString(AddressLine, 35)
   implicit def restrictField                  = validatedString(RestrictiveString, 35)
 
-  implicit def optUtrField: FormField[Option[UTR], Html] = inlineOptionString(UTR)
+  implicit def optUtrField: FormField[Html, Option[UTR]] = inlineOptionString(UTR)
 
-  implicit val intField: FormField[Int,Html] =
+  implicit val intField: FormField[Html, Int] =
     twirlStringFields().simap(x => 
       {
         Rule.nonEmpty[String].apply(x) andThen
@@ -146,7 +146,7 @@ trait Widgets {
       }.toEither
     )(_.toString)
 
-  implicit val floatField: FormField[Float, Html] =
+  implicit val floatField: FormField[Html, Float] =
     twirlStringFields(
       customRender = views.html.uniform.string(_,_,_,_,_,"form-control govuk-input--width-4 govuk-input-z-index")
     ).simap(x =>
@@ -156,7 +156,7 @@ trait Widgets {
       }.toEither
     )(_.toString)
 
-  implicit val longField: FormField[Long,Html] =
+  implicit val longField: FormField[Html, Long] =
     twirlStringFields().simap(x => 
       {
         Rule.nonEmpty[String].apply(x.replace("%", "")) andThen
@@ -164,7 +164,7 @@ trait Widgets {
       }.toEither
     )(_.toString)
 
-  implicit val bigdecimalField: FormField[BigDecimal,Html] = {
+  implicit val bigdecimalField: FormField[Html, BigDecimal] = {
     twirlStringFields(
       customRender = views.html.uniform.string(_,_,_,_,_,"govuk-input-money govuk-input--width-10")
     ).simap(x => {
@@ -174,7 +174,7 @@ trait Widgets {
     )(_.toString)
   }
 
-  implicit val twirlBoolField = new FormField[Boolean, Html] {
+  implicit val twirlBoolField = new FormField[Html, Boolean] {
     val True = true.toString.toUpperCase
     val False = false.toString.toUpperCase
 
@@ -204,7 +204,7 @@ trait Widgets {
     }
   }
 
-  implicit val twirlCountryCodeField = new FormField[CountryCode, Html] {
+  implicit val twirlCountryCodeField = new FormField[Html, CountryCode] {
 
     override def render(
       pageKey: List[String],
@@ -228,8 +228,8 @@ trait Widgets {
 
   }
 
-  implicit val twirlDateField: FormField[LocalDate, Html] =
-    new FormField[LocalDate, Html] {
+  implicit val twirlDateField: FormField[Html, LocalDate] =
+    new FormField[Html, LocalDate] {
 
       def decode(out: Input): Either[ErrorTree, LocalDate] = {
 
@@ -286,8 +286,8 @@ trait Widgets {
 
   implicit def twirlUKAddressField[T](
     implicit gen: shapeless.LabelledGeneric.Aux[UkAddress,T],
-    ffhlist: FormField[T, Html]
-  ): FormField[UkAddress, Html] = new FormField[UkAddress, Html] {
+    ffhlist: FormField[Html, T]
+  ): FormField[Html, UkAddress] = new FormField[Html, UkAddress] {
 
     def decode(out: Input): Either[ErrorTree, UkAddress] = ffhlist.decode(out).map(gen.from)
     def encode(in: UkAddress): Input = ffhlist.encode(gen.to(in))
@@ -313,8 +313,8 @@ trait Widgets {
 
   implicit def twirlForeignAddressField[T](
     implicit gen: shapeless.LabelledGeneric.Aux[ForeignAddress,T],
-    ffhlist: FormField[T, Html]
-  ): FormField[ForeignAddress, Html] = new FormField[ForeignAddress, Html] {
+    ffhlist: FormField[Html, T]
+  ): FormField[Html, ForeignAddress] = new FormField[Html, ForeignAddress] {
 
     def decode(out: Input): Either[ErrorTree, ForeignAddress] = ffhlist.decode(out).map(gen.from)
     def encode(in: ForeignAddress): Input = ffhlist.encode(gen.to(in))
@@ -336,8 +336,8 @@ trait Widgets {
     }
   }
 
-  implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): FormField[A, Html] =
-    new FormField[A, Html] {
+  implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): FormField[Html, A] =
+    new FormField[Html, A] {
 
       def decode(out: Input): Either[ErrorTree,A] = {out.toField[A](x =>
         nonEmpty[String].apply(x) andThen
@@ -365,8 +365,8 @@ trait Widgets {
       }
     }
 
-  implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A]): FormField[Set[A], Html] =
-    new FormField[Set[A], Html] {
+  implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A]): FormField[Html, Set[A]] =
+    new FormField[Html, Set[A]] {
 
       def decode(out: Input): Either[ErrorTree,Set[A]] = {
         val i: List[String] = out.valueAtRoot.getOrElse(Nil)
@@ -403,7 +403,7 @@ trait Widgets {
 
     }
 
-  implicit val addressTell = new GenericWebTell[Address, Html] {
+  implicit val addressTell = new GenericWebTell[Html, Address] {
     override def render(in: Address, key: String, messages: UniformMessages[Html]): Html =
       Html(
         s"<div id='${key}--sfer-content'>" +
@@ -412,17 +412,17 @@ trait Widgets {
       )
   }
 
-  implicit val kickoutTell = new GenericWebTell[Kickout, Html] {
+  implicit val kickoutTell = new GenericWebTell[Html, Kickout] {
     override def render(in: Kickout, key: String, messages: UniformMessages[Html]): Html =
       views.html.end.kickout(key)(messages, appConfig)
   }
 
-  implicit val groupCoTell = new GenericWebTell[GroupCompany, Html] {
+  implicit val groupCoTell = new GenericWebTell[Html, GroupCompany] {
     override def render(in: GroupCompany, key: String, messages: UniformMessages[Html]): Html =
       Html("")
   }
 
-  implicit val companyTell = new GenericWebTell[Company, Html] {
+  implicit val companyTell = new GenericWebTell[Html, Company] {
     override def render(in: Company, key: String, messages: UniformMessages[Html]): Html =
       Html(
         s"<p class='govuk-body-l' id='${key}--sfer-content'>" +
@@ -434,7 +434,7 @@ trait Widgets {
       )
   }
 
-  implicit val booleanTell = new GenericWebTell[Boolean, Html] {
+  implicit val booleanTell = new GenericWebTell[Html, Boolean] {
     override def render(in: Boolean, key: String, messages: UniformMessages[Html]): Html =
       Html(in.toString)
   }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.digitalservicestax.controllers
 
 import cats.implicits._
 import ltbs.uniform.common.web._
-import ltbs.uniform.interpreters.playframework.{RichPlayMessages, PlayInterpreter2 => PlayInterpreter, mon}
+import ltbs.uniform.interpreters.playframework.{RichPlayMessages, PlayInterpreter, mon}
 import ltbs.uniform._
 import ltbs.uniform.validation.Rule
 import play.api.mvc.{AnyContent, Request, Results}
@@ -46,7 +46,7 @@ trait DSTInterpreter
     validation: Rule[List[A]]): Html = ???
 
   // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
-  def unitAsk: WebInteraction[Unit, Html] = new FormField[Unit, Html] {
+  def unitAsk: WebInteraction[Html, Unit] = new FormField[Html, Unit] {
     override def render(
       pageKey: List[String],
       fieldKey: List[String],
@@ -61,7 +61,7 @@ trait DSTInterpreter
     override def decode(out: Input): Either[ErrorTree, Unit] = Right(())
   }
 
-  def unitTell: GenericWebTell[Unit, Html] = new GenericWebTell[Unit, Html] {
+  def unitTell: GenericWebTell[Html, Unit] = new GenericWebTell[Html, Unit] {
     def render(in: Unit, key: String, messages: UniformMessages[Html]): Html = Html("")
   }
 

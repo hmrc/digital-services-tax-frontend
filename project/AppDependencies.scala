@@ -5,7 +5,7 @@ import sbt._
 
 object AppDependencies {
 
-  val uniformVersion = "4.10.1-30-d9c34f6-SNAPSHOT"
+  val uniformVersion = "4.10.1-35-0ece894-SNAPSHOT"
 
   val compile = Seq(
     "com.chuusai"             %% "shapeless"                % "2.3.3",

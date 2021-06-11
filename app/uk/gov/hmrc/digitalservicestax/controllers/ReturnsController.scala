@@ -71,12 +71,12 @@ class ReturnsController @Inject()(
   //     }, messages)
   // }
 
-  private implicit val cyaRetTell = new GenericWebTell[CYA[(Return, Period, CompanyName)], Html] {
+  private implicit val cyaRetTell = new GenericWebTell[Html, CYA[(Return, Period, CompanyName)]] {
     override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Html =
       views.html.cya.check_your_return_answers(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages)
   }
 
-  private implicit val confirmRetTell = new GenericWebTell[Confirmation[(Return, CompanyName, Period, Period)], Html] {
+  private implicit val confirmRetTell = new GenericWebTell[Html, Confirmation[(Return, CompanyName, Period, Period)]] {
     override def render(in: Confirmation[(Return, CompanyName, Period, Period)], key: String, messages: UniformMessages[Html]): Html =
       views.html.end.confirmation_return(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period)(messages)
   }
@@ -161,7 +161,7 @@ class ReturnsController @Inject()(
         appConfig.mongoJourneyStoreExpireAfter
       )(_.internalId)
 
-    backend.lookupRegistration().flatMap{
+      backend.lookupRegistration().flatMap{
       case None      => Future.successful(NotFound)
       case Some(reg) =>
         backend.lookupAllReturns().flatMap { periods =>

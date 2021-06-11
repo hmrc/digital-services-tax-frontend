@@ -257,7 +257,7 @@ object TestInstances {
   implicit def financialDetailsArd: Arbitrary[FinancialTransaction] = Arbitrary((
     arbitrary[LocalDate],
     arbitrary[String],
-    arbitrary[BigDecimal]
+    arbitrary[BigDecimal].map(_.setScale(2))
   ).mapN(FinancialTransaction.apply))
 
   def neString(maxLen: Int = 255) = (
