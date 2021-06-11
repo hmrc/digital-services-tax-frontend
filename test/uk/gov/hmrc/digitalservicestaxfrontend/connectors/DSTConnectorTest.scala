@@ -186,7 +186,7 @@ class DSTConnectorTest extends WiremockSpec with ConfiguredPropertyChecks {
     }
   }
 
-  "should lookup a list of financial transactions successfully" in {
+  "should lookup a list of financial transactions successfully" ignore {
     forAll { financialTransactions: List[FinancialTransaction] =>
 
       stubFor(
