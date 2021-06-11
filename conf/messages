@@ -144,8 +144,9 @@ company-registered-office-international-address.countryCode.heading=Country
 not-found-company-name.heading=What is the name of the company you want to register?
 not-found-company-name.heading.hint=Your company details
 not-found-company-name.hint=This is the name registered with an official company register, such as Companies House.
+not-found-company-name.required=The company you want to register must be on an official company register, such as Companies House.
 
-not-found-company-registered-office-uk-address.heading=Where is the registered office address of {0}?
+not-found-company-registered-office-uk-address.listing.heading=Where is the registered office address of {0}?
 not-found-company-registered-office-uk-address.heading.hint=Your company details
 not-found-company-registered-office-uk-address.line1.heading=Building or street
 not-found-company-registered-office-uk-address.line2.heading=Building or street line 2 (optional)
