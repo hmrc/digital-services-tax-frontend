@@ -96,7 +96,14 @@
             * labels & their inputs
             *@
             @if(messages.get(s"$key.listing.heading").isDefined) {
-                <h1 class="heading-xlarge">@messages.get(s"$key.listing.heading")</h1>
+                <h1 class="heading-xlarge">
+                    @messages.get(s"$key.heading.hint").map { headHint =>
+                        <span class="govuk-caption-xl@if(hasErrors){ flush--top}">
+                        @headHint
+                        </span>
+                    }
+                    @messages.get(s"$key.listing.heading")
+                </h1>
             }
             @content
         }
