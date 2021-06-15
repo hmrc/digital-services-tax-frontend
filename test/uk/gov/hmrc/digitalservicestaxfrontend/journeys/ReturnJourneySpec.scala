@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
+import cats.implicits._
 import ltbs.uniform.interpreters.logictable._
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.digitalservicestax.data.Activity.SocialMedia
