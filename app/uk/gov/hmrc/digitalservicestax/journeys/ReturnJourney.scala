@@ -117,37 +117,43 @@ object ReturnJourney {
     for {
       groupCos <- ask[List[GroupCompany]]("manage-companies", validation = Rule.minLength(1)) when isGroup
       activities <- ask[Set[Activity]]("select-activities", validation = Rule.minLength(1))
-
-      dstReturn <- (
-        askAlternativeCharge(activities),
-        ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) >>= {
-          case Some(true) => ask[Money]("relief-deducted")
-          case _ => Money(BigDecimal(0).setScale(2)).pure[F]
-        },
-        askAmountForCompanies(groupCos) emptyUnless isGroup,
-        ask[Money](
-          "allowance-deducted",
-          validation =
-            Rule.cond[Money]({
-              case money: Money if money <= 25000000 => true
-              case _ => false
-            }, "max-money")
-        ),
-        ask[Money]("group-liability",
-          customContent =
-            message("group-liability.heading", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
-            message("group-liability.required", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
-            message("group-liability.not-a-number", isGroupMessage) ++
-            message("group-liability.length.exceeded", isGroupMessage) ++
-            message("group-liability.invalid", isGroupMessage)
-        ),
-        ask[RepaymentDetails]("bank-details") when ask[Boolean](
-            "repayment",
-            customContent =
-            message("repayment.heading", formatDate(period.start), formatDate(period.end)) ++
-            message("repayment.required", formatDate(period.start), formatDate(period.end))
+      dstReturn <- for {
+        alternateCharge         <- askAlternativeCharge(activities)
+        crossBorderReliefAmount <- ask[Boolean] ("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) >>= {
+                                     case Some(true) => ask[Money]("relief-deducted")
+                                     case _ => Money(BigDecimal(0).setScale(2)).pure[F]
+                                   }
+        allowanceAmount         <- ask[Money] (
+                                     "allowance-deducted",
+                                         validation = Rule.cond[Money] ( {
+                                           case money: Money if money <= 25000000 => true
+                                           case _ => false
+                                         }, "max-money")
+                                       ) when alternateCharge.forall{case (_,v) => v > 0 }
+        companiesAmount         <- askAmountForCompanies(groupCos) emptyUnless isGroup
+        totalLiability          <- ask[Money] (
+                                     "group-liability",
+                                     customContent =
+                                       message("group-liability.heading", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
+                                         message("group-liability.required", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
+                                         message("group-liability.not-a-number", isGroupMessage) ++
+                                         message("group-liability.length.exceeded", isGroupMessage) ++
+                                         message("group-liability.invalid", isGroupMessage))
+        repayment               <- ask[RepaymentDetails] ("bank-details") when
+                                     ask[Boolean] (
+                                       "repayment",
+                                       customContent =
+                                         message("repayment.heading", formatDate(period.start), formatDate(period.end)) ++
+                                           message("repayment.required", formatDate(period.start), formatDate(period.end)))
+      } yield
+        Return(
+          alternateCharge,
+          crossBorderReliefAmount,
+          allowanceAmount,
+          companiesAmount,
+          totalLiability,
+          repayment
         )
-      ).mapN(Return.apply)
       displayName = registration.ultimateParent.fold(registration.companyReg.company.name)(_.name)
       _ <- tell("check-your-answers", CYA((dstReturn, period, displayName)))
     } yield dstReturn
