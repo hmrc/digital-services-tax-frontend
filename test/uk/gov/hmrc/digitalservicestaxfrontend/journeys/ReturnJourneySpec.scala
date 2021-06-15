@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
-import cats.implicits._
 import ltbs.uniform.interpreters.logictable._
-import uk.gov.hmrc.digitalservicestax.data._
-import SampleData._
-import uk.gov.hmrc.digitalservicestax.journeys.ReturnJourney
 import org.scalatest.{FlatSpec, Matchers}
-import uk.gov.hmrc.digitalservicestax.data.Activity.{OnlineMarketplace, SearchEngine, SocialMedia}
+import uk.gov.hmrc.digitalservicestax.data.Activity.SocialMedia
+import uk.gov.hmrc.digitalservicestax.data.SampleData._
+import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.digitalservicestax.journeys.ReturnJourney
 
 import scala.util.matching.Regex
 
