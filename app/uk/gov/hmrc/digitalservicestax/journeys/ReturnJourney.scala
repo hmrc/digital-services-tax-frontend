@@ -129,7 +129,7 @@ object ReturnJourney {
                                            case money: Money if money <= 25000000 => true
                                            case _ => false
                                          }, "max-money")
-                                       ) when alternateCharge.values.nonEmpty
+                                       ) when alternateCharge.forall{case (_,v) => v > 0 }
         companiesAmount         <- askAmountForCompanies(groupCos) emptyUnless isGroup
         totalLiability          <- ask[Money] (
                                      "group-liability",

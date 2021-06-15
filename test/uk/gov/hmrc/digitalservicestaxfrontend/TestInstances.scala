@@ -161,7 +161,7 @@ object TestInstances {
   def genActivityPercentMap: Gen[Map[Activity, Percent]] = Gen.mapOf(
     (
       arbitrary[Activity],
-      Gen.oneOf(Gen.choose(0,100), Gen.const(0)).map{x => Percent.apply(x.asInstanceOf[Float])}
+      Gen.choose(0,100).map{x => Percent.apply(x.asInstanceOf[Float])}
       ).tupled
   )
 
