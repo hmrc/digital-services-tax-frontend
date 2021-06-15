@@ -18,10 +18,11 @@ package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
 import cats.implicits._
 import ltbs.uniform.interpreters.logictable._
-import uk.gov.hmrc.digitalservicestax.data._, SampleData._
+import uk.gov.hmrc.digitalservicestax.data._
+import SampleData._
 import uk.gov.hmrc.digitalservicestax.journeys.ReturnJourney
 import org.scalatest.{FlatSpec, Matchers}
-import uk.gov.hmrc.digitalservicestax.data.Activity.SocialMedia
+import uk.gov.hmrc.digitalservicestax.data.Activity.{OnlineMarketplace, SearchEngine, SocialMedia}
 
 import scala.util.matching.Regex
 
@@ -132,4 +133,65 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
     ret.repayment  should be ('empty)
   }
 
+  "Return.allowanceAmount" should "not be asked when activity doesn't apply alternative charge" in {
+    // social media only
+    implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
+    // no to alternative charge
+    implicit val sampleBooleanAsk = instancesF {
+      case "report-social-media-alternative-charge" => List(false)
+      case _ => List(true)
+    }
+    val ret:Return = ReturnJourney.returnJourney(
+      new TestReturnInterpreter,
+      samplePeriod,
+      sampleReg
+    ).value.run.asOutcome()
+    ret.allowanceAmount should be ('empty)
+  }
+
+  "Return.allowanceAmount" should "not be asked when 0 Percentage supplied for activity" in {
+    // social media only
+    implicit val sampleActivitySetAsk: SampleData[Set[Activity]] = instances(Set[Activity](SocialMedia))
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
+      case "report-social-media-loss" => List(false)
+      case _ => List(true)
+    }
+    implicit val samplePercentAsk = instancesF {
+      case "report-social-media-operating-margin" => List(Percent(0))
+      case _ => List.empty[Percent]
+    }
+    val ret:Return = ReturnJourney.returnJourney(
+      new TestReturnInterpreter,
+      samplePeriod,
+      sampleReg
+    ).value.run.asOutcome()
+    ret.allowanceAmount should be ('empty)
+  }
+
+  "Return.allowanceAmount" should "be asked when activity does apply alternative charge" in {
+    // social media only
+    implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
+    // no to alternative charge
+    val ret:Return = ReturnJourney.returnJourney(
+      new TestReturnInterpreter,
+      samplePeriod,
+      sampleReg
+    ).value.run.asOutcome()
+    ret.allowanceAmount should be ('nonEmpty)
+  }
+
+  "Return.allowanceAmount" should "be asked when positve Percentage supplied for activity" in {
+    // social media only
+    implicit val sampleActivitySetAsk: SampleData[Set[Activity]] = instances(Set[Activity](SocialMedia))
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
+      case "report-social-media-loss" => List(false)
+      case _ => List(true)
+    }
+    val ret:Return = ReturnJourney.returnJourney(
+      new TestReturnInterpreter,
+      samplePeriod,
+      sampleReg
+    ).value.run.asOutcome()
+    ret.allowanceAmount should be ('nonEmpty)
+  }
 }
