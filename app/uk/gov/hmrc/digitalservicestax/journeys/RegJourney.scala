@@ -91,7 +91,7 @@ object RegJourney {
                     )
                     companyAddress <- ask[UkAddress](
                       "company-registered-office-uk-address",
-                      customContent = message("company-registered-office-uk-address.heading", companyName)
+                      customContent = message("company-registered-office-uk-address.listing.heading", companyName)
                     ).map(identity)
                   } yield CompanyRegWrapper(Company(companyName, companyAddress), useSafeId = true)
 
