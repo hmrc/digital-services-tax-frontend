@@ -23,7 +23,7 @@ import connectors.{DSTConnector, MongoPersistence}
 import cats.implicits.catsKernelOrderingForOrder
 import javax.inject.Inject
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
-import ltbs.uniform.common.web.{GenericWebTell, JourneyConfig, ListingRow, WebInteraction}
+import ltbs.uniform.common.web.{Breadcrumbs, GenericWebTell, JourneyConfig, ListingRow, WebInteraction, WebMonad}
 import ltbs.uniform.interpreters.playframework.{PersistenceEngine, tellTwirlUnit}
 import ltbs.uniform.validation.Rule
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -42,7 +42,6 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
-import ltbs.uniform.common.web.Breadcrumbs
 
 
 class ReturnsController @Inject()(
@@ -50,18 +49,18 @@ class ReturnsController @Inject()(
   http: HttpClient,
   servicesConfig: ServicesConfig,
   mongo: ReactiveMongoApi,
+  interpreter: DSTInterpreter,
   val authConnector: AuthConnector,
-  val messagesApi: MessagesApi  
+  val messagesApi: MessagesApi
 )(implicit
-  val appConfig: AppConfig,
   ec: ExecutionContext
 ) extends ControllerHelpers
     with I18nSupport
     with AuthorisedFunctions
     with FrontendHeaderCarrierProvider
-    with DSTInterpreter
 {
 
+  import interpreter._
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   // private implicit def autoGroupListingTell = new ListingTell[Html, GroupCompany] {
@@ -149,7 +148,7 @@ class ReturnsController @Inject()(
 
   def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
-      implicit val msg: UniformMessages[Html] = messages(request)
+      implicit val msg: UniformMessages[Html] = interpreter.messages(request)
     import journeys.ReturnJourney._
 
     val periodKey = Period.Key(periodKeyString)

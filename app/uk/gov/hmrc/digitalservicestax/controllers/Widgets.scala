@@ -20,7 +20,9 @@ import java.time.LocalDate
 
 import cats.data.Validated
 import cats.implicits._
+import com.google.inject.ImplementedBy
 import enumeratum._
+import javax.inject.Inject
 import ltbs.uniform.common.web.{FormField, GenericWebTell, ListingRow, WebInteraction}
 import ltbs.uniform.interpreters.playframework.Breadcrumbs
 import ltbs.uniform.validation.Rule._
@@ -35,6 +37,7 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.frontend.{Kickout, RichAddress}
 
+//@ImplementedBy(classOf[WidgetsImpl])
 trait Widgets {
 
   implicit val appConfig: AppConfig
@@ -440,3 +443,8 @@ trait Widgets {
   }
 
 }
+
+//class Foo {}
+//class WidgetsImpl @Inject() () {
+//
+//}

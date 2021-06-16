@@ -44,17 +44,18 @@ class RegistrationController @Inject()(
   http: HttpClient,
   servicesConfig: ServicesConfig,
   mongo: ReactiveMongoApi,
+  interpreter: DSTInterpreter,
   val authConnector: AuthConnector,
-  val messagesApi: MessagesApi  
+  val messagesApi: MessagesApi
 )(implicit
-  val appConfig: AppConfig,
   ec: ExecutionContext
 ) extends ControllerHelpers
     with I18nSupport
     with AuthorisedFunctions
     with FrontendHeaderCarrierProvider
-    with DSTInterpreter
 {
+
+  import interpreter._
 
   /// TODO: Make Luke fix rerunOnPriorStateChange
   implicit val futureAdapter = FutureAdapter[Html].alwaysRerun

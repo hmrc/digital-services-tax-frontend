@@ -17,22 +17,26 @@
 package uk.gov.hmrc.digitalservicestax.controllers
 
 import cats.implicits._
+import com.google.inject.ImplementedBy
+import javax.inject.Inject
 import ltbs.uniform.common.web._
-import ltbs.uniform.interpreters.playframework.{RichPlayMessages, PlayInterpreter, mon}
+import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages, mon}
 import ltbs.uniform._
 import ltbs.uniform.validation.Rule
 import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
+import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.views
 import uk.gov.hmrc.digitalservicestax.views.html.uniform.radios
 
-trait DSTInterpreter
-    extends PlayInterpreter[Html]
-    with InferFormFields[Html]
-    with AutoListingPage[Html]
-    with Widgets {
-
-  def messagesApi: play.api.i18n.MessagesApi
+class DSTInterpreter @Inject()(
+  messagesApi: play.api.i18n.MessagesApi
+)(
+  implicit val appConfig: AppConfig
+) extends PlayInterpreter[Html]
+  with InferFormFields[Html]
+  with AutoListingPage[Html]
+  with Widgets {
 
   // TODO implement twirl versions
   // Members declared in ltbs.uniform.common.web.AutoListingPage
@@ -65,19 +69,19 @@ trait DSTInterpreter
     def render(in: Unit, key: String, messages: UniformMessages[Html]): Html = Html("")
   }
 
-   def renderAnd(
-     pageKey: List[String],
-     fieldKey: List[String],
-     breadcrumbs: Breadcrumbs,
-     data: Input,
-     errors: ErrorTree,
-     messages: UniformMessages[Html],
-     members: Seq[(String, Html)]
-   ): Html = Html(
-     members.map { x =>
-       x._2.toString
-     }.mkString
-   )
+  def renderAnd(
+    pageKey: List[String],
+    fieldKey: List[String],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    members: Seq[(String, Html)]
+  ): Html = Html(
+    members.map { x =>
+      x._2.toString
+    }.mkString
+  )
 
   def renderOr(
     pageKey: List[String],
@@ -88,16 +92,18 @@ trait DSTInterpreter
     messages: UniformMessages[Html],
     alternatives: Seq[(String, Option[Html])],
     selected: Option[String]): Html = {
-      radios(
-        fieldKey,
-        alternatives.map{_._1},
-        selected,
-        errors,
-        messages,
-        alternatives.collect {
-          case (name, Some(html)) => name -> html
-        }.toMap
-      )
+    radios(
+      fieldKey,
+      alternatives.map {
+        _._1
+      },
+      selected,
+      errors,
+      messages,
+      alternatives.collect {
+        case (name, Some(html)) => name -> html
+      }.toMap
+    )
   }
 
   // def blankTell: Html = Html("")
@@ -107,8 +113,9 @@ trait DSTInterpreter
   ): UniformMessages[Html] =
     messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+|
       UniformMessages.bestGuess.map(HtmlFormat.escape)
+
   // N.b. this next line very useful for correcting the keys of missing content, leave for now
-//     UniformMessages.attentionSeeker.map(HtmlFormat.escape)
+  //     UniformMessages.attentionSeeker.map(HtmlFormat.escape)
 
   override def pageChrome(
     keyList: List[String],
