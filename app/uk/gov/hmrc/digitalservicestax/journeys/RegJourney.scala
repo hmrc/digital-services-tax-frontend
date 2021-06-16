@@ -75,7 +75,7 @@ object RegJourney {
               )
               companyAddress <- ask[ForeignAddress](
                 "company-registered-office-international-address",
-                customContent = message("company-registered-office-international-address.heading", companyName)
+                customContent = message("company-registered-office-international-address.listing.heading", companyName)
               ).map(identity)
             } yield CompanyRegWrapper(Company(companyName, companyAddress), useSafeId = true)
 
@@ -156,13 +156,13 @@ object RegJourney {
                    case true =>
                      ask[UkAddress](
                        "ultimate-parent-company-uk-address",
-                       customContent = message("ultimate-parent-company-uk-address.heading", parentName)
+                       customContent = message("ultimate-parent-company-uk-address.listing.heading", parentName)
                      ).map(identity)
                    case false =>
                      ask[ForeignAddress](
                        "ultimate-parent-company-international-address",
                        customContent =
-                         message("ultimate-parent-company-international-address.heading", parentName)
+                         message("ultimate-parent-company-international-address.listing.heading", parentName)
                      ).map(identity)
                  }
              } yield Company(parentName, parentAddress).some

@@ -125,7 +125,7 @@ check-company-registered-office-address.heading.hint=Your company details
 check-company-registered-office-address.TRUE=Yes
 check-company-registered-office-address.FALSE=No
 
-company-registered-office-uk-address.heading=Where is the registered office address of {0}?
+company-registered-office-uk-address.listing.heading=Where is the registered office address of {0}?
 company-registered-office-uk-address.heading.hint=Your company details
 company-registered-office-uk-address.line1.heading=Building or street
 company-registered-office-uk-address.line2.heading=Building or street line 2 (optional)
@@ -133,7 +133,7 @@ company-registered-office-uk-address.line3.heading=Town or city (optional)
 company-registered-office-uk-address.line4.heading=County (optional)
 company-registered-office-uk-address.postalCode.heading=Postcode
 
-company-registered-office-international-address.heading=Where is the registered office address of {0}?
+company-registered-office-international-address.listing.heading=Where is the registered office address of {0}?
 company-registered-office-international-address.heading.hint=Your company details
 company-registered-office-international-address.line1.heading=Address line 1
 company-registered-office-international-address.line2.heading=Address line 2 (optional)
@@ -170,7 +170,7 @@ check-contact-address.heading.hint=Your company details
 check-contact-address.TRUE=Yes
 check-contact-address.FALSE=No
 
-contact-uk-address.heading=What is your contact address?
+contact-uk-address.listing.heading=What is your contact address?
 contact-uk-address.heading.hint=Contact person’s details
 contact-uk-address.line1.heading=Building or street
 contact-uk-address.line2.heading=Building or street line 2 (optional)
@@ -178,7 +178,7 @@ contact-uk-address.line3.heading=Town or city (optional)
 contact-uk-address.line4.heading=County (optional)
 contact-uk-address.postalCode.heading=Postcode
 
-contact-international-address.heading=What is your contact address?
+contact-international-address.listing.heading=What is your contact address?
 contact-international-address.heading.hint=Contact person’s details
 contact-international-address.line1.heading=Address line 1
 contact-international-address.line2.heading=Address line 2 (optional)
@@ -210,7 +210,7 @@ check-ultimate-parent-company-address.heading.hint=Ultimate parent company detai
 check-ultimate-parent-company-address.TRUE=Yes
 check-ultimate-parent-company-address.FALSE=No
 
-ultimate-parent-company-uk-address.heading=What is the registered office address of {0}?
+ultimate-parent-company-uk-address.listing.heading=What is the registered office address of {0}?
 ultimate-parent-company-uk-address.heading.hint=Ultimate parent company details
 ultimate-parent-company-uk-address.line1.heading=Building or street
 ultimate-parent-company-uk-address.line2.heading=Building or street line 2 (optional)
@@ -218,7 +218,7 @@ ultimate-parent-company-uk-address.line3.heading=Town or city (optional)
 ultimate-parent-company-uk-address.line4.heading=County (optional)
 ultimate-parent-company-uk-address.postalCode.heading=Postcode
 
-ultimate-parent-company-international-address.heading=What is the registered office address of {0}?
+ultimate-parent-company-international-address.listing.heading=What is the registered office address of {0}?
 ultimate-parent-company-international-address.heading.hint=Ultimate parent company details
 ultimate-parent-company-international-address.line1.heading=Address line 1
 ultimate-parent-company-international-address.line2.heading=Address line 2 (optional)
@@ -374,7 +374,7 @@ company-registered-office-uk-address.line1.length.exceeded=Building or street mu
 company-registered-office-uk-address.line2.length.exceeded=Building or street line 2 must be 35 characters or fewer
 company-registered-office-uk-address.line3.length.exceeded=Town or city must be 35 characters or fewer
 company-registered-office-uk-address.line4.length.exceeded=County must be 35 characters or fewer
-company-registered-office-uk-address.postalCode.required=Enter the postcode of your registered office address
+company-registered-office-uk-address.postalCode.required=Enter the postcode
 company-registered-office-uk-address.postalCode.not-a-postcode=Enter a real postcode
 company-registered-office-uk-address.postalCode.invalid=Enter a real postcode
 
@@ -387,7 +387,7 @@ not-found-company-registered-office-uk-address.line1.length.exceeded=Building or
 not-found-company-registered-office-uk-address.line2.length.exceeded=Building or street line 2 must be 35 characters or fewer
 not-found-company-registered-office-uk-address.line3.length.exceeded=Town or city must be 35 characters or fewer
 not-found-company-registered-office-uk-address.line4.length.exceeded=County must be 35 characters or fewer
-not-found-company-registered-office-uk-address.postalCode.required=Enter the postcode of your registered office address
+not-found-company-registered-office-uk-address.postalCode.required=Enter the postcode
 not-found-company-registered-office-uk-address.postalCode.not-a-postcode=Enter a real postcode
 not-found-company-registered-office-uk-address.postalCode.invalid=Enter a real postcode
 
@@ -411,7 +411,7 @@ company-contact-address.required=Select yes if we can use this address to contac
 #Check contact address
 check-contact-address.required=Select yes if your contact address is in the UK
 
-contact-uk-address.line1.required=Enter the building and street of your contact address
+contact-uk-address.line1.required=Enter the building and street
 contact-uk-address.line1.invalid=Building and street must only include letters a to z, numbers, apostrophes, full stops, ampersands, hyphens and spaces
 contact-uk-address.line2.invalid=Building or street line 2 must only include letters a to z, numbers, apostrophes, full stops, ampersands, hyphens and spaces
 contact-uk-address.line3.invalid=Town or city must only include letters a to z, numbers, apostrophes, full stops, ampersands, hyphens and spaces
@@ -420,7 +420,7 @@ contact-uk-address.line1.length.exceeded=Building or street must be 35 character
 contact-uk-address.line2.length.exceeded=Building or street line 2 must be 35 characters or fewer
 contact-uk-address.line3.length.exceeded=Town or city must be 35 characters or fewer
 contact-uk-address.line4.length.exceeded=County must be 35 characters or fewer
-contact-uk-address.postalCode.required=Enter the postcode of your contact address
+contact-uk-address.postalCode.required=Enter the postcode
 contact-uk-address.postalCode.not-a-postcode=Enter a real postcode
 
 contact-international-address.line1.required=Enter Address Line 1
@@ -445,7 +445,7 @@ ultimate-parent-company-name.invalid=Name of group’s ultimate global parent co
 #check ultimate parent company address
 check-ultimate-parent-company-address.required=Select yes if the registered office address of {0} is in the UK
 
-ultimate-parent-company-uk-address.line1.required=Enter the building and street of your contact address
+ultimate-parent-company-uk-address.line1.required=Enter the building and street
 ultimate-parent-company-uk-address.line1.invalid=Building and street must only include letters a to z, numbers, apostrophes, full stops, ampersands, hyphens and spaces
 ultimate-parent-company-uk-address.line2.invalid=Building or street line 2 must only include letters a to z, numbers, apostrophes, full stops, ampersands, hyphens and spaces
 ultimate-parent-company-uk-address.line3.invalid=Town or city must only include letters a to z, numbers, apostrophes, full stops, ampersands, hyphens and spaces
@@ -454,7 +454,7 @@ ultimate-parent-company-uk-address.line1.length.exceeded=Building or street must
 ultimate-parent-company-uk-address.line2.length.exceeded=Building or street line 2 must be 35 characters or fewer
 ultimate-parent-company-uk-address.line3.length.exceeded=Town or city must be 35 characters or fewer
 ultimate-parent-company-uk-address.line4.length.exceeded=County must be 35 characters or fewer
-ultimate-parent-company-uk-address.postalCode.required=Enter the postcode of your registered office address
+ultimate-parent-company-uk-address.postalCode.required=Enter the postcode
 ultimate-parent-company-uk-address.postalCode.invalid=Enter a real postcode
 ultimate-parent-company-uk-address.postalCode.not-a-postcode=Enter a real postcode
 not-a-postcode=Enter a real postcode

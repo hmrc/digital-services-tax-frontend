@@ -319,8 +319,8 @@ trait Widgets {
     implicit gen: shapeless.LabelledGeneric.Aux[ForeignAddress,T],
     ffhlist: FormField[T, Html]
   ): FormField[ForeignAddress, Html] = new FormField[ForeignAddress, Html] {
-
-    override def stats = FormFieldStats(children = 5)
+    
+    override def stats = FormFieldStats(children = 1)
 
     def decode(out: Input): Either[ErrorTree, ForeignAddress] = ffhlist.decode(out).map(gen.from)
     def encode(in: ForeignAddress): Input = ffhlist.encode(gen.to(in))
