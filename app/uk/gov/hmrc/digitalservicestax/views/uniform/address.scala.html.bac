@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
 @import ltbs.uniform._
 
-@(key: List[String], values: UfInput, errors: ErrorTree, messages: UniformMessages[Html], addressKey: String = "")
+@(key: List[String], values: Input, errors: ErrorTree, messages: UniformMessages[Html], addressKey: String = "")
 
 @fieldList = @{if(addressKey == "UkAddress") {
     List("line1", "line2", "line3", "line4", "postalCode")

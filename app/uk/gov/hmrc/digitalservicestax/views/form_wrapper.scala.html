@@ -16,7 +16,7 @@
 
 @import uniform._
 
-@(keyList: List[String], errors: ErrorTree, content: Html, breadcrumbs: Breadcrumbs = Nil)(implicit messages: UniformMessages[Html], request: Request[AnyContent])
+@(keyList: List[String], errors: ErrorTree, content: Html, breadcrumbs: UfBreadcrumbs = Nil)(implicit messages: UniformMessages[Html], request: Request[AnyContent])
   
   @key = @{keyList.last}
 

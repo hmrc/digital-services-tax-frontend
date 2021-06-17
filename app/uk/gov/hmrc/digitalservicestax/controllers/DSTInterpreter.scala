@@ -18,6 +18,7 @@ package uk.gov.hmrc.digitalservicestax.controllers
 
 import cats.implicits._
 import com.google.inject.ImplementedBy
+
 import javax.inject.Inject
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages, mon}
@@ -27,10 +28,12 @@ import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.views
+import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.digitalservicestax.views.html.uniform.radios
 
 class DSTInterpreter @Inject()(
-  messagesApi: play.api.i18n.MessagesApi
+  messagesApi: play.api.i18n.MessagesApi,
+  layout: Layout
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
@@ -143,9 +146,10 @@ class DSTInterpreter @Inject()(
     }
 
     val errorTitle: String = if(errors.isNonEmpty) s"${messages("common.error")}: " else ""
-    views.html.main_template(title =
-      errorTitle + s"${messages(keyList.mkString("-") + ".heading")} - ${messages("common.title")} - ${messages("common.title.suffix")}")(
-      content)(request, messages, appConfig)
+
+    layout(
+      pageTitle = (errorTitle + s"${messages(keyList.mkString("-") + ".heading")} - ${messages("common.title")} - ${messages("common.title.suffix")}").some
+    )(content)(request, messages, appConfig)
   }
 
 }
