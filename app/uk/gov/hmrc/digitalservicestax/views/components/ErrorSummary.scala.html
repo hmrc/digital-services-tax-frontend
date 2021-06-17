@@ -1,0 +1,43 @@
+@import cats.implicits._
+@import ltbs.uniform._
+
+@this(
+        govukErrorSummary: GovukErrorSummary
+)
+
+@(keyList: List[String], errors: ErrorTree, messages: UniformMessages[Html])
+
+@if(errors.nonEmpty) {
+
+@* TODO - check error link to form field *@
+
+    @govukErrorSummary(
+
+        ErrorSummary(
+            errorList = errors.flatMap { case (path, errormsg) =>
+               errormsg.toList.map { msg =>
+                    ErrorLink(
+                      href = Some(if((keyList ++ path.head).mkString("_") == "manage-companies_add_add_name" || (keyList ++ path.head).mkString("_") == "manage-companies_add_add_utr"){
+                        s"""#${keyList.last ++ "_" ++ path.head.mkString("_")}-input"""
+                      } else {
+                        s"""#${(keyList ++ path.head).mkString("_")}-input"""
+                      }),
+                      content = Text(if(path.map(x => x.nonEmpty).head) {
+                        if(path.length > 1) {
+                            msg.prefixWith(List(s"""${keyList.head}.${path.toList.flatten.mkString(".")}""")).render(messages).toString
+                        } else {
+                            msg.prefixWith(path.map(x => s"""${keyList.head}.${x.mkString(".")}""").toList).render(messages).toString
+                        }
+                    } else {
+                        msg.prefixWith(keyList).render(messages).toString
+                    }),
+                    attributes = Map("class" ->"govuk-link")
+                    )
+               }
+            }.toSeq,
+            title = Text(messages("vatcheck.common.errorSummary").toString)
+        )
+    )
+
+}
+

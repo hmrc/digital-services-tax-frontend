@@ -20,7 +20,8 @@
 
 @this(
         formHelper: FormWithCSRF,
-        button: components.Button
+        button: components.Button,
+        errorSummary: components.ErrorSummary
 )
 
 @(keyList: List[String], errors: ErrorTree, content: Html, breadcrumbs: UfBreadcrumbs = Nil)(implicit messages: UniformMessages[Html], request: Request[AnyContent])
@@ -36,7 +37,7 @@
   }
 
   @formHelper(action = play.api.mvc.Call("post", key), 'novalidate -> "novalidate") {
-    @errorsummary(keyList, errors, messages)
+    @errorSummary(keyList, errors, messages)
     @defining((messages.get(s"$key.hint").isDefined, errors.definedAtRoot, messages.get(s"$key.intro").isDefined)){ case (hasHint, hasErrors, hasIntro) =>
       @fieldsurround(key, content, false /* FIXME */, hasHint, hasErrors, hasIntro)
     }
