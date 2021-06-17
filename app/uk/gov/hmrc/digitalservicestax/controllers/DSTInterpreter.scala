@@ -28,12 +28,13 @@ import play.api.mvc.{AnyContent, Request, Results}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.views
-import uk.gov.hmrc.digitalservicestax.views.html.Layout
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, FormWrapper}
 import uk.gov.hmrc.digitalservicestax.views.html.uniform.radios
 
 class DSTInterpreter @Inject()(
   messagesApi: play.api.i18n.MessagesApi,
-  layout: Layout
+  layout: Layout,
+  formWrapper: FormWrapper
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
@@ -137,7 +138,7 @@ class DSTInterpreter @Inject()(
     val content: Html = if (isKickout) {
       tell.getOrElse(throw new Exception("missing tell")) // TODO - review
     } else {
-      views.html.form_wrapper(
+      formWrapper(
         keyList,
         errors,
         List(tell, ask).flatten.combineAll,

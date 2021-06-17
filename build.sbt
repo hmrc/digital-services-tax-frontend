@@ -43,7 +43,8 @@ lazy val microservice = Project(appName, file("."))
       "ltbs.uniform.interpreters.playframework._",
       "uk.gov.hmrc.govukfrontend.views.html.components._",
       "uk.gov.hmrc.govukfrontend.views.html.helpers._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.components._"
+      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
+      "uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages"
     )
   ).settings(scoverageSettings)
 
