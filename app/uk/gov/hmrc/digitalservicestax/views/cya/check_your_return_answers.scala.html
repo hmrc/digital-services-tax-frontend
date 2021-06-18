@@ -69,7 +69,12 @@
             @defining(rep.bankAccount match {
                 case dba: DomesticBankAccount => Html(
                     s"${standard_cya_row(key, s"account-type", messages("common.yes"), s"$serviceUrl/${per.key}/bank-details")(messages)}" ++
-                    s"${standard_cya_row(key, s"sort-code", Html(s"${dba.sortCode}"), s"$serviceUrl/${per.key}/bank-details")(messages)}" ++
+                    s"${standard_cya_row(
+                        key,
+                        s"sort-code",
+                        Html(s"${dba.sortCode.replaceAll(".{2}", "$0-").init}"),
+                        s"$serviceUrl/${per.key}/bank-details"
+                    )(messages)}" ++
                     s"${standard_cya_row(key, s"account-number", Html(s"${dba.accountNo}"), s"$serviceUrl/${per.key}/bank-details")(messages)}" ++
                     s"${dba.buildingSocietyNumber.map{ bsn =>
                         standard_cya_row(key, s"building-society", Html(s"$bsn"), s"$serviceUrl/${per.key}/bank-details")(messages)
