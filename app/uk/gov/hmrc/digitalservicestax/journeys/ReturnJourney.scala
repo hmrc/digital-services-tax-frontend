@@ -147,6 +147,7 @@ object ReturnJourney {
                                            message("repayment.required", formatDate(period.start), formatDate(period.end)))
       } yield
         Return(
+          activities,
           alternateCharge,
           crossBorderReliefAmount,
           allowanceAmount,
