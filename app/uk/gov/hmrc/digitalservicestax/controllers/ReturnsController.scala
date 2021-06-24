@@ -21,6 +21,7 @@ import data._
 import config.AppConfig
 import connectors.{DSTConnector, MongoPersistence}
 import cats.implicits.catsKernelOrderingForOrder
+
 import javax.inject.Inject
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.common.web.{GenericWebTell, JourneyConfig}
@@ -28,7 +29,7 @@ import ltbs.uniform.interpreters.playframework.{PersistenceEngine, tellTwirlUnit
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
-import play.twirl.api.Html
+import play.twirl.api.{Html, HtmlFormat}
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -41,7 +42,6 @@ import ltbs.uniform.common.web.ListingTell
 import ltbs.uniform.common.web.ListingTellRow
 import play.api.data.Form
 import play.api.data.Forms._
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 
 class ReturnsController @Inject()(
@@ -70,14 +70,39 @@ class ReturnsController @Inject()(
       }, messages)
   }
 
+  private def cyaView(key: String, ret: Return, per: Period, displayName: CompanyName)(
+    implicit messages: UniformMessages[Html]
+  ): Html = {
+    views.html.cya.check_your_return_answers(s"$key.ret", ret, per, displayName)(messages)
+  }
+
   private implicit val cyaRetTell = new GenericWebTell[CYA[(Return, Period, CompanyName)], Html] {
     override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Html =
-      views.html.cya.check_your_return_answers(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages)
+      cyaView(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages)
   }
 
   private implicit val confirmRetTell = new GenericWebTell[Confirmation[(Return, CompanyName, Period, Period)], Html] {
-    override def render(in: Confirmation[(Return, CompanyName, Period, Period)], key: String, messages: UniformMessages[Html]): Html =
-      views.html.end.confirmation_return(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period)(messages)
+    override def render(
+      in: Confirmation[(Return, CompanyName, Period, Period)],
+      key: String,
+      messages: UniformMessages[Html]
+    ): Html = {
+      val printCya =
+        cyaView(
+          s"$key.ret": String,
+          in.value._1: Return,
+          in.value._3: Period,
+          in.value._2: CompanyName
+        )(messages)
+
+      views.html.end.confirmation_return(
+        key: String,
+        in.value._2: CompanyName,
+        in.value._3: Period,
+        in.value._4: Period,
+        printCya: Html
+      )(messages)
+    }
   }
 
   private def applyKey(key: Key): Period.Key = key
