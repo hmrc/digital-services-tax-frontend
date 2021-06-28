@@ -16,9 +16,14 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
-import ltbs.uniform._, interpreters.playframework._
+import ltbs.uniform._
+import interpreters.playframework._
+import play.api.mvc.Request
+import reactivemongo.play.json.collection
+import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.Wrapper
+import uk.gov.hmrc.digitalservicestax.data.{Activity, CompanyName, GroupCompany, Money, Percent, Return}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import java.time.LocalDateTime
 // import reactivemongo.api.{ Cursor, DefaultDB, MongoConnection, AsyncDriver }
@@ -32,6 +37,38 @@ import play.api.libs.functional.syntax._
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import play.api.libs.json._
 import reactivemongo.play.json._, collection._
+
+//object EngineWrapper {
+//
+//  implicit class RichPersistenceEngine[A <: Request[AnyContent]](in: PersistenceEngine[A])(implicit ec: ExecutionContext) {
+//
+//    implicit val wrapperFormat = Json.format[Wrapper]
+//
+//    def findAndDelete(request: A, sessionId: String, collection: Future[JSONCollection]): Future[Return] = {
+//      val selector = Json.obj("session" -> sessionId)
+//      collection.flatMap(_.find(selector).one[Wrapper]).flatMap {
+//        case Some(Wrapper(_, data, _)) => {
+//          // type DB = Map[List[String],String]
+//          println(s"DB = $data XXXXXXXXXXXX")
+//          Future.successful(
+//            Return(
+//              Set(Activity.SearchEngine, Activity.SearchEngine),
+//              Map((Activity.SearchEngine, Percent(10)),(Activity.SocialMedia, Percent(5))),
+//              Money(100.50),
+//              Some(Money(100.50)),
+//              Map(
+//                (GroupCompany(CompanyName("Foo"), None), Money(12.34)),
+//                (GroupCompany(CompanyName("Bar"), None), Money(45.67))
+//              ),
+//              Money(12345.67),
+//              None
+//            )
+//          )
+//        }
+//      }
+//    }
+//  }
+//}
 
 object MongoPersistence {
   case class Wrapper(
@@ -52,8 +89,12 @@ object MongoPersistence {
       }.toMap)
       case e => JsError(s"expected an object, got $e")
     }
-  }  
+  }
 
+}
+
+trait FindAndDelete[A] {
+  def findAndDelete(): Future[Return]
 }
 
 case class MongoPersistence[A <: Request[AnyContent]] (
@@ -61,9 +102,12 @@ case class MongoPersistence[A <: Request[AnyContent]] (
   collectionName: String,
   expireAfter: Duration,
   useMongoTTL: Boolean = false
-)(getSession: A => String)(implicit ec: ExecutionContext) extends PersistenceEngine[A] {
+)(getSession: A => String)(implicit ec: ExecutionContext) extends PersistenceEngine[A] with FindAndDelete[A] {
   import MongoPersistence._
   import reactiveMongoApi.database
+
+  implicit val wrapperFormat = Json.format[Wrapper]
+
 
   def killDate: LocalDateTime = LocalDateTime.now.minusNanos(expireAfter.toNanos)
 
@@ -95,7 +139,7 @@ case class MongoPersistence[A <: Request[AnyContent]] (
 
       val im = c.indexesManager
 
-      if (useMongoTTL) { 
+      if (useMongoTTL) {
         Future.sequence(List(
           im.ensure(sessionIndex),
           im.ensure(timestamp)
@@ -106,7 +150,6 @@ case class MongoPersistence[A <: Request[AnyContent]] (
     }
   }
 
-  implicit val wrapperFormat = Json.format[Wrapper]
 
   def apply(request: A)(f: DB => Future[(DB, Result)]): Future[Result] = {
     val selector = Json.obj("session" -> getSession(request))
@@ -126,4 +169,5 @@ case class MongoPersistence[A <: Request[AnyContent]] (
     }
   }
 
+  override def findAndDelete(): Future[Return] = ???
 }

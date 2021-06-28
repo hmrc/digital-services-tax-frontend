@@ -42,6 +42,8 @@ import ltbs.uniform.common.web.ListingTell
 import ltbs.uniform.common.web.ListingTellRow
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.libs.json.Json
+import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.Wrapper
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 
 class ReturnsController @Inject()(
@@ -78,7 +80,7 @@ class ReturnsController @Inject()(
 
   private implicit val cyaRetTell = new GenericWebTell[CYA[(Return, Period, CompanyName)], Html] {
     override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Html =
-      cyaView(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages)
+      views.html.cya.check_your_return_answers(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages)
   }
 
   private implicit val confirmRetTell = new GenericWebTell[Confirmation[(Return, CompanyName, Period, Period)], Html] {
@@ -87,20 +89,21 @@ class ReturnsController @Inject()(
       key: String,
       messages: UniformMessages[Html]
     ): Html = {
-      val printCya =
-        cyaView(
-          s"$key.ret": String,
-          in.value._1: Return,
-          in.value._3: Period,
-          in.value._2: CompanyName
-        )(messages)
+//      val printCya =
+//        cyaView(
+//          s"$key.ret": String,
+//          in.value._1: Return,
+//          in.value._3: Period,
+//          in.value._2: CompanyName
+//        )(messages)
 
       views.html.end.confirmation_return(
         key: String,
         in.value._2: CompanyName,
         in.value._3: Period,
-        in.value._4: Period,
-        printCya: Html
+        in.value._4: Period
+//        ,
+//        printCya: Html
       )(messages)
     }
   }
@@ -170,6 +173,12 @@ class ReturnsController @Inject()(
       }
 
   }
+  val returnsPersistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
+    MongoPersistence[AuthorisedRequest[AnyContent]](
+      mongo,
+      collectionName = "uf-returns",
+      appConfig.mongoJourneyStoreExpireAfter
+    )(_.internalId)
 
   def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
@@ -180,11 +189,7 @@ class ReturnsController @Inject()(
     val periodKey = Period.Key(periodKeyString)
 
     implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
-      MongoPersistence[AuthorisedRequest[AnyContent]](
-        mongo,
-        collectionName = "uf-returns",
-        appConfig.mongoJourneyStoreExpireAfter
-      )(_.internalId)
+      returnsPersistence
 
     backend.lookupRegistration().flatMap{
       case None      => Future.successful(NotFound)
@@ -211,7 +216,23 @@ class ReturnsController @Inject()(
   def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = authorisedAction.async { implicit request =>
     implicit val msg: UniformMessages[Html] = interpreter.messages(request)
     val submittedPeriodKey = Period.Key(submittedPeriodKeyString)
+//    val selector = Json.obj("session" -> getSession(request))
+//    collection.flatMap(_.find(selector).one[Wrapper]).flatMap {
+//      case Some(Wrapper(_, data, d)) if {d isBefore killDate} & !useMongoTTL =>
+//        reaver.flatMap{_ => f(DB.empty)}
+//      case Some(Wrapper(_, data, _)) =>
+//        f(data)
+//      case None =>
+//        f(DB.empty)
+//    } flatMap { case (newDb, result) =>
+//      val wrapper = Wrapper(getSession(request), newDb)
+//      collection.flatMap(_.update(selector, wrapper, upsert = true).map{
+//        case wr: reactivemongo.api.commands.WriteResult if wr.writeErrors.isEmpty => result
+//        case e => throw new Exception(s"$e")
+//      })
+//    }
 
+//returnsPersistence.
     for {
       reg <- backend.lookupRegistration()
       outstandingPeriods <- backend.lookupOutstandingReturns()
