@@ -24,11 +24,12 @@ import cats.Monad
 import cats.implicits._
 import ltbs.uniform.{NonEmptyString => _, _}
 import ltbs.uniform.validation._
+import play.twirl.api.Html
 import uk.gov.hmrc.digitalservicestax.data.Activity.OnlineMarketplace
 
 object ReturnJourney {
 
-  type ReturnTellTypes = Confirmation[(Return, CompanyName, Period, Period)] :: CYA[(Return, Period, CompanyName)] :: GroupCompany :: NilTypes
+  type ReturnTellTypes = Confirmation[(Return, CompanyName, Period, Period, Html)] :: CYA[(Return, Period, CompanyName)] :: GroupCompany :: NilTypes
   type ReturnAskTypes = Set[Activity] :: Money :: RepaymentDetails :: Percent :: Boolean :: List[GroupCompany] :: NilTypes
 
   private def message(key: String, args: String*) = {

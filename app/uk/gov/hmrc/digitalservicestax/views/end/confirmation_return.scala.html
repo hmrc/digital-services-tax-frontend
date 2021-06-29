@@ -15,7 +15,9 @@
  *@
 
 @import uk.gov.hmrc.digitalservicestax.frontend.formatDate
-@(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period)(implicit messages: UniformMessages[Html])
+@(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period, printableCYA: Html)(implicit messages: UniformMessages[Html])
+
+<div style="border: 1px solid red">@printableCYA</div>
 
 <div class="govuk-box-highlight">
     <h1 class="heading-xlarge">@messages(s"$key.heading")</h1>

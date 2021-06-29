@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
-import ltbs.uniform._, interpreters.playframework._
+import ltbs.uniform._
+import interpreters.playframework._
+import common.web.Codec
+import uk.gov.hmrc.digitalservicestax.data.Return
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import java.time.LocalDateTime
 // import reactivemongo.api.{ Cursor, DefaultDB, MongoConnection, AsyncDriver }
@@ -27,7 +30,7 @@ import play.modules.reactivemongo._
 import concurrent.{Future,ExecutionContext}
 import java.util.UUID
 import scala.util.Try
-import play.api._, mvc._
+import play.api._, mvc.{Codec => -,_}
 import play.api.libs.functional.syntax._
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import play.api.libs.json._
@@ -126,4 +129,16 @@ case class MongoPersistence[A <: Request[AnyContent]] (
     }
   }
 
+  // N.b. this removes the entire record
+  def getDirect[T](key: String*)(implicit request: A, codec: Codec[T]): Future[Either[ErrorTree, T]] = {
+    val selector = Json.obj("session" -> getSession(request))
+    val dbF: Future[DB] = collection.flatMap(_.findAndRemove(selector).map(_.result[Wrapper])).map {
+      case Some(Wrapper(_, data, _)) => data
+      case None => DB.empty
+    }
+    dbF.map(_.get(key.toList).map {Input.fromUrlEncodedString(_) flatMap codec.decode} match {
+      case None => Left(ltbs.uniform.ErrorMsg("not found").toTree)
+      case Some(x) => x
+    })
+  }
 }
