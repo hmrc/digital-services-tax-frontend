@@ -1,0 +1,65 @@
+@import uk.gov.hmrc.digitalservicestax.frontend.formatDate
+@import uk.gov.hmrc.digitalservicestax.views.html.helpers.standard_cya_row
+@(key: String, ret: Return, per: Period, displayName: CompanyName)(implicit messages: UniformMessages[Html])
+
+<div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-xlarge">@messages(s"$key.title.print", formatDate(per.start), formatDate(per.end))</h1>
+    <div class="subsection--wide">
+        <h2 class="govuk-heading-m">@messages(s"$key.company.title", displayName)</h2>
+
+        <dl class="govuk-check-your-answers cya-questions-short">
+            @standard_cya_row(key, "group-liability", Html(s"${ret.totalLiability}"), currency = Html("£"))(messages)
+            @ret.allowanceAmount.map { allAm =>
+                @standard_cya_row(key, "allowance-deducted", Html(s"$allAm"), currency = Html("£"))(messages)
+            }
+            @standard_cya_row(key, "report-cross-border-transaction-relief", if(ret.crossBorderReliefAmount != Money(0)){ messages("common.yes")} else { messages("common.no")})(messages)
+            @if(ret.crossBorderReliefAmount != Money(0)) {
+                @standard_cya_row(key, "relief-deducted", Html(s"${ret.crossBorderReliefAmount}"), currency = Html("£"))(messages)
+            }
+            @ret.companiesAmount.zipWithIndex.map { case (co, i) =>
+            <div>
+                <dt class="cya-question">@messages(s"$key.group-company", co._1.name)</dt>
+                <dd class="cya-answer">£ @co._2</dd>
+            </div>
+            }
+        </dl>
+
+        @ret.alternateCharge.map{ alt =>
+            <h2 class="govuk-heading-m">@messages(s"$key.${Activity.toUrl(alt._1)}.title")</h2>
+            <dl class="govuk-check-your-answers cya-questions-short">
+                @standard_cya_row(key, s"report-alternative-charge", messages("common.yes"))(messages)
+                @standard_cya_row(key, s"report-${Activity.toUrl(alt._1)}-alternative-charge", messages("common.yes"))(messages)
+                @standard_cya_row(key, s"report-${Activity.toUrl(alt._1)}-loss", if(alt._2 == 0){ messages("common.yes")} else { messages("common.no")})(messages)
+                @standard_cya_row(key, s"report-${Activity.toUrl(alt._1)}-operating-margin", Html(s"${alt._2}%"))(messages)
+            </dl>
+        }
+
+        @ret.repayment.map { rep =>
+            <h2 class="govuk-heading-m">@messages(s"$key.repayment.title")</h2>
+            <dl class="govuk-check-your-answers cya-questions-short">
+                @standard_cya_row(key, s"repayment", messages("common.yes"))(messages)
+                @standard_cya_row(key, s"account-name", Html(rep.accountName))(messages)
+                @defining(rep.bankAccount match {
+                    case dba: DomesticBankAccount => Html(
+                        s"${standard_cya_row(key, s"account-type", messages("common.yes"))(messages)}" ++
+                                s"${standard_cya_row(
+                                    key,
+                                    s"sort-code",
+                                    Html(s"${dba.sortCode.replaceAll(".{2}", "$0-").init}")
+                                )(messages)}" ++
+                                s"${standard_cya_row(key, s"account-number", Html(s"${dba.accountNo}"))(messages)}" ++
+                                s"${dba.buildingSocietyNumber.map{ bsn =>
+                                    standard_cya_row(key, s"building-society", Html(s"$bsn"))(messages)
+                                }.getOrElse(Html(""))}"
+                    )
+                    case fba: ForeignBankAccount => Html(
+                        s"${standard_cya_row(key, s"account-type", messages("common.no"))(messages)}" ++
+                                s"${standard_cya_row(key, s"iban", Html(s"${fba.iban}"))(messages)}"
+                    )
+                }){ bankAccountHtml =>
+                    @bankAccountHtml
+                }
+            </dl>
+        }
+    </div>
+</div>

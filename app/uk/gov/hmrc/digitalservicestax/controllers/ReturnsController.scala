@@ -211,7 +211,7 @@ class ReturnsController @Inject()(
         case None => NotFound
         case Some(period) =>
           val companyName = reg.fold(CompanyName(""))(_.companyReg.company.name)
-          val printableCYA: Html = views.html.cya.check_your_return_answers(
+          val printableCYA: Html = views.html.print.returns_cya_print(
             "check-your-answers.ret", ret, period, companyName)(msg)
           Ok(
             views.html.main_template(
