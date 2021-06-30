@@ -29,7 +29,7 @@ import uk.gov.hmrc.digitalservicestax.data.Activity.OnlineMarketplace
 
 object ReturnJourney {
 
-  type ReturnTellTypes = Confirmation[(Return, CompanyName, Period, Period, Html)] :: CYA[(Return, Period, CompanyName)] :: GroupCompany :: NilTypes
+  type ReturnTellTypes = Confirmation[(Return, CompanyName, Period, Period, Option[Html])] :: CYA[(Return, Period, CompanyName)] :: GroupCompany :: NilTypes
   type ReturnAskTypes = Set[Activity] :: Money :: RepaymentDetails :: Percent :: Boolean :: List[GroupCompany] :: NilTypes
 
   private def message(key: String, args: String*) = {

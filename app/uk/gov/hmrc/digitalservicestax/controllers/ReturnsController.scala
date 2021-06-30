@@ -79,9 +79,9 @@ class ReturnsController @Inject()(
       views.html.cya.check_your_return_answers(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages)
   }
 
-  private implicit val confirmRetTell = new GenericWebTell[Confirmation[(Return, CompanyName, Period, Period, Html)], Html] {
-    override def render(in: Confirmation[(Return, CompanyName, Period, Period, Html)], key: String, messages: UniformMessages[Html]): Html =
-      views.html.end.confirmation_return(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period, in.value._5: Html)(messages)
+  private implicit val confirmRetTell = new GenericWebTell[Confirmation[(Return, CompanyName, Period, Period, Option[Html])], Html] {
+    override def render(in: Confirmation[(Return, CompanyName, Period, Period, Option[Html])], key: String, messages: UniformMessages[Html]): Html =
+      views.html.end.confirmation_return(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period, in.value._5: Option[Html])(messages)
   }
 
   private def applyKey(key: Key): Period.Key = key
@@ -187,14 +187,14 @@ class ReturnsController @Inject()(
     } 
   }
 
-  def getReturn(submittedPeriodKeyString: String)(implicit request: AuthorisedRequest[AnyContent]): Future[Return] = {
+  def getReturn(submittedPeriodKeyString: String)(implicit request: AuthorisedRequest[AnyContent]): Future[Option[Return]] = {
     import interpreter.{appConfig => _, _}
     persistence.getDirect[String](s"return-$submittedPeriodKeyString").map {
       case Right(retString) =>
         Json.fromJson[Return](
           Json.parse(retString)
-        ).getOrElse(throw new IllegalStateException("unable to parse result from mongo"))
-      case _ => throw new IllegalStateException("no return found")
+        ).asOpt
+      case _ => None
     }
   }
 
@@ -211,8 +211,8 @@ class ReturnsController @Inject()(
         case None => NotFound
         case Some(period) =>
           val companyName = reg.fold(CompanyName(""))(_.companyReg.company.name)
-          val printableCYA: Html = views.html.print.returns_cya_print(
-            "check-your-answers.ret", ret, period, companyName)(msg)
+          val printableCYA: Option[Html] = ret.map { r => views.html.print.returns_cya_print(
+            "check-your-answers.ret", r, period, companyName)(msg)}
           Ok(
             views.html.main_template(
             title = s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"

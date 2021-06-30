@@ -1,3 +1,7 @@
+.print-only {
+    display: none;
+}
+
 .autocomplete__wrapper {
     max-width: 100%;
 }
