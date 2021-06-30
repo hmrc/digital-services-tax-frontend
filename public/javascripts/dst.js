@@ -6,18 +6,6 @@
         Array.prototype.map.call(jsOnlyEls, el => el.style.display = 'block')
     })();
 
-    function printElement(elId, ms) {
-        var divToPrint = document.getElementById(elId);
-        newWin = window.open();
-        newWin.document.write(divToPrint.innerHTML);
-        newWin.focus();
-        setTimeout(function() {printNewWindow()}, ms);
-    }
-    function printNewWindow(){
-        newWin.print();
-        newWin.close();
-    };
-
     var showHideContent = new GOVUK.ShowHideContent()
     showHideContent.init()
     

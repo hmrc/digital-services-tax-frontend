@@ -176,9 +176,10 @@ class ReturnsController @Inject()(
                 create[ReturnTellTypes, ReturnAskTypes](messages(request)),
                 period,
                 reg
-              ) >>= { ret => interpreter.db.update[String](List(s"return-$periodKeyString"), Json.toJson(ret).toString()).map(_=> ret)}
-              playProgram.run(targetId, purgeStateUponCompletion = false, config = JourneyConfig(askFirstListItem = true)) { ret =>
+              )
+              playProgram.run(targetId, purgeStateUponCompletion = true, config = JourneyConfig(askFirstListItem = true)) { ret =>
                 backend.submitReturn(period, ret).map{ _ =>
+                  persistence.cacheReturn(ret)
                   Redirect(routes.ReturnsController.returnComplete(periodKeyString))
                 }
               }
@@ -202,11 +203,13 @@ class ReturnsController @Inject()(
     implicit val msg: UniformMessages[Html] = interpreter.messages(request)
     val submittedPeriodKey = Period.Key(submittedPeriodKeyString)
     for {
-      ret <- getReturn(submittedPeriodKeyString)
+//      ret <- getReturn(submittedPeriodKeyString)
+      ret <- persistence.retrieveCachedReturn
       reg <- backend.lookupRegistration()
       outstandingPeriods <- backend.lookupOutstandingReturns()
       allReturns <- backend.lookupAllReturns()
     } yield {
+      println(s"########################### retrieved $ret")
       allReturns.find(_.key == submittedPeriodKey) match {
         case None => NotFound
         case Some(period) =>

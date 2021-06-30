@@ -18,7 +18,7 @@
 @(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period, printableCYA: Option[Html])(implicit messages: UniformMessages[Html])
 
 @printableCYA.map { printable =>
-    <div id="printable-cya">@printable</div>
+    <div class="print-only">@printable</div>
 }
 
 <div class="govuk-box-highlight">
@@ -28,7 +28,7 @@
 
 @printableCYA.map { _ =>
     <p class="govuk-body jsonly">
-        <a href="javascript:window.print()" onclick="printElement('printable-cya','1000')" class="govuk-link">@messages(s"$key.print-save")</a>
+        <a href="javascript:window.print()" class="govuk-link">@messages(s"$key.print-save")</a>
     </p>
 }
 <h2 class="govuk-heading-m">@messages("confirmation.what-you-do-next.title")</h2>
