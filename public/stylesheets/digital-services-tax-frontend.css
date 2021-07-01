@@ -3,6 +3,9 @@
 }
 
 @media print {
+  #global-header {
+    display: none;
+  }
   .content__body > div.print-only {
     display: block;
   }
