@@ -177,9 +177,10 @@ class ReturnsController @Inject()(
                 period,
                 reg
               )
-              playProgram.run(targetId, purgeStateUponCompletion = true, config = JourneyConfig(askFirstListItem = true)) { ret =>
+              val purgeStateUponCompletion = true
+              playProgram.run(targetId, purgeStateUponCompletion , config = JourneyConfig(askFirstListItem = true)) { ret =>
                 backend.submitReturn(period, ret).map{ _ =>
-                  persistence.cacheReturn(ret)
+                  persistence.cacheReturn(ret, purgeStateUponCompletion)
                   Redirect(routes.ReturnsController.returnComplete(periodKeyString))
                 }
               }

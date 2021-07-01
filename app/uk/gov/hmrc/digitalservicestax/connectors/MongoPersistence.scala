@@ -19,21 +19,14 @@ package uk.gov.hmrc.digitalservicestax.connectors
 import ltbs.uniform._
 import interpreters.playframework._
 import common.web.Codec
-import reactivemongo.api.commands.{FindAndModifyCommand, WriteConcern, WriteResult}
-import reactivemongo.bson.BSONDocument
+import reactivemongo.api.commands.{WriteResult}
 import uk.gov.hmrc.digitalservicestax.data.Return
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import java.time.LocalDateTime
-// import reactivemongo.api.{ Cursor, DefaultDB, MongoConnection, AsyncDriver }
-//import reactivemongo.api.bson.BSONDocument
 import play.modules.reactivemongo._
 import concurrent.{Future,ExecutionContext}
-import java.util.UUID
-import scala.util.Try
-import play.api._, mvc.{Codec => -,_}
-import play.api.libs.functional.syntax._
+import play.api._, mvc.{Codec => _,_}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import play.api.libs.json._
 import reactivemongo.play.json._, collection._
@@ -145,28 +138,10 @@ case class MongoPersistence[A <: Request[AnyContent]] (
     })
   }
 
-
-
-  // TODO - this currently always empties the data DB, make it update just the "ret"
-  def cacheReturn(ret: Return)(implicit request: A): Future[Unit] = {
-//    collection.map(_.findAndUpdate(
-//      Json.obj("session" -> getSession(request)),
-//      Json.obj("$set" -> Json.obj("ret" -> Json.toJson[Return](ret))),
-//      false,
-//      false,
-//      None,
-//      None,
-//      false,
-//      WriteConcern.Default,
-//      None,
-//      None,
-//      Seq.empty
-//    )).map {
-//      case a: FindAndModifyCommand.Result[_] if a.lastError.isEmpty => (())
-//      case e => throw new Exception(s"$e")
-//    }
+  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit request: A): Future[Unit] = {
     collection.flatMap(_.find(selector(request)).one[Wrapper]).map {
-      case Some(wrapper) => wrapper.copy(ret = Some(ret), data = DB.empty) // TODO - remove empty
+      case Some(wrapper) if purgeStateUponCompletion => wrapper.copy(ret = Some(ret), data = DB.empty)
+      case Some(wrapper) => wrapper.copy(ret = Some(ret))
       case None => Wrapper(getSession(request), DB.empty, Some(ret))
     }.flatMap { wrapper =>
       collection.flatMap(_.update(ordered = false).one(selector(request), wrapper).map {
