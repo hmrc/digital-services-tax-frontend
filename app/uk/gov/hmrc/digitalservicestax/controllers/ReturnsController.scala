@@ -189,34 +189,21 @@ class ReturnsController @Inject()(
     } 
   }
 
-  def getReturn(submittedPeriodKeyString: String)(implicit request: AuthorisedRequest[AnyContent]): Future[Option[Return]] = {
-    import interpreter.{appConfig => _, _}
-    persistence.getDirect[String](s"return-$submittedPeriodKeyString").map {
-      case Right(retString) =>
-        Json.fromJson[Return](
-          Json.parse(retString)
-        ).asOpt
-      case _ => None
-    }
-  }
-
   def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = authorisedAction.async { implicit request =>
     implicit val msg: UniformMessages[Html] = interpreter.messages(request)
     val submittedPeriodKey = Period.Key(submittedPeriodKeyString)
     for {
-//      ret <- getReturn(submittedPeriodKeyString)
       ret <- persistence.retrieveCachedReturn
       reg <- backend.lookupRegistration()
       outstandingPeriods <- backend.lookupOutstandingReturns()
       allReturns <- backend.lookupAllReturns()
     } yield {
-      println(s"########################### retrieved $ret")
       allReturns.find(_.key == submittedPeriodKey) match {
         case None => NotFound
         case Some(period) =>
           val companyName = reg.fold(CompanyName(""))(_.companyReg.company.name)
-          val printableCYA: Option[Html] = ret.map { r => views.html.print.returns_cya_print(
-            "check-your-answers.ret", r, period, companyName)(msg)}
+          val printableCYA: Option[Html] = ret.map { r => views.html.cya.check_your_return_answers(
+            "check-your-answers.ret", r, period, companyName, isPrint = true)(msg)}
           Ok(
             views.html.main_template(
             title = s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"

@@ -14,10 +14,10 @@
  * limitations under the License.
  *@
 
-@(key: String, subKey: String, field: Html, changeLink: String = "", currency: Html = Html(""))(implicit messages: UniformMessages[Html])
+@(key: String, subKey: String, field: Html, changeLink: String = "", currency: Html = Html(""), msgArgs: List[String] = List.empty)(implicit messages: UniformMessages[Html])
 
 <div>
-    <dt class="cya-question">@messages(s"$key.$subKey.question")</dt>
+    <dt class="cya-question">@messages(s"$key.$subKey.question", msgArgs:_*)</dt>
     <dd class="cya-answer">@currency @field</dd>
     @if(changeLink.nonEmpty) {
         <dd class="app-check-your-answers__change">

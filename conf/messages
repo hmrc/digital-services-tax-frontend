@@ -756,9 +756,10 @@ bank-details.bankAccount.ForeignBankAccount.iban.length.exceeded=International B
 
 #Returns cya
 check-your-answers.ret.title=Check your answers before sending your return for {0} to {1}
-check-your-answers.ret.title.print=Your return for {0} to {1}
+check-your-answers.ret.title.print=Digital Services Tax return details for {0} (for the period {1} to {2})
 check-your-answers.ret.company.title=Digital Services Tax return details for {0}
 check-your-answers.ret.group-liability.question=Group’s total Digital Services Tax liability
+check-your-answers.ret.liability.question=Digital Services Tax liability for {0}
 check-your-answers.ret.group-liability.change=Change the group’s total Digital Services Tax liability
 check-your-answers.ret.allowance-deducted.question=Amount of £25m annual allowance claimed
 check-your-answers.ret.allowance-deducted.change=Change the amount of £25m annual allowance claimed

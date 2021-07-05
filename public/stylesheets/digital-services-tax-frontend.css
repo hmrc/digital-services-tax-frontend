@@ -6,6 +6,12 @@
   #global-header {
     display: none;
   }
+  .print-hide {
+    display: none;
+  }
+  .phase-banner a {
+    display: inline;
+  }
   .content__body > div.print-only {
     display: block;
   }
