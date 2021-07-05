@@ -17,20 +17,16 @@
 package uk.gov.hmrc.digitalservicestax
 package controllers
 
-import cats.implicits.catsStdBimonadForFunction0.<*
 import data._
 import data.BackendAndFrontendJson._
 import config.AppConfig
 import connectors.{DSTConnector, MongoPersistence}
-import cats.implicits.{catsKernelOrderingForOrder, catsSyntaxFlatMapOps}
+import cats.implicits.catsKernelOrderingForOrder
 
 import javax.inject.Inject
 import ltbs.uniform._
 import common.web._
 import interpreters.playframework._
-import WebMonad.webMonadMonadInstance
-import cats.Functor.ops.toAllFunctorOps
-import com.fasterxml.jackson.core.JsonParseException
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -45,7 +41,6 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.libs.json.Json
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 
 class ReturnsController @Inject()(

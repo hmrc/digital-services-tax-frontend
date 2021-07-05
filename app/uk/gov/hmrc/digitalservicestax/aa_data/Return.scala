@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.digitalservicestax.data
 
-import play.api.libs.json.Json
-
 case class Return (
   reportedActivities: Set[Activity],
   alternateCharge: Map[Activity, Percent],
