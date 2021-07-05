@@ -17,17 +17,29 @@
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
 @import uk.gov.hmrc.digitalservicestax.frontend.formatDate
 
-@(key: String, ret: Return, per: Period, displayName: CompanyName)(implicit messages: UniformMessages[Html])
+@(key: String, ret: Return, per: Period, displayName: CompanyName, isPrint: Boolean = false)(implicit messages: UniformMessages[Html])
 
-@serviceUrl = @{"/digital-services-tax/submit-return"}
+@serviceUrl = @{ if (isPrint) "" else "/digital-services-tax/submit-return"}
+
+@liabilitySwitch = @{
+    if (ret.companiesAmount.keys.size > 0) {
+        ("group-liability", List.empty[String])
+    } else {
+        ("liability", List(displayName))
+    }
+}
 
 <div class="govuk-grid-column-two-thirds">
+    @if(isPrint) {
+    <h1 class="govuk-heading-m">@messages(s"$key.title.print", displayName, formatDate(per.start), formatDate(per.end))</h1>
+    } else {
     <h1 class="heading-xlarge">@messages(s"$key.title", formatDate(per.start), formatDate(per.end))</h1>
+    }
     <div class="subsection--wide">
-        <h2 class="govuk-heading-m">@messages(s"$key.company.title", displayName)</h2>
+        <h2 class="govuk-heading-m print-hide">@messages(s"$key.company.title", displayName)</h2>
 
         <dl class="govuk-check-your-answers cya-questions-short">
-            @standard_cya_row(key, "group-liability", Html(s"${ret.totalLiability}"), s"$serviceUrl/${per.key}/group-liability", Html("£"))(messages)
+            @standard_cya_row(key, liabilitySwitch._1, Html(s"${ret.totalLiability}"), s"$serviceUrl/${per.key}/group-liability", Html("£"), liabilitySwitch._2)(messages)
             @ret.allowanceAmount.map { allAm =>
                 @standard_cya_row(key, "allowance-deducted", Html(s"$allAm"), s"$serviceUrl/${per.key}/allowance-deducted", Html("£"))(messages)
             }
@@ -39,12 +51,14 @@
                 <div>
                     <dt class="cya-question">@messages(s"$key.group-company", co._1.name)</dt>
                     <dd class="cya-answer">£ @co._2</dd>
+                    @if(!isPrint){
                     <dd class="app-check-your-answers__change">
                         <a href=@{s"$serviceUrl/${per.key}/company-liabilities-${i}"}>
                             <span aria-hidden="true">@messages("common.change")</span>
                             <span class="govuk-visually-hidden">@messages(s"$key.group-company.change", co._1.name)</span>
                         </a>
                     </dd>
+                    }
                 </div>
             }
         </dl>
@@ -92,10 +106,8 @@
 
         
     </div>
-
+    @if(!isPrint) {
     <h2 class="govuk-heading-m">@messages(s"$key.submission.title")</h2>
     <p>@messages(s"$key.submission.notice")</p>
-    <p class="govuk-body jsonly">
-        <a href="javascript:window.print()" class="govuk-link">@messages("common.print-save")</a>
-    </p>
+    }
 </div>

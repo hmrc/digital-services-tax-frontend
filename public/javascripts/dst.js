@@ -6,7 +6,6 @@
         Array.prototype.map.call(jsOnlyEls, el => el.style.display = 'block')
     })();
 
-
     var showHideContent = new GOVUK.ShowHideContent()
     showHideContent.init()
     
