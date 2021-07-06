@@ -40,6 +40,7 @@ object Period {
   object Key extends ValidatedType[String]{
     def validateAndTransform(in: String): Option[String] = 
       Some(in).filter{x => x.nonEmpty && x.size <= 4}
+        .map("^#".r.replaceAllIn(_,""))
   }
 
 }
