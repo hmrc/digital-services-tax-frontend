@@ -169,7 +169,7 @@ class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks wit
   }
 
   it should "serialize and de-serialise a Map[GroupCompany, Money]" in {
-    testJsonRoundtrip[Map[GroupCompany, Money]](gencomap)
+    testJsonRoundtrip[scala.collection.immutable.ListMap[GroupCompany, Money]](gencomap)
   }
 
   it should "serialize and de-serialise a LocalDate" in {

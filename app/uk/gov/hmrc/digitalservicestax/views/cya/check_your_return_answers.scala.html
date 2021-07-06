@@ -43,8 +43,8 @@
             @ret.allowanceAmount.map { allAm =>
                 @standard_cya_row(key, "allowance-deducted", Html(s"$allAm"), s"$serviceUrl/${per.key}/allowance-deducted", Html("£"))(messages)
             }
-            @standard_cya_row(key, "report-cross-border-transaction-relief", if(ret.crossBorderReliefAmount != 0){ messages("common.yes")} else { messages("common.no")}, s"$serviceUrl/${per.key}/report-cross-border-transaction-relief")(messages)
-            @if(ret.crossBorderReliefAmount != 0) {
+            @standard_cya_row(key, "report-cross-border-transaction-relief", if(ret.crossBorderReliefAmount != Money(0)){ messages("common.yes")} else { messages("common.no")}, s"$serviceUrl/${per.key}/report-cross-border-transaction-relief")(messages)
+            @if(ret.crossBorderReliefAmount != Money(0)) {
                 @standard_cya_row(key, "relief-deducted", Html(s"${ret.crossBorderReliefAmount}"), s"$serviceUrl/${per.key}/relief-deducted", Html("£"))(messages)
             }
             @ret.companiesAmount.zipWithIndex.map { case (co, i) =>

@@ -17,16 +17,18 @@
 package uk.gov.hmrc.digitalservicestaxfrontend
 
 import java.time.LocalDate
-
 import cats.implicits.{none, _}
 import enumeratum.scalacheck._
 import org.scalacheck.Arbitrary.{arbitrary, arbBigDecimal => _, _}
+import org.scalacheck.Gen.buildableOf
 import org.scalacheck.cats.implicits._
 import org.scalacheck.{Arbitrary, Gen}
 import shapeless.tag.@@
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.digitalservicestax.data.{Period, _}
 import wolfendale.scalacheck.regexp.RegexpGen
+
+import scala.collection.immutable.ListMap
 
 object TestInstances {
 
@@ -194,7 +196,7 @@ object TestInstances {
     } yield Enrolments(list.toSet)
   }
 
-  def gencomap: Gen[Map[GroupCompany, Money]] = Gen.mapOf(
+  def gencomap: Gen[ListMap[GroupCompany, Money]] = buildableOf[ListMap[GroupCompany,Money],(GroupCompany,Money)](
     (
       genGroupCo,
       arbitrary[Money]

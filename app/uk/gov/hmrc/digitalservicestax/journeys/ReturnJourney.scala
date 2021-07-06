@@ -18,6 +18,7 @@ package uk.gov.hmrc.digitalservicestax
 package journeys
 
 import scala.language.higherKinds
+import scala.collection.immutable.ListMap
 import data._
 import frontend.formatDate
 import cats.Monad
@@ -100,8 +101,8 @@ object ReturnJourney {
     } emptyUnless ask[Boolean]("report-alternative-charge")
 
 
-    def askAmountForCompanies(companies: Option[List[GroupCompany]]): F[Map[GroupCompany, Money]] = {
-      companies.fold(Map.empty[GroupCompany, Money].pure[F]){_.zipWithIndex.map{ case (co, i) =>
+    def askAmountForCompanies(companies: Option[List[GroupCompany]]): F[ListMap[GroupCompany, Money]] = {
+      companies.fold(ListMap.empty[GroupCompany, Money].pure[F]){_.zipWithIndex.map{ case (co, i) =>
         interact[GroupCompany, Money](
           s"company-liabilities-$i",
           co,
@@ -112,7 +113,7 @@ object ReturnJourney {
             message(s"company-liabilities-$i.length.exceeded", co.name) ++
             message(s"company-liabilities-$i.invalid", co.name)
         ).map{(co, _)}
-      }.sequence.map{_.toMap}}
+      }.sequence.map{x => ListMap(x: _*)}}
     }
 
     for {
