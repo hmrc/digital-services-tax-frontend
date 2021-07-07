@@ -68,6 +68,13 @@
                     <div class="column-one-third">
                         <div class="card">
                             <h2 class="heading-medium flush--top">@messages("landing.payment-due")</h2>
+                            <p>
+                                @messages("landing.payment-due-warning.due")
+                                <span class="govuk-!-font-weight-bold">
+                                    @messages("landing.payment-due-warning.after")
+                                </span>
+                                @messages("landing.payment-due-warning.return-submitted")
+                            </p>
                             <p>@formatDate(period.paymentDue)</p>
                             <p>
                                 <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.PaymentsController.payYourDST()">
