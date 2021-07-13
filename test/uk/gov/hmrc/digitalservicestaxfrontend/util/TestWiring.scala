@@ -21,22 +21,11 @@ import java.time.Clock
 
 import com.softwaremill.macwire.wire
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.audit.http.HttpAuditing
-import uk.gov.hmrc.play.audit.http.config.AuditingConfig
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
-import uk.gov.hmrc.play.bootstrap.config.{AuditingConfigProvider, RunMode, ServicesConfig}
-import uk.gov.hmrc.play.bootstrap.http.DefaultHttpAuditing
+import uk.gov.hmrc.play.bootstrap.config.RunMode
 
 trait TestWiring {
   val appName: String = configuration.get[String]("appName")
 
-  lazy val auditingConfigProvider: AuditingConfigProvider = wire[AuditingConfigProvider]
-
-  val auditingconfig: AuditingConfig = auditingConfigProvider.get()
-
-  lazy val auditConnector: AuditConnector = wire[DefaultAuditConnector]
-  lazy val httpAuditing: HttpAuditing = wire[DefaultHttpAuditing]
   lazy val configuration: Configuration = Configuration.load(environment, Map(
     "auditing.enabled" -> "false",
     "services.auth.port" -> "11111"
@@ -46,7 +35,4 @@ trait TestWiring {
   lazy val mode = environment.mode
 
   implicit def clock: Clock = Clock.systemDefaultZone()
-
-
-
 }

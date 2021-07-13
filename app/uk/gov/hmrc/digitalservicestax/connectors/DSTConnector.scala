@@ -27,7 +27,7 @@ class DSTConnector (
   val http: HttpClient,
   servicesConfig: ServicesConfig
 )(implicit executionContext: ExecutionContext, hc: HeaderCarrier)
-    extends DSTService[Future] with OptionHttpReads {
+    extends DSTService[Future] {
 
   val backendURL: String = servicesConfig.baseUrl("digital-services-tax") + "/digital-services-tax"
 
