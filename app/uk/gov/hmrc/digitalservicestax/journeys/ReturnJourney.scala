@@ -92,7 +92,7 @@ object ReturnJourney {
     } emptyUnless ask[Boolean]("report-alternative-charge")
 
     def askAmountForCompanies(companies: Option[List[GroupCompany]]) = {
-      companies.fold(pure(Map.empty[GroupCompany, Money]): Uniform[Needs.Ask[Money] with Needs.Tell[GroupCompany],GroupCompany,Map[GroupCompany,Money]]) {
+      companies.fold(pure(Map.empty[GroupCompany, Money]): Uniform[Needs.Interact[GroupCompany,Money],GroupCompany,Map[GroupCompany,Money]]) {
         _.zipWithIndex.map { case (co, i) =>
           interact[Money](
             s"company-liabilities-$i",

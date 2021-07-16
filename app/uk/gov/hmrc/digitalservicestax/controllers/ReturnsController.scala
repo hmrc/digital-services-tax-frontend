@@ -17,31 +17,31 @@
 package uk.gov.hmrc.digitalservicestax
 package controllers
 
-import data._
-import config.AppConfig
-import connectors.{DSTConnector, MongoPersistence}
 import cats.implicits.catsKernelOrderingForOrder
-import javax.inject.Inject
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
-import ltbs.uniform.common.web.{Breadcrumbs, GenericWebTell, JourneyConfig, ListingRow, WebInteraction, WebMonad}
-import ltbs.uniform.interpreters.playframework.{PersistenceEngine, tellTwirlUnit}
-import ltbs.uniform.validation.Rule
-import play.api.i18n.{I18nSupport, MessagesApi}
+import ltbs.uniform.common.web._
+import ltbs.uniform.interpreters.playframework.PersistenceEngine
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
-
-import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{AuthorisedAction, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import play.api.data.Form
-import play.api.data.Forms._
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.digitalservicestax.data.Period.Key
+
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+
+import data._
+import connectors.{DSTConnector, MongoPersistence}
 
 
 class ReturnsController @Inject()(
@@ -70,15 +70,15 @@ class ReturnsController @Inject()(
   //     }, messages)
   // }
 
-  private implicit val cyaRetTell = new GenericWebTell[Html, CYA[(Return, Period, CompanyName)]] {
-    override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Html =
-      views.html.cya.check_your_return_answers(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages)
+  private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
+    override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(views.html.cya.check_your_return_answers(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
   }
 
-  private implicit val confirmRetTell = new GenericWebTell[Html, Confirmation[(Return, CompanyName, Period, Period)]] {
-    override def render(in: Confirmation[(Return, CompanyName, Period, Period)], key: String, messages: UniformMessages[Html]): Html =
-      views.html.end.confirmation_return(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period)(messages)
-  }
+  // private implicit val confirmRetTell = new WebTell[Html, Confirmation[(Return, CompanyName, Period, Period)]] {
+  //   override def render(in: Confirmation[(Return, CompanyName, Period, Period)], key: String, messages: UniformMessages[Html]): Option[Html] =
+  //     Some(views.html.end.confirmation_return(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period)(messages))
+  // }
 
   private def applyKey(key: Key): Period.Key = key
   private def unapplyKey(arg: Period.Key): Option[(Key)] = Option(arg)
@@ -93,12 +93,12 @@ class ReturnsController @Inject()(
     implicit request: AuthorisedRequest[AnyContent] =>
       implicit val msg: UniformMessages[Html] = messages(request)
 
-      implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
-        MongoPersistence[AuthorisedRequest[AnyContent]](
-          mongo,
-          collectionName = "uf-amendments-returns",
-          appConfig.mongoJourneyStoreExpireAfter
-        )(_.internalId)
+      // implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
+      //   MongoPersistence[AuthorisedRequest[AnyContent]](
+      //     mongo,
+      //     collectionName = "uf-amendments-returns",
+      //     appConfig.mongoJourneyStoreExpireAfter
+      //   )(_.internalId)
 
       backend.lookupRegistration().flatMap{
         case None      => Future.successful(NotFound)

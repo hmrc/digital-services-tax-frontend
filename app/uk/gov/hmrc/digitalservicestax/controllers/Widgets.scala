@@ -16,33 +16,70 @@
 
 package uk.gov.hmrc.digitalservicestax.controllers
 
-import java.time.LocalDate
-
 import cats.data.Validated
 import cats.implicits._
-import com.google.inject.ImplementedBy
 import enumeratum._
-import javax.inject.Inject
-import ltbs.uniform.common.web.{FormField, GenericWebTell, ListingRow, WebInteraction}
+import ltbs.uniform._
+import ltbs.uniform.common.web.WebAsk
+import ltbs.uniform.common.web.WebInteraction
+import ltbs.uniform.common.web.WebTell
 import ltbs.uniform.interpreters.playframework.Breadcrumbs
 import ltbs.uniform.validation.Rule._
 import ltbs.uniform.validation._
-import ltbs.uniform._
 import play.twirl.api.Html
 import play.twirl.api.HtmlFormat.Appendable
 import shapeless.tag
-import tag.@@
 import uk.gov.hmrc.digitalservicestax._
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.frontend.{Kickout, RichAddress}
+import uk.gov.hmrc.digitalservicestax.frontend.Kickout
+import uk.gov.hmrc.digitalservicestax.frontend.RichAddress
+
+import java.time.LocalDate
+
+import tag.@@
 
 //@ImplementedBy(classOf[WidgetsImpl])
 trait Widgets {
 
   implicit val appConfig: AppConfig
 
-  implicit val twirlStringField: FormField[Html, String] = twirlStringFields()
+  implicit val twirlStringField: WebAsk[Html, String] = twirlStringFields()
+
+  implicit val blah: WebAsk[Html, Unit] = new WebAsk[Html, Unit] {
+    def decode(out: Input): Either[ErrorTree,Unit] = Right(())
+    def encode(in: Unit): Input = Input.empty
+
+    def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      breadcrumbs: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = Some(views.html.uniform.standard_field(pageKey,errors,"",messages)(tell.getOrElse(Html(""))))
+  }
+
+  implicit val blah3: WebAsk[Html, Nothing] = new WebAsk[Html, Nothing] {
+    def decode(out: Input): Either[ErrorTree,Nothing] =
+      Left(ErrorMsg("impossible-state").toTree)
+
+    def encode(in: Nothing): Input =
+      sys.error("attempting to encode nothing")
+    
+    def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      breadcrumbs: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = tell
+  }
+
+  implicit val blah4: WebInteraction[Html,Kickout,Nothing] = ??? // FIXME!!!
 
   type CustomStringRenderer =
     (List[String], String, ErrorTree, UniformMessages[Html], Option[String]) => Appendable
@@ -50,7 +87,7 @@ trait Widgets {
   def twirlStringFields(
     autoFields: Option[String] = None,
     customRender: CustomStringRenderer = views.html.uniform.string.apply(_,_,_,_,_)
-  ): FormField[Html, String] = new FormField[Html, String] {
+  ): WebAsk[Html, String] = new WebAsk[Html, String] {
     def decode(out: Input): Either[ErrorTree, String] =
       out.toStringField().toEither
 
@@ -59,6 +96,7 @@ trait Widgets {
     def render(
       pageKey: List[String],
       fieldKey: List[String],
+      tell: Option[Html],
       path: Breadcrumbs,
       data: Input,
       errors: ErrorTree,
@@ -71,8 +109,8 @@ trait Widgets {
   }
 
   def validatedVariant[BaseType](validated: ValidatedType[BaseType])(
-    implicit baseForm: FormField[Html, BaseType]
-  ): FormField[Html, BaseType @@ validated.Tag] =
+    implicit baseForm: WebAsk[Html, BaseType]
+  ): WebAsk[Html, BaseType @@ validated.Tag] =
     baseForm.simap{x =>
       Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
     }{x => x: BaseType}
@@ -81,8 +119,8 @@ trait Widgets {
     validated: ValidatedType[String],
     maxLen: Int = Integer.MAX_VALUE
   )(
-    implicit baseForm: FormField[Html, String]
-  ): FormField[Html, String @@ validated.Tag] =
+    implicit baseForm: WebAsk[Html, String]
+  ): WebAsk[Html, String @@ validated.Tag] =
     baseForm.simap{
       case x if x.trim.isEmpty => Left(ErrorMsg("required").toTree)
       case l if l.length > maxLen => Left(ErrorMsg("length.exceeded").toTree)
@@ -92,7 +130,7 @@ trait Widgets {
   def inlineOptionString(
     validated: ValidatedType[String],
     maxLen: Int = Integer.MAX_VALUE
-  ): FormField[Html, Option[String @@ validated.Tag]] =
+  ): WebAsk[Html, Option[String @@ validated.Tag]] =
     twirlStringField.simap{
       case "" => Right(None)
       case l if l.length > maxLen => Left(ErrorMsg("length.exceeded").toTree)
@@ -108,8 +146,8 @@ trait Widgets {
     validated: ValidatedType[BigDecimal],
     maxLen: Int = Integer.MAX_VALUE
   )(
-    implicit baseForm: FormField[Html, BigDecimal]
-  ): FormField[Html, BigDecimal @@ validated.Tag] =
+    implicit baseForm: WebAsk[Html, BigDecimal]
+  ): WebAsk[Html, BigDecimal @@ validated.Tag] =
     baseForm.simap{
       case l if l.precision > maxLen => Left(ErrorMsg("length.exceeded").toTree)
       case x => Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
@@ -139,9 +177,9 @@ trait Widgets {
   implicit def optAddressField                = inlineOptionString(AddressLine, 35)
   implicit def restrictField                  = validatedString(RestrictiveString, 35)
 
-  implicit def optUtrField: FormField[Html, Option[UTR]] = inlineOptionString(UTR)
+  implicit def optUtrField: WebAsk[Html, Option[UTR]] = inlineOptionString(UTR)
 
-  implicit val intField: FormField[Html, Int] =
+  implicit val intField: WebAsk[Html, Int] =
     twirlStringFields().simap(x => 
       {
         Rule.nonEmpty[String].apply(x) andThen
@@ -149,7 +187,7 @@ trait Widgets {
       }.toEither
     )(_.toString)
 
-  implicit val floatField: FormField[Html, Float] =
+  implicit val floatField: WebAsk[Html, Float] =
     twirlStringFields(
       customRender = views.html.uniform.string(_,_,_,_,_,"form-control govuk-input--width-4 govuk-input-z-index")
     ).simap(x =>
@@ -159,7 +197,7 @@ trait Widgets {
       }.toEither
     )(_.toString)
 
-  implicit val longField: FormField[Html, Long] =
+  implicit val longField: WebAsk[Html, Long] =
     twirlStringFields().simap(x => 
       {
         Rule.nonEmpty[String].apply(x.replace("%", "")) andThen
@@ -167,7 +205,7 @@ trait Widgets {
       }.toEither
     )(_.toString)
 
-  implicit val bigdecimalField: FormField[Html, BigDecimal] = {
+  implicit val bigdecimalField: WebAsk[Html, BigDecimal] = {
     twirlStringFields(
       customRender = views.html.uniform.string(_,_,_,_,_,"govuk-input-money govuk-input--width-10")
     ).simap(x => {
@@ -177,7 +215,7 @@ trait Widgets {
     )(_.toString)
   }
 
-  implicit val twirlBoolField = new FormField[Html, Boolean] {
+  implicit val twirlBoolField = new WebAsk[Html, Boolean] {
     val True = true.toString.toUpperCase
     val False = false.toString.toUpperCase
 
@@ -192,6 +230,7 @@ trait Widgets {
     def render(
       pageKey: List[String],
       fieldKey: List[String],
+      tell: Option[Html],      
       path: Breadcrumbs,
       data: Input,
       errors: ErrorTree,
@@ -207,11 +246,12 @@ trait Widgets {
     }
   }
 
-  implicit val twirlCountryCodeField = new FormField[Html, CountryCode] {
+  implicit val twirlCountryCodeField = new WebAsk[Html, CountryCode] {
 
     override def render(
       pageKey: List[String],
       fieldKey: List[String],
+      tell: Option[Html],      
       breadcrumbs: Breadcrumbs,
       data: Input,
       errors: ErrorTree,
@@ -231,8 +271,8 @@ trait Widgets {
 
   }
 
-  implicit val twirlDateField: FormField[Html, LocalDate] =
-    new FormField[Html, LocalDate] {
+  implicit val twirlDateField: WebAsk[Html, LocalDate] =
+    new WebAsk[Html, LocalDate] {
 
       def decode(out: Input): Either[ErrorTree, LocalDate] = {
 
@@ -273,6 +313,7 @@ trait Widgets {
       def render(
         pageKey: List[String],        
         fieldKey: List[String],
+        tell: Option[Html],
         path: Breadcrumbs,
         data: Input,
         errors: ErrorTree,
@@ -289,15 +330,16 @@ trait Widgets {
 
   implicit def twirlUKAddressField[T](
     implicit gen: shapeless.LabelledGeneric.Aux[UkAddress,T],
-    ffhlist: FormField[Html, T]
-  ): FormField[Html, UkAddress] = new FormField[Html, UkAddress] {
+    ffhlist: WebAsk[Html, T]
+  ): WebAsk[Html, UkAddress] = new WebAsk[Html, UkAddress] {
 
     def decode(out: Input): Either[ErrorTree, UkAddress] = ffhlist.decode(out).map(gen.from)
     def encode(in: UkAddress): Input = ffhlist.encode(gen.to(in))
 
     def render(
       pagekey: List[String],
-      fieldKey: List[String],      
+      fieldKey: List[String],
+      tell: Option[Html],      
       path: Breadcrumbs,
       data: Input,
       errors: ErrorTree,
@@ -316,8 +358,8 @@ trait Widgets {
 
   implicit def twirlForeignAddressField[T](
     implicit gen: shapeless.LabelledGeneric.Aux[ForeignAddress,T],
-    ffhlist: FormField[Html, T]
-  ): FormField[Html, ForeignAddress] = new FormField[Html, ForeignAddress] {
+    ffhlist: WebAsk[Html, T]
+  ): WebAsk[Html, ForeignAddress] = new WebAsk[Html, ForeignAddress] {
 
     def decode(out: Input): Either[ErrorTree, ForeignAddress] = ffhlist.decode(out).map(gen.from)
     def encode(in: ForeignAddress): Input = ffhlist.encode(gen.to(in))
@@ -325,6 +367,7 @@ trait Widgets {
     def render(
       pagekey: List[String],
       fieldKey: List[String],
+      tell: Option[Html],      
       path: Breadcrumbs,
       data: Input,
       errors: ErrorTree,
@@ -339,8 +382,8 @@ trait Widgets {
     }
   }
 
-  implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): FormField[Html, A] =
-    new FormField[Html, A] {
+  implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, A] =
+    new WebAsk[Html, A] {
 
       def decode(out: Input): Either[ErrorTree,A] = {out.toField[A](x =>
         nonEmpty[String].apply(x) andThen
@@ -350,7 +393,8 @@ trait Widgets {
       def encode(in: A): Input = Input.one(List(in.entryName))
       def render(
         pageKey: List[String],
-        fieldKey: List[String],        
+        fieldKey: List[String],
+        tell: Option[Html],
         path: Breadcrumbs,
         data: Input,
         errors: ErrorTree,
@@ -368,8 +412,8 @@ trait Widgets {
       }
     }
 
-  implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A]): FormField[Html, Set[A]] =
-    new FormField[Html, Set[A]] {
+  implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, Set[A]] =
+    new WebAsk[Html, Set[A]] {
 
       def decode(out: Input): Either[ErrorTree,Set[A]] = {
         val i: List[String] = out.valueAtRoot.getOrElse(Nil)
@@ -384,10 +428,11 @@ trait Widgets {
       def encode(in: Set[A]): Input =
         Map(Nil -> in.toList.map{_.entryName})
 
-      // Members declared in ltbs.uniform.common.web.FormField
+      // Members declared in ltbs.uniform.common.web.WebAsk
       def render(
         pageKey: List[String],
         fieldKey: List[String],
+        tell: Option[Html],
         breadcrumbs: Breadcrumbs,
         data: Input,
         errors: ErrorTree,
@@ -406,40 +451,40 @@ trait Widgets {
 
     }
 
-  implicit val addressTell = new GenericWebTell[Html, Address] {
-    override def render(in: Address, key: String, messages: UniformMessages[Html]): Html =
-      Html(
+  implicit val addressTell = new WebTell[Html, Address] {
+    override def render(in: Address, key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(Html(
         s"<div id='${key}--sfer-content'>" +
         s"<p>${in.lines.map{x => s"<span class='govuk-body-m'>${x.escapeHtml}</span>"}.mkString("<br/>")}</p>" +
         "</div>"
-      )
+      ))
   }
 
-  implicit val kickoutTell = new GenericWebTell[Html, Kickout] {
-    override def render(in: Kickout, key: String, messages: UniformMessages[Html]): Html =
-      views.html.end.kickout(key)(messages, appConfig)
+  implicit val kickoutTell = new WebTell[Html, Kickout] {
+    override def render(in: Kickout, key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(views.html.end.kickout(key)(messages, appConfig))
   }
 
-  implicit val groupCoTell = new GenericWebTell[Html, GroupCompany] {
-    override def render(in: GroupCompany, key: String, messages: UniformMessages[Html]): Html =
-      Html("")
+  implicit val groupCoTell = new WebTell[Html, GroupCompany] {
+    override def render(in: GroupCompany, key: String, messages: UniformMessages[Html]): Option[Html] =
+      None /// ????
   }
 
-  implicit val companyTell = new GenericWebTell[Html, Company] {
-    override def render(in: Company, key: String, messages: UniformMessages[Html]): Html =
-      Html(
+  implicit val companyTell = new WebTell[Html, Company] {
+    override def render(in: Company, key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(Html(
         s"<p class='govuk-body-l' id='${key}--sfer-content'>" +
           s"${in.name.toString.escapeHtml}<br>" +
           s"<span class='govuk-body-m'>" +
           s"${in.address.lines.map{_.escapeHtml}.mkString("<br>")}" +
           s"</span>" +
           "</p>"
-      )
+      ))
   }
 
-  implicit val booleanTell = new GenericWebTell[Html, Boolean] {
-    override def render(in: Boolean, key: String, messages: UniformMessages[Html]): Html =
-      Html(in.toString)
+  implicit val booleanTell = new WebTell[Html, Boolean] {
+    override def render(in: Boolean, key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(Html(in.toString))
   }
 
 }

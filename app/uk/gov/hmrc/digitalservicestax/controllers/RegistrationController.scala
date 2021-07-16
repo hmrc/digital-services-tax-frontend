@@ -17,10 +17,7 @@
 package uk.gov.hmrc.digitalservicestax
 package controllers
 
-import data._
-import config.AppConfig
-import connectors.{DSTConnector, MongoPersistence}
-import javax.inject.Inject
+import cats.instances.future._
 import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework._
@@ -28,16 +25,18 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
-
-import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{AuthorisedAction, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import cats.instances.future._
-import ltbs.uniform.validation.Rule
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
+import data._
+import connectors.{DSTConnector, MongoPersistence}
 
 class RegistrationController @Inject()(
   authorisedAction: AuthorisedAction,
@@ -65,15 +64,15 @@ class RegistrationController @Inject()(
   private def hod(id: InternalId)(implicit hc: HeaderCarrier) =
     connectors.CachedDstService(backend)(id)
 
-  private implicit val cyaRegTell = new GenericWebTell[Html, CYA[Registration]] {
-    override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Html =
-      views.html.cya.check_your_registration_answers(s"$key.reg", in.value)(messages)
+  private implicit val cyaRegTell = new WebTell[Html, CYA[Registration]] {
+    override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(views.html.cya.check_your_registration_answers(s"$key.reg", in.value)(messages))
   }
 
-  private implicit val confirmRegTell = new GenericWebTell[Html, Confirmation[Registration]] {
-    override def render(in: Confirmation[Registration], key: String, messages: UniformMessages[Html]): Html = {
+  private implicit val confirmRegTell = new WebTell[Html, Confirmation[Registration]] {
+    override def render(in: Confirmation[Registration], key: String, messages: UniformMessages[Html]): Option[Html] = {
       val reg = in.value
-      views.html.end.confirmation(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages)
+      Some(views.html.end.confirmation(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages))
     }
   }
 

@@ -17,17 +17,14 @@
 package uk.gov.hmrc.digitalservicestax.controllers
 
 import cats.implicits._
-import com.google.inject.ImplementedBy
-
 import javax.inject.Inject
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages, mon}
 import ltbs.uniform._
 import ltbs.uniform.validation.Rule
-import play.api.mvc.{AnyContent, Request, Results}
+import play.api.mvc.{AnyContent, Request}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
-import uk.gov.hmrc.digitalservicestax.views
 import uk.gov.hmrc.digitalservicestax.views.html.{Layout, FormWrapper}
 import uk.gov.hmrc.digitalservicestax.views.html.uniform.radios
 
@@ -38,7 +35,7 @@ class DSTInterpreter @Inject()(
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
-  with InferFormFields[Html]
+  with InferWebAsk[Html]
   with AutoListingPage[Html]
   with Widgets {
 
@@ -54,11 +51,12 @@ class DSTInterpreter @Inject()(
     validation: Rule[List[A]]): Html = ???
 
   // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
-  def unitAsk: WebInteraction[Html, Unit] = new FormField[Html, Unit] {
+  def unitAsk = new WebAsk[Html, Unit] {
     override def render(
       pageKey: List[String],
       fieldKey: List[String],
-      breadcrumbs: _root_.ltbs.uniform.common.web.Breadcrumbs,
+      tell: Option[Html],      
+      breadcrumbs: Breadcrumbs,
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
@@ -69,13 +67,10 @@ class DSTInterpreter @Inject()(
     override def decode(out: Input): Either[ErrorTree, Unit] = Right(())
   }
 
-  def unitTell: GenericWebTell[Html, Unit] = new GenericWebTell[Html, Unit] {
-    def render(in: Unit, key: String, messages: UniformMessages[Html]): Html = Html("")
-  }
-
   def renderAnd(
     pageKey: List[String],
     fieldKey: List[String],
+    tell: Option[Html],
     breadcrumbs: Breadcrumbs,
     data: Input,
     errors: ErrorTree,
@@ -90,6 +85,7 @@ class DSTInterpreter @Inject()(
   def renderOr(
     pageKey: List[String],
     fieldKey: List[String],
+    tell: Option[Html],    
     breadcrumbs: Breadcrumbs,
     data: Input,
     errors: ErrorTree,
@@ -124,8 +120,7 @@ class DSTInterpreter @Inject()(
   override def pageChrome(
     keyList: List[String],
     errors: ErrorTree,
-    tell: Option[Html],
-    ask: Option[Html],
+    html: Option[Html],
     breadcrumbs: List[String],
     request: Request[AnyContent],
     messages: UniformMessages[Html]): Html = {
@@ -133,15 +128,15 @@ class DSTInterpreter @Inject()(
     // very crude method to determine if a page is a kickout - we
     // need a more robust/generic technique based upon different
     // behaviour for 'end' interactions
-    def isKickout: Boolean = tell.toString.contains("""<div class="kickout""")
+    def isKickout: Boolean = html.fold(false)(_.toString.contains("""<div class="kickout"""))
 
     val content: Html = if (isKickout) {
-      tell.getOrElse(throw new Exception("missing tell")) // TODO - review
+      html.get
     } else {
       formWrapper(
         keyList,
         errors,
-        List(tell, ask).flatten.combineAll,
+        html.get, 
         List(breadcrumbs.drop(1))
       )(messages, request)
     }
