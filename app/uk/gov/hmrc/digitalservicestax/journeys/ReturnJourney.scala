@@ -24,6 +24,8 @@ import uk.gov.hmrc.digitalservicestax.data.Activity.OnlineMarketplace
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.frontend.formatDate
 
+import scala.collection.immutable.ListMap
+
 object ReturnJourney {
 
   private def message(key: String, args: String*) = {
@@ -92,7 +94,7 @@ object ReturnJourney {
     } emptyUnless ask[Boolean]("report-alternative-charge")
 
     def askAmountForCompanies(companies: Option[List[GroupCompany]]) = {
-      companies.fold(pure(Map.empty[GroupCompany, Money]): Uniform[Needs.Interact[GroupCompany,Money],GroupCompany,Map[GroupCompany,Money]]) {
+      companies.fold(pure(ListMap.empty[GroupCompany, Money]): Uniform[Needs.Interact[GroupCompany, Money], GroupCompany, ListMap[GroupCompany, Money]]) {
         _.zipWithIndex.map { case (co, i) =>
           interact[Money](
             s"company-liabilities-$i",
@@ -106,44 +108,53 @@ object ReturnJourney {
           ).map {
             (co, _)
           }
-        }.sequence.map{_.toMap}
+        }.sequence.map {
+           x => ListMap(x: _*)
+        }
       }
     }
 
     for {
       groupCos <- ask[List[GroupCompany]]("manage-companies", validation = Rule.minLength(1)) when isGroup
       activities <- ask[Set[Activity]]("select-activities", validation = Rule.minLength(1))
-
-      dstReturn <- (
-        askAlternativeCharge(activities),
-        ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) flatMap {
-          case Some(true) => ask[Money]("relief-deducted")
-          case _ => pure(Money(BigDecimal(0).setScale(2)))
-        },
-        askAmountForCompanies(groupCos) emptyUnless isGroup,
-        ask[Money](
-          "allowance-deducted",
-          validation =
-            Rule.cond[Money]({
-              case money: Money if money <= 25000000 => true
-              case _ => false
-            }, "max-money")
-        ),
-        ask[Money]("group-liability",
-          customContent =
-            message("group-liability.heading", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
-            message("group-liability.required", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
-            message("group-liability.not-a-number", isGroupMessage) ++
-            message("group-liability.length.exceeded", isGroupMessage) ++
-            message("group-liability.invalid", isGroupMessage)
-        ),
-        ask[RepaymentDetails]("bank-details") when ask[Boolean](
-            "repayment",
-            customContent =
-            message("repayment.heading", formatDate(period.start), formatDate(period.end)) ++
-            message("repayment.required", formatDate(period.start), formatDate(period.end))
+      dstReturn <- for {
+        alternateCharge         <- askAlternativeCharge(activities)
+        crossBorderReliefAmount <- ask[Boolean]("report-cross-border-transaction-relief") when activities.contains(OnlineMarketplace) flatMap {
+                                    case Some(true) => ask[Money]("relief-deducted")
+                                    case _ => pure(Money(BigDecimal(0).setScale(2)))
+                                  }
+        allowanceAmount         <- ask[Money] (
+                                     "allowance-deducted",
+                                         validation = Rule.cond[Money] ( {
+                                           case money: Money if money <= 25000000 => true
+                                           case _ => false
+                                         }, "max-money")
+                                       ) when alternateCharge.forall{case (_,v) => v > 0 }
+        companiesAmount         <- askAmountForCompanies(groupCos) emptyUnless isGroup
+        totalLiability          <- ask[Money] (
+                                     "group-liability",
+                                     customContent =
+                                       message("group-liability.heading", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
+                                         message("group-liability.required", isGroupMessage, formatDate(period.start), formatDate(period.end)) ++
+                                         message("group-liability.not-a-number", isGroupMessage) ++
+                                         message("group-liability.length.exceeded", isGroupMessage) ++
+                                         message("group-liability.invalid", isGroupMessage))
+        repayment               <- ask[RepaymentDetails] ("bank-details") when
+                                     ask[Boolean] (
+                                       "repayment",
+                                       customContent =
+                                         message("repayment.heading", formatDate(period.start), formatDate(period.end)) ++
+                                           message("repayment.required", formatDate(period.start), formatDate(period.end)))
+      } yield
+        Return(
+          activities,
+          alternateCharge,
+          crossBorderReliefAmount,
+          allowanceAmount,
+          companiesAmount,
+          totalLiability,
+          repayment
         )
-      ).mapN(Return.apply)
       displayName = registration.ultimateParent.fold(registration.companyReg.company.name)(_.name)
       _ <- tell("check-your-answers", CYA((dstReturn, period, displayName)))
     } yield dstReturn

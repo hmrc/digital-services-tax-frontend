@@ -15,17 +15,22 @@
  *@
 
 @import uk.gov.hmrc.digitalservicestax.frontend.formatDate
-@(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period)(implicit messages: UniformMessages[Html])
+@(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period, printableCYA: Option[Html])(implicit messages: UniformMessages[Html])
+
+@printableCYA.map { printable =>
+    <div class="print-only">@printable</div>
+}
 
 <div class="govuk-box-highlight">
     <h1 class="heading-xlarge">@messages(s"$key.heading")</h1>
     <span class="heading-large">@messages(s"$key.detail", companyName, formatDate(submittedPeriod.start), formatDate(submittedPeriod.end))</span>
 </div>
 
-<p class="govuk-body">
-    <a href="javascript:window.print()" class="govuk-link">@messages(s"$key.print-save")</a>
-</p>
-
+@printableCYA.map { _ =>
+    <p class="govuk-body jsonly">
+        <a href="javascript:window.print()" class="govuk-link">@messages(s"$key.print-save")</a>
+    </p>
+}
 <h2 class="govuk-heading-m">@messages("confirmation.what-you-do-next.title")</h2>
 <p class="govuk-body">@messages("confirmation.what-you-do-next.p1", formatDate(nextPeriod.start), formatDate(nextPeriod.end))</p>
 <p class="govuk-body">@messages("confirmation.what-you-do-next.p2", formatDate(nextPeriod.paymentDue), formatDate(nextPeriod.returnDue))</p>

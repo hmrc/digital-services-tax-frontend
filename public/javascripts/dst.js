@@ -1,5 +1,11 @@
 ;(function(window, document) {
 
+    // SET VISIBILITY OF JS ONLY ELEMENTS
+    (function() {
+        const jsOnlyEls = document.getElementsByClassName('jsonly')
+        Array.prototype.map.call(jsOnlyEls, el => el.style.display = 'block')
+    })();
+
     var showHideContent = new GOVUK.ShowHideContent()
     showHideContent.init()
     

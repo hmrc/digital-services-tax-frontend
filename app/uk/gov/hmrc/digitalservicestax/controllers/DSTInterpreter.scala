@@ -48,7 +48,9 @@ class DSTInterpreter @Inject()(
     data: Input,
     errors: ErrorTree,
     messages: UniformMessages[Html],
-    validation: Rule[List[A]]): Html = ???
+    validation: Rule[List[A]]): Html =
+    //TODO Implement this
+    Html("")
 
   // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
   def unitAsk = new WebAsk[Html, Unit] {

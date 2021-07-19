@@ -1,3 +1,25 @@
+.print-only {
+    display: none;
+}
+
+@media print {
+  #global-header {
+    display: none;
+  }
+  .print-hide {
+    display: none;
+  }
+  .phase-banner a {
+    display: inline;
+  }
+  .content__body > div.print-only {
+    display: block;
+  }
+  .content__body > :not(.print-only), a {
+    display: none;
+  }
+}
+
 .autocomplete__wrapper {
     max-width: 100%;
 }
@@ -1342,4 +1364,8 @@ only screen and (max-width: 760px),
     .responsive-table td:before {
         content: "" !important;
     }
+}
+
+.jsonly {
+    display: none;
 }

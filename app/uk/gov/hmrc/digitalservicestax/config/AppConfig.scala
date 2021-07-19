@@ -17,7 +17,7 @@
 package uk.gov.hmrc.digitalservicestax.config
 
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment, Mode}
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.duration.Duration

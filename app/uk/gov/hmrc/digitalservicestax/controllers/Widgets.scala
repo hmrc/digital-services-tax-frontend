@@ -20,9 +20,7 @@ import cats.data.Validated
 import cats.implicits._
 import enumeratum._
 import ltbs.uniform._
-import ltbs.uniform.common.web.WebAsk
-import ltbs.uniform.common.web.WebInteraction
-import ltbs.uniform.common.web.WebTell
+import ltbs.uniform.common.web.{PageIn, PageOut, WebAsk, WebInteraction, WebMonad, WebTell}
 import ltbs.uniform.interpreters.playframework.Breadcrumbs
 import ltbs.uniform.validation.Rule._
 import ltbs.uniform.validation._
@@ -36,8 +34,9 @@ import uk.gov.hmrc.digitalservicestax.frontend.Kickout
 import uk.gov.hmrc.digitalservicestax.frontend.RichAddress
 
 import java.time.LocalDate
-
 import tag.@@
+
+import scala.concurrent.{ExecutionContext, Future}
 
 //@ImplementedBy(classOf[WidgetsImpl])
 trait Widgets {
@@ -79,7 +78,18 @@ trait Widgets {
     ): Option[Html] = tell
   }
 
-  implicit val blah4: WebInteraction[Html,Kickout,Nothing] = ??? // FIXME!!!
+  implicit val blah4: WebInteraction[Html,Kickout,Nothing] = new WebInteraction[Html,Kickout,Nothing] {
+    override def apply(
+      id: String,
+      tell: Option[Kickout],
+      defaultIn: Option[Nothing],
+      validationIn: Rule[Nothing],
+      customContent: Map[String, (String, List[Any])]
+    ): WebMonad[Html, Nothing] = new WebMonad[Html, Nothing] {
+      override def apply(pageIn: PageIn[Html])(implicit ec: ExecutionContext): Future[PageOut[Html, Nothing]] =
+        ??? //TODO implement this
+    }
+  }
 
   type CustomStringRenderer =
     (List[String], String, ErrorTree, UniformMessages[Html], Option[String]) => Appendable
@@ -154,7 +164,8 @@ trait Widgets {
     }{x => x: BigDecimal}
 
   implicit def postcodeField                  = validatedString(Postcode)(twirlStringFields(
-    customRender = views.html.uniform.string(_,_,_,_,_,"form-control postcode")
+    //TODO Check 'form-control-1-4' class it could be 'postcode' instead
+    customRender = views.html.uniform.string(_,_,_,_,_,"form-control form-control-1-4")
   ))
   implicit def nesField                       = validatedVariant(NonEmptyString)
   implicit def utrField                       = validatedString(UTR)

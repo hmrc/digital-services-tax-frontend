@@ -16,10 +16,9 @@ object AppDependencies {
     "com.luketebbs.uniform"   %% "interpreter-play26"       % uniformVersion,
     "uk.gov.hmrc"             %% "mongo-caching"            % "6.12.0-play-26",
     "org.reactivemongo"       %% "play2-reactivemongo"      % "0.18.6-play26", // TODO fix /home/luke/hmrc/digital-services-tax-frontend/app/uk/gov/hmrc/digitalservicestax/connectors/MongoPersistence.scala:85:21 for v0.20.10 upgrade
-    "uk.gov.hmrc"             %% "auth-client"              % "3.0.0-play-26",
     "uk.gov.hmrc"             %% "play-language"            % "4.2.0-play-26",
     "commons-validator"       % "commons-validator"         % "1.6",
-    "uk.gov.hmrc"             %% "bootstrap-play-26"        % "1.7.0",
+    "uk.gov.hmrc"             %% "bootstrap-play-26"        % "4.0.0",
     "fr.marcwrobel"           % "jbanking"                  % "2.0.0"
   )
 

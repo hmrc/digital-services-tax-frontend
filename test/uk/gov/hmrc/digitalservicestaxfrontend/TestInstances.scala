@@ -17,16 +17,18 @@
 package uk.gov.hmrc.digitalservicestaxfrontend
 
 import java.time.LocalDate
-
 import cats.implicits.{none, _}
 import enumeratum.scalacheck._
 import org.scalacheck.Arbitrary.{arbitrary, arbBigDecimal => _, _}
+import org.scalacheck.Gen.buildableOf
 import org.scalacheck.cats.implicits._
 import org.scalacheck.{Arbitrary, Gen}
 import shapeless.tag.@@
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.digitalservicestax.data.{Period, _}
 import wolfendale.scalacheck.regexp.RegexpGen
+
+import scala.collection.immutable.ListMap
 
 object TestInstances {
 
@@ -194,7 +196,7 @@ object TestInstances {
     } yield Enrolments(list.toSet)
   }
 
-  def gencomap: Gen[Map[GroupCompany, Money]] = Gen.mapOf(
+  def gencomap: Gen[ListMap[GroupCompany, Money]] = buildableOf[ListMap[GroupCompany,Money],(GroupCompany,Money)](
     (
       genGroupCo,
       arbitrary[Money]
@@ -223,11 +225,22 @@ object TestInstances {
   def date(start: LocalDate, end: LocalDate): Gen[LocalDate] =
     Gen.choose(start.toEpochDay, end.toEpochDay).map(LocalDate.ofEpochDay)
 
+  def genAllowanceAmount(g: Gen[Map[Activity, Percent]]): Gen[Option[Money]] =
+    g.map {
+      case x if x.forall{ case (_,v) => v > 0 } => Gen.some(arbitrary[Money])
+      case _ => Gen.const(None)
+    }.flatten
+
+  def genActivitySet: Gen[Set[Activity]] = Gen.oneOf(1,2,3).map { x =>
+    Gen.listOfN(x, arbitrary[Activity])
+  }.flatten.retryUntil(x => x.distinct.size == x.size, 100).map(_.toSet)
+
   implicit def returnGen: Arbitrary[Return] = Arbitrary((
+    genActivitySet,
     genActivityPercentMap,
     arbitrary[Money],
+    genAllowanceAmount(genActivityPercentMap),
     gencomap,
-    arbitrary[Money],
     arbitrary[Money],
     Gen.option(genRepayment)
     ).mapN(Return.apply))
