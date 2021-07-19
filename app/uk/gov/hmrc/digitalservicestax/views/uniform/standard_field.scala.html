@@ -17,6 +17,10 @@
 @import cats.implicits._
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
 
+@this(
+    govukDetails: GovukDetails
+)
+
 @(keyList: List[String], errors: ErrorTree, fieldType: String, messages: UniformMessages[Html])(inner: Html)
 
 @key=@{keyList.mkString(".")}
@@ -98,6 +102,13 @@
             @messages(s"$key.details.text")
         </div>
     </details>
+
+    @govukDetails(Details(
+        summary = Text(ufMessagesToPlayMessages.apply(s"$key.details")(messages)),
+        content = Text(ufMessagesToPlayMessages.apply(s"$key.details.text")(messages))
+    ))
+}
+
 }
 
 @if(!noShowErrors) {

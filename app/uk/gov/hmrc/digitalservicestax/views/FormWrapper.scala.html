@@ -21,7 +21,8 @@
 @this(
         formHelper: FormWithCSRF,
         button: components.Button,
-        errorSummary: components.ErrorSummary
+        errorSummary: components.ErrorSummary,
+        govukDetails: GovukDetails
 )
 
 @(keyList: List[String], errors: ErrorTree, content: Html, breadcrumbs: UfBreadcrumbs = Nil)(implicit messages: UniformMessages[Html], request: Request[AnyContent])
@@ -49,6 +50,13 @@
         </summary>
         <div class="details__text">@v</div>
       </details>
+
+        @govukDetails(Details(
+            summary = Text(ufMessagesToPlayMessages.apply(k)),
+            content = Text(ufMessagesToPlayMessages.apply(v))
+        ))
+
+
     }
     @button(List(s"$key.save-continue", "common.continue"))
   }
