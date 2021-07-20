@@ -16,6 +16,10 @@
 
 @import cats.implicits._
 
+@this(
+        standard_field: standard_field
+)
+
 @(key: List[String], values: String, errors: ErrorTree, messages: UniformMessages[Html], autoFields: Option[String] = None, inputClass: String = "form-control form-control-2-3")
 
 @headKey=@{key.headOption.getOrElse("")}

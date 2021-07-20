@@ -16,6 +16,11 @@
 
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
 
+@this(
+        standard_field: standard_field,
+        govukRadios : GovukRadios
+)
+
 @(key: List[String], options: Seq[String], existing: Option[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty )
 
 @keyNoDots=@{key.mkString("-")}
@@ -40,6 +45,35 @@
         @error_message(key.mkString("."), error.prefixWith(key).render(messages), messages)
     }
 }
+
+
+
+    @govukRadios(Radios(
+        fieldset = Some(Fieldset(
+            legend = Some(Legend(
+                content = HtmlContent(messages(s"${key.mkString(".")}.radio.heading")),
+                classes = "govuk-fieldset__legend--l",
+                isPageHeading = true
+            ))
+        )),
+        hint = Some(Hint(
+            content = HtmlContent(messages(s"${key.mkString(".")}.radio.hint"))
+        )),
+        idPrefix = Some("changed-name"),
+        name = "changed-name",
+        items = Seq(
+            RadioItem(
+                content = Text("Yes"),
+                value = Some("yes")
+            ),
+            RadioItem(
+                content = Text("No"),
+                value = Some("no")
+            )
+        ),
+        classes = "govuk-radios--inline"
+    ))
+
 
             <div class="radios@if(inlineRadioKeys){--inline}">
               @for((opt,num) <- if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}) {

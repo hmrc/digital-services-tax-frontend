@@ -16,7 +16,12 @@
 
 @import cats.implicits._
 
-@(key: List[String], values: String, errors: ErrorTree, messages: UniformMessages[Html], autoFields: Option[String] = None)
+@this(
+        standard_field: standard_field
+)
+
+
+@(key: List[String], values: String, errors: ErrorTree, messages: UniformMessages[Html], autoFields: Option[String] = None)(implicit messagesDupe: UniformMessages[Html], request: Request[AnyContent])
 
 @headKey=@{key.headOption.getOrElse("")}
 

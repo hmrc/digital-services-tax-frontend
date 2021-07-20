@@ -14,7 +14,12 @@
  * limitations under the License.
  *@
 
-@(key: List[String], options: Seq[String], existing: Set[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty )
+@this(
+        standard_field: standard_field
+)
+
+
+@(key: List[String], options: Seq[String], existing: Set[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty )(implicit messagesDupe: UniformMessages[Html], request: Request[AnyContent])
 
 @keyNoDots=@{key.mkString("-")}
 @inlineCheckboxKeys=@{(key.mkString(".") == "loan-amount.estimate")}

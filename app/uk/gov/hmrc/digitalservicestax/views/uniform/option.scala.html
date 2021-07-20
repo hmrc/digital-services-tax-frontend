@@ -14,7 +14,13 @@
  * limitations under the License.
  *@
 
+
+@this(
+        radios: radios
+)
+
+
 @(key: List[String], values: UfInput, errors: ErrorTree, messages: UniformMessages[Html], inner: (List[String], UfInput, ErrorTree, UniformMessages[Html]) => Html)
 
 
-@radios(key :+ "outer", Seq("TRUE","FALSE"), values.valueAtPath({key :+ "outer"}).flatMap(_.headOption), errors, messages, {case "TRUE" => inner(key :+ "inner", values, errors, messages)})
+radios(key :+ "outer", Seq("TRUE","FALSE"), values.valueAtPath({key :+ "outer"}).flatMap(_.headOption), errors, messages, {case "TRUE" => inner(key :+ "inner", values, errors, messages)})

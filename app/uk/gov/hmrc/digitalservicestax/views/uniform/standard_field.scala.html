@@ -16,9 +16,13 @@
 
 @import cats.implicits._
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
+@import uk.gov.hmrc.digitalservicestax.views.html.components
+
+
+@import uk.gov.hmrc.govukfrontend.views.html.components
 
 @this(
-    govukDetails: GovukDetails
+        govukDetails: GovukDetails
 )
 
 @(keyList: List[String], errors: ErrorTree, fieldType: String, messages: UniformMessages[Html])(inner: Html)
@@ -92,23 +96,10 @@
 }
 
 @messages.get(s"$key.details").map { details =>
-    <details class="govuk-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-            <span class="details__summary-text">
-                @messages(s"$key.details")
-            </span>
-        </summary>
-        <div class="govuk-details__text">
-            @messages(s"$key.details.text")
-        </div>
-    </details>
-
     @govukDetails(Details(
-        summary = Text(ufMessagesToPlayMessages.apply(s"$key.details")(messages)),
-        content = Text(ufMessagesToPlayMessages.apply(s"$key.details.text")(messages))
+        summary = HtmlContent(messages(s"$key.details")),
+        content = HtmlContent(messages(s"$key.details.text"))
     ))
-}
-
 }
 
 @if(!noShowErrors) {

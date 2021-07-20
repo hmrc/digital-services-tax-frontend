@@ -16,28 +16,227 @@
 
 package uk.gov.hmrc.digitalservicestax.controllers
 
+import cats.data.Validated
 import cats.implicits._
+import enumeratum.{Enum, EnumEntry}
 import javax.inject.Inject
 import ltbs.uniform.common.web._
-import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages, mon}
+import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages}
 import ltbs.uniform._
 import ltbs.uniform.validation.Rule
+import ltbs.uniform.validation.Rule.nonEmpty
+import ltbs.uniform.validation._
 import play.api.mvc.{AnyContent, Request}
 import play.twirl.api.{Html, HtmlFormat}
+import shapeless.tag
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
-import uk.gov.hmrc.digitalservicestax.views.html.{Layout, FormWrapper}
-import uk.gov.hmrc.digitalservicestax.views.html.uniform.radios
+import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.digitalservicestax.views
+import uk.gov.hmrc.digitalservicestax.views.html.{FormWrapper, Layout}
+import uk.gov.hmrc.digitalservicestax.views.html.uniform._
+
+import tag.@@
+
 
 class DSTInterpreter @Inject()(
   messagesApi: play.api.i18n.MessagesApi,
   layout: Layout,
-  formWrapper: FormWrapper
+  formWrapper: FormWrapper,
+  standardField: standard_field,
+  checkboxes: checkboxes,
+  phonenumber: phonenumber,
+  string: string,
+  radios: radios
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
   with InferWebAsk[Html]
   with AutoListingPage[Html]
   with Widgets {
+
+  implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, A] =
+    new WebAsk[Html, A] {
+
+      def decode(out: Input): Either[ErrorTree,A] = {out.toField[A](x =>
+        nonEmpty[String].apply(x) andThen
+          ( y => Validated.catchOnly[NoSuchElementException](enum.withName(y)).leftMap(_ => ErrorTree.oneErr(ErrorMsg("invalid"))))
+      )}.toEither
+
+      def encode(in: A): Input = Input.one(List(in.entryName))
+      def render(
+        pageKey: List[String],
+        fieldKey: List[String],
+        tell: Option[Html],
+        path: Breadcrumbs,
+        data: Input,
+        errors: ErrorTree,
+        messages: UniformMessages[Html]
+      ): Option[Html] = {
+        val options = enum.values.map{_.entryName}
+        val existingValue = decode(data).map{_.entryName}.toOption
+        radios(
+          fieldKey,
+          options,
+          existingValue,
+          errors,
+          messages
+        ).some
+      }
+    }
+
+  implicit def twirlBoolField = new WebAsk[Html, Boolean] {
+    val True = true.toString.toUpperCase
+    val False = false.toString.toUpperCase
+
+    def decode(out: Input): Either[ErrorTree, Boolean] =
+      out.toField[Boolean](
+        x => nonEmpty[String].apply(x) andThen ( y => Validated.catchOnly[IllegalArgumentException](y.toBoolean)
+          .leftMap(_ => ErrorMsg("invalid").toTree))
+      ).toEither
+
+    def encode(in: Boolean): Input = Input.one(List(in.toString))
+
+    def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      path: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = {
+      val options = if (pageKey.contains("about-you") || pageKey.contains("user-employed")) List(False, True) else List(True, False)
+      val existingValue = data.toStringField().toOption
+      radios(fieldKey,
+        options,
+        existingValue,
+        errors,
+        messages).some
+    }
+  }
+
+  implicit val twirlStringField = twirlStringFields()
+
+  implicit val twirlCountryCodeField = new WebAsk[Html, CountryCode] {
+
+    override def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      breadcrumbs: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]): Option[Html] =
+      views.html.helpers.country_select(
+        fieldKey.mkString("."),
+        data.values.flatten.headOption,
+        errors.nonEmpty,
+        messages
+      ).some
+
+    override def encode(in: CountryCode): Input =
+      validatedVariant(CountryCode).encode(in)
+
+    override def decode(out: Input): Either[ErrorTree, CountryCode] =
+      validatedVariant(CountryCode).decode(out)
+
+  }
+
+  def twirlStringFields(
+    autoFields: Option[String] = None,
+    customRender: Option[CustomStringRenderer] = None
+  ):WebAsk[Html, String] = new WebAsk[Html, String] {
+    def decode(out: Input): Either[ErrorTree, String] =
+      out.toStringField().toEither
+
+    def encode(in: String): Input = Input.one(List(in))
+
+    def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      path: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = {
+      val existingValue: String = data.valueAtRoot.flatMap{_.headOption}.getOrElse("")
+
+      customRender.fold(string.apply(fieldKey, existingValue, errors, messages, autoFields).some) { cr =>
+        cr(fieldKey, existingValue, errors, messages, autoFields).some
+      }
+
+    }
+  }
+
+
+  implicit def phoneField(
+    implicit request: Request[AnyContent]
+  )=
+    validatedString(
+      PhoneNumber,
+      24
+    )(
+      twirlStringFields(
+        customRender = Some(phonenumber.apply(_:List[String],_:String,_:ErrorTree,_:UniformMessages[Html], _:Option[String])(messages(request), request)))
+    )
+
+
+  implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A], request: Request[AnyContent]): WebAsk[Html, Set[A]] =
+    new WebAsk[Html, Set[A]] {
+
+      def decode(out: Input): Either[ErrorTree,Set[A]] = {
+        val i: List[String] = out.valueAtRoot.getOrElse(Nil)
+        val r: List[Either[ErrorTree, A]] = i.map{x =>
+          Either.catchOnly[NoSuchElementException](enum.withName(x))
+            .leftMap(_ => ErrorTree.oneErr(ErrorMsg("invalid")))
+        }
+        r.sequence.map{_.toSet}
+      }
+
+      // Members declared in ltbs.uniform.common.web.Codec
+      def encode(in: Set[A]): Input =
+        Map(Nil -> in.toList.map{_.entryName})
+
+      // Members declared in ltbs.uniform.common.web.WebAsk
+      def render(
+        pageKey: List[String],
+        fieldKey: List[String],
+        tell: Option[Html],
+        breadcrumbs: Breadcrumbs,
+        data: Input,
+        errors: ErrorTree,
+        messages: UniformMessages[Html]
+      ): Option[Html] = {
+        val options = enum.values.map{_.entryName}
+        val existingValues: Set[String] = decode(data).map{_.map{_.entryName}}.getOrElse(Set.empty)
+        checkboxes(
+          fieldKey,
+          options,
+          existingValues,
+          errors,
+          messages
+        )(messages, request).some
+      }
+
+    }
+
+  implicit def blah: WebAsk[Html, Unit] = new WebAsk[Html, Unit] {
+    def decode(out: Input): Either[ErrorTree,Unit] = Right(())
+    def encode(in: Unit): Input = Input.empty
+
+    def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      breadcrumbs: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = Some(standardField(pageKey,errors,"",messages)(tell.getOrElse(Html(""))))
+  }
+
+
 
   // TODO implement twirl versions
   // Members declared in ltbs.uniform.common.web.AutoListingPage
@@ -148,6 +347,115 @@ class DSTInterpreter @Inject()(
     layout(
       pageTitle = (errorTitle + s"${messages(keyList.mkString("-") + ".heading")} - ${messages("common.title")} - ${messages("common.title.suffix")}").some
     )(content)(request, messages, appConfig)
+  }
+
+  def validatedVariant[BaseType](validated: ValidatedType[BaseType])(
+    implicit baseForm: WebAsk[Html, BaseType]
+  ): WebAsk[Html, BaseType @@ validated.Tag] =
+    baseForm.simap{x =>
+      Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
+    }{x => x: BaseType}
+
+  def validatedString(
+    validated: ValidatedType[String],
+    maxLen: Int = Integer.MAX_VALUE
+  )(
+    implicit baseForm: WebAsk[Html, String]
+  ): WebAsk[Html, String @@ validated.Tag] =
+    baseForm.simap{
+      case x if x.trim.isEmpty => Left(ErrorMsg("required").toTree)
+      case l if l.length > maxLen => Left(ErrorMsg("length.exceeded").toTree)
+      case x => Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
+    }{x => x: String}
+
+  def inlineOptionString(
+    validated: ValidatedType[String],
+    maxLen: Int = Integer.MAX_VALUE
+  ): WebAsk[Html, Option[String @@ validated.Tag]] =
+    twirlStringField.simap{
+      case "" => Right(None)
+      case l if l.length > maxLen => Left(ErrorMsg("length.exceeded").toTree)
+      case x  => Either.fromOption(
+        validated.of(x).map(Some(_)), ErrorMsg("invalid").toTree
+      )
+    }{
+      case None => ""
+      case Some(x) => x.toString
+    }
+
+  def validatedBigDecimal(
+    validated: ValidatedType[BigDecimal],
+    maxLen: Int = Integer.MAX_VALUE
+  )(
+    implicit baseForm: WebAsk[Html, BigDecimal]
+  ): WebAsk[Html, BigDecimal @@ validated.Tag] =
+    baseForm.simap{
+      case l if l.precision > maxLen => Left(ErrorMsg("length.exceeded").toTree)
+      case x => Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
+    }{x => x: BigDecimal}
+
+  implicit def postcodeField= validatedString(Postcode)(twirlStringFields(
+    //TODO Check 'form-control-1-4' class it could be 'postcode' instead
+    customRender = Some(string(_,_,_,_,_,"form-control form-control-1-4"))
+  ))
+
+  implicit def nesField                       = validatedVariant(NonEmptyString)
+  implicit def utrField                       = validatedString(UTR)
+  implicit def emailField                     = validatedString(Email, 132)
+  //  implicit def phoneField       = validatedString(PhoneNumber, 24)(twirlStringFields(
+  //    customRender = views.html.uniform.phonenumber.apply _
+  //  ))
+  implicit def percentField                   = validatedVariant(Percent)
+  implicit def moneyField                     = validatedBigDecimal(Money, 15)
+  implicit def accountNumberField             = validatedString(AccountNumber)
+  implicit def BuildingSocietyRollNumberField = inlineOptionString(BuildingSocietyRollNumber, 18)
+  implicit def accountNameField               = validatedString(AccountName, 35)
+  implicit def sortCodeField= validatedString(SortCode)(twirlStringFields(
+    customRender = Some(string(_,_,_,_,_,"form-control form-control-1-4"))
+  ))
+
+  implicit def ibanField                      = validatedString(IBAN, 34)
+  implicit def companyNameField               = validatedString(CompanyName, 105)
+  implicit def mandatoryAddressField          = validatedString(AddressLine, 35)
+  implicit def optAddressField                = inlineOptionString(AddressLine, 35)
+  implicit def restrictField                  = validatedString(RestrictiveString, 35)
+
+  implicit def optUtrField: WebAsk[Html, Option[UTR]] = inlineOptionString(UTR)
+
+  implicit def intField: WebAsk[Html, Int] =
+    twirlStringFields().simap(x =>
+      {
+        Rule.nonEmpty[String].apply(x) andThen
+          Transformation.catchOnly[NumberFormatException]("not-a-number")(_.toInt)
+      }.toEither
+    )(_.toString)
+
+  implicit def floatField: WebAsk[Html, Float] =
+    twirlStringFields(
+      customRender = Some(string(_,_,_,_,_,"form-control govuk-input--width-4 govuk-input-z-index"))
+    ).simap(x =>
+      {
+        Rule.nonEmpty[String].apply(x) andThen
+          Transformation.catchOnly[NumberFormatException]("not-a-number")(_.toFloat)
+      }.toEither
+    )(_.toString)
+
+  implicit def longField: WebAsk[Html, Long] =
+    twirlStringFields().simap(x =>
+      {
+        Rule.nonEmpty[String].apply(x.replace("%", "")) andThen
+          Transformation.catchOnly[NumberFormatException]("not-a-number")(_.toLong)
+      }.toEither
+    )(_.toString)
+
+  implicit def bigdecimalField: WebAsk[Html, BigDecimal] = {
+    twirlStringFields(
+      customRender = Some(string(_,_,_,_,_,"govuk-input-money govuk-input--width-10"))
+    ).simap(x => {
+      Rule.nonEmpty[String].apply(x.replace(",", "").replace("£", "")) andThen
+        Transformation.catchOnly[NumberFormatException]("not-a-number")(BigDecimal.apply)
+    }.toEither
+    )(_.toString)
   }
 
 }
