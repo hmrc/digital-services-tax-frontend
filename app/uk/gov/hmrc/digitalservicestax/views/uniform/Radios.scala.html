@@ -18,7 +18,7 @@
 @import play.twirl.api.HtmlFormat
 
 @this(
-        standard_field: standard_field,
+        standard_field: StandardField,
         govukRadios : GovukRadios
 )
 
@@ -66,19 +66,16 @@
 
 @hint=@{messages.get(s"$keyWithDots.hint")}
 @intro=@{messages.get(s"$keyWithDots.radio.intro")}
-@tellHtml=@{tell.getOrElse(HtmlFormat.empty)}
 
 @hintAndIntro=@{
     import collection.immutable.Seq
 
-    def introStyling(inner: Html) = Html(s"<p class='govuk-body-m'>$inner</p>")
+    def introStyling(inner: Option[Html]) =
+        inner.map{ i =>
+            Html(s"<p class='govuk-body-m'>$i</p>")
+        }
 
-    val textSeq = (hint, intro) match {
-        case(Some(h), Some(i)) => Seq(introStyling(i), h, tellHtml)
-        case(Some(h), None) => Seq(h, tellHtml)
-        case(None, Some(i)) => Seq(introStyling(i), tellHtml)
-        case _ => Seq(tellHtml)
-    }
+    val textSeq = Seq(introStyling(intro), hint, tell).flatten
     if(textSeq.nonEmpty) {
         Some(Hint(
             content = HtmlContent(HtmlFormat.fill(textSeq))

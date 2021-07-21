@@ -42,11 +42,11 @@ class DSTInterpreter @Inject()(
   messagesApi: play.api.i18n.MessagesApi,
   layout: Layout,
   formWrapper: FormWrapper,
-  standardField: standard_field,
+  standardField: StandardField,
   checkboxes: checkboxes,
   phonenumber: phonenumber,
   string: string,
-  radios: radios
+  radios: Radios
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
