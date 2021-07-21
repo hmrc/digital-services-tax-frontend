@@ -15,14 +15,16 @@
  *@
 
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
+@import play.twirl.api.HtmlFormat
 
 @this(
         standard_field: standard_field,
         govukRadios : GovukRadios
 )
 
-@(key: List[String], options: Seq[String], existing: Option[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty )
+@(key: List[String], options: Seq[String], existing: Option[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty, tell: Option[Html] = None)
 
+@keyWithDots=@{key.mkString(".")}
 @keyNoDots=@{key.mkString("-")}
 @inlineRadioKeys=@{key.mkString(".") == "manage-companies"}
 @reverseRadios=@{
@@ -31,8 +33,8 @@
     key.head == "ultimate-parent-company-address"
 }
 
-@foo=@{if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}}
-@bar=@{foo.map{case (opt,num) =>
+@indexedOptions=@{if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}}
+@radios=@{indexedOptions.map{case (opt,num) =>
     RadioItem(
         content = HtmlContent(messages.decompose({key :+ opt}.mkString("."))),
         id = Some(s"$keyNoDots-$num"),
@@ -54,27 +56,21 @@
         } else None
     )
 }.toSeq}
+@errMessage=@{
+    errors.valueAtRootList.headOption.map { error =>
+        ErrorMessage(
+            content = HtmlContent(error.prefixWith(key).render(messages))
+        )
+    }
+}
 
-@standard_field(key, errors, "radios", messages) {
-@*@if(inlineRadioKeys) {*@
-@*<div class="form-group@if(errors.definedAtRoot){ form-group-error}">*@
-@*    <fieldset class="govuk-fieldset" id="@{key.mkString("_")}-input" aria-describedby="add-to-list-hint @if(errors.definedAtRoot){@{s"${key.mkString(".")}-error"}}">*@
-@*        <legend class="govuk-fieldset__legend">*@
-@*        @messages.get(s"${key.mkString(".")}.radio.heading")*@
-@*    </legend>*@
-@*    <span id="add-to-list-hint" class="hint">*@
-@*        @messages.get(s"${key.mkString(".")}.radio.hint")*@
-@*    </span>*@
-@*    @errors.valueAtRootList.map { error =>*@
-@*        @error_message(key.mkString("."), error.prefixWith(key).render(messages), messages)*@
-@*    }*@
-@*}*@
+
+@standard_field(key, errors, "radios", messages, true) {
 
     @govukRadios(Radios(
         fieldset =
-            if(inlineRadioKeys)
                 Some(Fieldset(
-                        legend = messages.get(s"${key.mkString(".")}.radio.heading").fold(Option.empty[Legend]){ leg =>
+                        legend = messages.get(s"$keyWithDots.heading").fold(Option.empty[Legend]){ leg =>
                             Some(
                                 Legend(
                                     content = HtmlContent(leg),
@@ -82,52 +78,20 @@
                                     isPageHeading = true
                                 )
                             )
-                        }
-                ))
-            else Option.empty[Fieldset],
+                        },
+                        attributes = Map("id" -> s"$keyWithDots-input")
+                )),
         hint =
-            messages.get(s"${key.mkString(".")}.radio.hint").fold(Option.empty[Hint]) { hint =>
+            messages.get(s"$keyWithDots.hint").fold(Option.empty[Hint]) { hint =>
                 Some(Hint(
-                    content = HtmlContent(hint)
+                    content = HtmlContent(HtmlFormat.fill(collection.immutable.Seq(hint,tell.getOrElse(Html("")))))
                 ))
             },
-        idPrefix = Some("changed-name"),
-        name = key.mkString("."),
-        items = bar,
+
+        errorMessage = errMessage,
+        idPrefix = Some(keyWithDots),
+        name = keyWithDots,
+        items = radios,
         classes = if(inlineRadioKeys){"govuk-radios--inline"} else {""}
     ))
-
-
-@*            <div class="radios@if(inlineRadioKeys){--inline}">*@
-@*              @for((opt,num) <- if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}) {*@
-@*                <div class="radios__item multiple-choice" data-target="@keyNoDots-@opt">*@
-@*                  <input*@
-@*                    class="radios__input"*@
-@*                    id="@keyNoDots-@num"*@
-@*                    name="@{key.mkString(".")}"*@
-@*                    type="radio"*@
-@*                    value="@opt"*@
-@*                    @if(existing.exists(_.toUpperCase == opt.toUpperCase())){ checked }*@
-@*                  >*@
-@*                  <label class="label radios__label form-label" for="@keyNoDots-@num">*@
-@*                    <span>@messages.decompose({key :+ opt}.mkString("."))</span>*@
-@*                    @messages.get({key :+ opt :+ "hint"}.mkString(".")).map { hint =>*@
-@*                      <span id="@keyNoDots-@opt-item-hint" class="form-hint checkboxes__hint">*@
-@*                        @hint*@
-@*                      </span>*@
-@*                  }*@
-@*                  </label>*@
-@*                </div>*@
-
-@*                @if(conditional.isDefinedAt(opt)) {*@
-@*                  <div id="@keyNoDots-@opt" class="radios__conditional panel panel-border-narrow js-hidden">*@
-@*                    @conditional(opt)*@
-@*                  </div>*@
-@*                }*@
-@*              }*@
-@*            </div>*@
-@*    @if(inlineRadioKeys) {*@
-@*    </fieldset>*@
-@*    </div>*@
-@*    }*@
 }

@@ -1,5 +1,6 @@
 @import cats.implicits._
 @import ltbs.uniform._
+@import uk.gov.hmrc.digitalservicestax.data.Activity
 
 @this(
         govukErrorSummary: GovukErrorSummary
@@ -7,21 +8,44 @@
 
 @(keyList: List[String], errors: ErrorTree, messages: UniformMessages[Html])
 
-@if(errors.nonEmpty) {
+@radioKeys=@{
+    List(
+        "global-revenues",
+        "uk-revenues",
+        "check-company-registered-office-address",
+        "check-unique-taxpayer-reference",
+        "confirm-company-details",
+        "check-contact-address",
+        "company-contact-address",
+        "check-liability-date",
+        s"report-${Activity.toUrl(Activity.SocialMedia)}-loss",
+        s"report-${Activity.toUrl(Activity.SearchEngine)}-loss",
+        s"report-${Activity.toUrl(Activity.OnlineMarketplace)}-loss",
+        s"report-${Activity.toUrl(Activity.SocialMedia)}-alternative-charge",
+        s"report-${Activity.toUrl(Activity.SearchEngine)}-alternative-charge",
+        s"report-${Activity.toUrl(Activity.OnlineMarketplace)}-alternative-charge",
+        "report-alternative-charge",
+        "report-cross-border-transaction-relief",
+        "repayment"
+    )
+}
 
-@* TODO - check error link to form field *@
+@if(errors.nonEmpty) {
 
     @govukErrorSummary(
 
         ErrorSummary(
             errorList = errors.flatMap { case (path, errormsg) =>
+               val target = if((keyList ++ path.head).mkString("_") == "manage-companies_add_add_name" || (keyList ++ path.head).mkString("_") == "manage-companies_add_add_utr") {
+                   s"""#${keyList.last ++ "_" ++ path.head.mkString("_")}-input"""
+               } else if(radioKeys.contains(keyList.head)) {
+                   s"""#${(keyList ++ path.head).mkString("_")}-0"""
+               } else {
+                   s"""#${(keyList ++ path.head).mkString("_")}-input"""
+               }
                errormsg.toList.map { msg =>
                     ErrorLink(
-                      href = Some(if((keyList ++ path.head).mkString("_") == "manage-companies_add_add_name" || (keyList ++ path.head).mkString("_") == "manage-companies_add_add_utr"){
-                        s"""#${keyList.last ++ "_" ++ path.head.mkString("_")}-input"""
-                      } else {
-                        s"""#${(keyList ++ path.head).mkString("_")}-input"""
-                      }),
+                      href = Some(target),
                       content = Text(if(path.map(x => x.nonEmpty).head) {
                         if(path.length > 1) {
                             msg.prefixWith(List(s"""${keyList.head}.${path.toList.flatten.mkString(".")}""")).render(messages).toString

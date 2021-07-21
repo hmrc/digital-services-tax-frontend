@@ -23,7 +23,8 @@
         button: components.Button,
         errorSummary: components.ErrorSummary,
         govukDetails: GovukDetails,
-        govukBackLink : GovukBackLink
+        govukBackLink: GovukBackLink,
+        fieldsurround: fieldsurround
 )
 
 @(keyList: List[String], errors: ErrorTree, content: Html, breadcrumbs: UfBreadcrumbs = Nil)(implicit messages: UniformMessages[Html], request: Request[AnyContent])

@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *@
-
+@this(
+    govukHint: GovukHint // TODO remove if unused
+)
 @(key: String, content: Html, isCompoundField: Boolean, hasHint: Boolean, hasErrors: Boolean, hasIntro: Boolean)(implicit messages: UniformMessages[Html])
 
 @describedByClass = @{
@@ -26,14 +28,15 @@
 
     @* There are more than one fieldset/formgroup on the page *@
     @if(true /*FIXME stats.compoundChildren >= 2*/) {
-        <h1 class="heading-xlarge @if(key == "loan-amount"){margin-bottom-20}">
+        @*<h1 class="govuk-heading-xl @if(key == "loan-amount"){margin-bottom-20}">*@
             @messages.get(s"$key.heading.hint").map { headHint =>
                 <span class="govuk-caption-xl@if(hasErrors){ flush--top}">
                 @headHint
                 </span>
             }
-            @messages(s"$key.heading")
-        </h1>
+@*//            @messages(s"$key.heading")*@
+@*//        </h1>*@
+           @**@
 
         @for(msg <- messages.list(s"$key.intro")) {
             <p class="govuk-body">
@@ -94,7 +97,7 @@
             * labels & their inputs
             *@
             @if(messages.get(s"$key.listing.heading").isDefined) {
-                <h1 class="heading-xlarge">
+                <h1 class="govuk-heading-xl">
                     @messages.get(s"$key.heading.hint").map { headHint =>
                         <span class="govuk-caption-xl@if(hasErrors){ flush--top}">
                         @headHint

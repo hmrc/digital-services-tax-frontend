@@ -111,7 +111,8 @@ class DSTInterpreter @Inject()(
         options,
         existingValue,
         errors,
-        messages).some
+        messages,
+        tell = tell).some
     }
   }
 
