@@ -19,6 +19,7 @@ package uk.gov.hmrc.digitalservicestax.controllers
 import cats.data.Validated
 import cats.implicits._
 import enumeratum.{Enum, EnumEntry}
+
 import javax.inject.Inject
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages}
@@ -27,6 +28,7 @@ import ltbs.uniform.validation.Rule
 import ltbs.uniform.validation.Rule.nonEmpty
 import ltbs.uniform.validation._
 import play.api.mvc.{AnyContent, Request}
+import play.twirl.api.HtmlFormat.Appendable
 import play.twirl.api.{Html, HtmlFormat}
 import shapeless.tag
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
@@ -34,7 +36,6 @@ import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.views
 import uk.gov.hmrc.digitalservicestax.views.html.{FormWrapper, Layout}
 import uk.gov.hmrc.digitalservicestax.views.html.uniform._
-
 import tag.@@
 
 
@@ -45,8 +46,9 @@ class DSTInterpreter @Inject()(
   standardField: StandardField,
   checkboxes: checkboxes,
   phonenumber: phonenumber,
-  string: string,
-  radios: Radios
+  stringField: StringField,
+  radios: Radios,
+  address: AddressField
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
@@ -142,6 +144,8 @@ class DSTInterpreter @Inject()(
       validatedVariant(CountryCode).decode(out)
 
   }
+  type CustomStringRenderer =
+    (List[String], String, ErrorTree, UniformMessages[Html], Option[String]) => Appendable
 
   def twirlStringFields(
     autoFields: Option[String] = None,
@@ -163,7 +167,7 @@ class DSTInterpreter @Inject()(
     ): Option[Html] = {
       val existingValue: String = data.valueAtRoot.flatMap{_.headOption}.getOrElse("")
 
-      customRender.fold(string.apply(fieldKey, existingValue, errors, messages, autoFields).some) { cr =>
+      customRender.fold(stringField.apply(fieldKey, existingValue, errors, messages, autoFields).some) { cr =>
         cr(fieldKey, existingValue, errors, messages, autoFields).some
       }
 
@@ -221,6 +225,60 @@ class DSTInterpreter @Inject()(
       }
 
     }
+
+  implicit def twirlUKAddressField[T](
+    implicit gen: shapeless.LabelledGeneric.Aux[UkAddress,T],
+    ffhlist: WebAsk[Html, T]
+  ): WebAsk[Html, UkAddress] = new WebAsk[Html, UkAddress] {
+
+    def decode(out: Input): Either[ErrorTree, UkAddress] = ffhlist.decode(out).map(gen.from)
+    def encode(in: UkAddress): Input = ffhlist.encode(gen.to(in))
+
+    def render(
+      pagekey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      path: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = {
+      // TODO pass thru fieldKey
+      address(
+        fieldKey,
+        data,
+        errors,
+        messages,
+        "UkAddress"
+      ).some
+    }
+  }
+
+  implicit def twirlForeignAddressField[T](
+    implicit gen: shapeless.LabelledGeneric.Aux[ForeignAddress,T],
+    ffhlist: WebAsk[Html, T]
+  ): WebAsk[Html, ForeignAddress] = new WebAsk[Html, ForeignAddress] {
+
+    def decode(out: Input): Either[ErrorTree, ForeignAddress] = ffhlist.decode(out).map(gen.from)
+    def encode(in: ForeignAddress): Input = ffhlist.encode(gen.to(in))
+
+    def render(
+      pagekey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      path: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = {
+      address(
+        fieldKey,
+        data,
+        errors,
+        messages
+      ).some
+    }
+  }
 
   implicit def blah: WebAsk[Html, Unit] = new WebAsk[Html, Unit] {
     def decode(out: Input): Either[ErrorTree,Unit] = Right(())
@@ -397,7 +455,7 @@ class DSTInterpreter @Inject()(
 
   implicit def postcodeField= validatedString(Postcode)(twirlStringFields(
     //TODO Check 'form-control-1-4' class it could be 'postcode' instead
-    customRender = Some(string(_,_,_,_,_,"form-control form-control-1-4"))
+    customRender = Some(stringField(_,_,_,_,_,"form-control form-control-1-4"))
   ))
 
   implicit def nesField                       = validatedVariant(NonEmptyString)
@@ -412,7 +470,7 @@ class DSTInterpreter @Inject()(
   implicit def BuildingSocietyRollNumberField = inlineOptionString(BuildingSocietyRollNumber, 18)
   implicit def accountNameField               = validatedString(AccountName, 35)
   implicit def sortCodeField= validatedString(SortCode)(twirlStringFields(
-    customRender = Some(string(_,_,_,_,_,"form-control form-control-1-4"))
+    customRender = Some(stringField(_,_,_,_,_,"form-control form-control-1-4"))
   ))
 
   implicit def ibanField                      = validatedString(IBAN, 34)
@@ -433,7 +491,7 @@ class DSTInterpreter @Inject()(
 
   implicit def floatField: WebAsk[Html, Float] =
     twirlStringFields(
-      customRender = Some(string(_,_,_,_,_,"form-control govuk-input--width-4 govuk-input-z-index"))
+      customRender = Some(stringField(_,_,_,_,_,"form-control govuk-input--width-4 govuk-input-z-index"))
     ).simap(x =>
       {
         Rule.nonEmpty[String].apply(x) andThen
@@ -451,7 +509,7 @@ class DSTInterpreter @Inject()(
 
   implicit def bigdecimalField: WebAsk[Html, BigDecimal] = {
     twirlStringFields(
-      customRender = Some(string(_,_,_,_,_,"govuk-input-money govuk-input--width-10"))
+      customRender = Some(stringField(_,_,_,_,_,"govuk-input-money govuk-input--width-10"))
     ).simap(x => {
       Rule.nonEmpty[String].apply(x.replace(",", "").replace("£", "")) andThen
         Transformation.catchOnly[NumberFormatException]("not-a-number")(BigDecimal.apply)

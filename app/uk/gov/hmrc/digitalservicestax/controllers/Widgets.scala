@@ -75,13 +75,6 @@ trait Widgets {
     }
   }
 
-  type CustomStringRenderer =
-    (List[String], String, ErrorTree, UniformMessages[Html], Option[String]) => Appendable
-
-
-
-
-
   implicit val twirlDateField: WebAsk[Html, LocalDate] =
     new WebAsk[Html, LocalDate] {
 
@@ -138,63 +131,6 @@ trait Widgets {
         ).some
       }
     }
-
-  implicit def twirlUKAddressField[T](
-    implicit gen: shapeless.LabelledGeneric.Aux[UkAddress,T],
-    ffhlist: WebAsk[Html, T]
-  ): WebAsk[Html, UkAddress] = new WebAsk[Html, UkAddress] {
-
-    def decode(out: Input): Either[ErrorTree, UkAddress] = ffhlist.decode(out).map(gen.from)
-    def encode(in: UkAddress): Input = ffhlist.encode(gen.to(in))
-
-    def render(
-      pagekey: List[String],
-      fieldKey: List[String],
-      tell: Option[Html],      
-      path: Breadcrumbs,
-      data: Input,
-      errors: ErrorTree,
-      messages: UniformMessages[Html]
-    ): Option[Html] = {
-      // TODO pass thru fieldKey
-      views.html.uniform.address(
-        fieldKey,
-        data,
-        errors,
-        messages,
-        "UkAddress"
-      ).some
-    }
-  }
-
-  implicit def twirlForeignAddressField[T](
-    implicit gen: shapeless.LabelledGeneric.Aux[ForeignAddress,T],
-    ffhlist: WebAsk[Html, T]
-  ): WebAsk[Html, ForeignAddress] = new WebAsk[Html, ForeignAddress] {
-
-    def decode(out: Input): Either[ErrorTree, ForeignAddress] = ffhlist.decode(out).map(gen.from)
-    def encode(in: ForeignAddress): Input = ffhlist.encode(gen.to(in))
-
-    def render(
-      pagekey: List[String],
-      fieldKey: List[String],
-      tell: Option[Html],      
-      path: Breadcrumbs,
-      data: Input,
-      errors: ErrorTree,
-      messages: UniformMessages[Html]
-    ): Option[Html] = {
-      views.html.uniform.address(
-        fieldKey,
-        data,
-        errors,
-        messages
-      ).some
-    }
-  }
-
-
-
 
   implicit val addressTell = new WebTell[Html, Address] {
     override def render(in: Address, key: String, messages: UniformMessages[Html]): Option[Html] =

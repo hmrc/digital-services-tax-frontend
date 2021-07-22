@@ -19,7 +19,8 @@
 
 @this(
         standard_field: StandardField,
-        govukRadios : GovukRadios
+        govukRadios : GovukRadios,
+        govukDetails: GovukDetails
 )
 
 @(key: List[String], options: Seq[String], existing: Option[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty, tell: Option[Html] = None)
@@ -70,12 +71,19 @@
 @hintAndIntro=@{
     import collection.immutable.Seq
 
+    val details = messages.get(s"$keyWithDots.details").map { details =>
+        govukDetails(Details(
+            summary = HtmlContent(messages(s"$keyWithDots.details")),
+            content = HtmlContent(messages(s"$keyWithDots.details.text"))
+        ))
+    }
+
     def introStyling(inner: Option[Html]) =
         inner.map{ i =>
             Html(s"<p class='govuk-body-m'>$i</p>")
         }
 
-    val textSeq = Seq(introStyling(intro), hint, tell).flatten
+    val textSeq = Seq(introStyling(intro), hint, tell, details).flatten
     if(textSeq.nonEmpty) {
         Some(Hint(
             content = HtmlContent(HtmlFormat.fill(textSeq))
@@ -83,7 +91,7 @@
     } else Option.empty[Hint]
 }
 
-@standard_field(key, errors, "radios", messages, true) {
+@standard_field(key, errors, "radios", messages, false, false) {
 
     @govukRadios(Radios(
         fieldset =

@@ -30,7 +30,7 @@
     @if(true /*FIXME stats.compoundChildren >= 2*/) {
         @*<h1 class="govuk-heading-xl @if(key == "loan-amount"){margin-bottom-20}">*@
             @messages.get(s"$key.heading.hint").map { headHint =>
-                <span class="govuk-caption-xl@if(hasErrors){ flush--top}">
+                <span class="govuk-caption-l@if(hasErrors){ flush--top}">
                 @headHint
                 </span>
             }

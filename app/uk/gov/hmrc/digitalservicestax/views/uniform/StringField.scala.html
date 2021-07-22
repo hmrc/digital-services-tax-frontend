@@ -17,10 +17,11 @@
 @import cats.implicits._
 
 @this(
-        standard_field: StandardField
+        standard_field: StandardField,
+        govukInput: GovukInput
 )
 
-@(key: List[String], values: String, errors: ErrorTree, messages: UniformMessages[Html], autoFields: Option[String] = None, inputClass: String = "form-control form-control-2-3")
+@(key: List[String], values: String, errors: ErrorTree, messages: UniformMessages[Html], autoFields: Option[String] = None, inputClass: String = "govuk-!-width-two-thirds")
 
 @headKey=@{key.headOption.getOrElse("")}
 
@@ -54,7 +55,7 @@
 }}
 
 <div class="form-group@if(errors.definedAtRoot){ form-group-error}">
-    @standard_field(key, errors, "string", messages) {
+    @standard_field(key, errors, "string", messages, false, true) {
 
         @if(currencyInput){
             <div class="hmrc-currency-input__wrapper">
@@ -63,29 +64,44 @@
         @if(percentageInput){
             <div class="govuk-input__wrapper">
         }
-            @*
-            * Todo - refactor this describedby error/hint string value to be a helper
-            *@
-            @defining((messages.get(s"${key.mkString(".")}.hint").isDefined, errors.definedAtRoot) match {
-            case (true,true) => s"${key.mkString(".")}-hint ${key.mkString(".")}-error"
-            case (true,false) => s"${key.mkString(".")}-hint"
-            case (false,true) => s"${key.mkString(".")}-error"
-            case _ => ""
-            }){ describedBy =>
 
-                <input 
-                    class="@{inputClass}@if(errors){ form-control-error}"
-                    id="@{key.mkString("_")}-input"
-                    @if(telInput){ inputmode="numeric" pattern="[0-9]*" }
-                    name="@{key.mkString(".")}"
-                    value="@{values}"
-                    @autoFields.map { f => autocomplete=@f }
-                    @if(describedBy.nonEmpty){aria-describedby="@describedBy"}
-                    @if(autoComplete){autocomplete="@{autoComplete}"}
-                    @if(currencyInput){inputMode="decimal"}
-                    @if(percentageInput){inputMode="numeric" pattern="[0-9]*"}
-                />
-            }
+            @govukInput(Input(
+                id = s"${key.mkString("_")}-input",
+                name = s"${key.mkString(".")}",
+                value = Some(values),
+                inputmode = if(telInput || percentageInput){Some("numeric")} else if(currencyInput){Some("decimal")} else None,
+                label = Label(
+                    isPageHeading = if(key.length == 1) true else false,
+                    classes = "govuk-label--xl",
+                    content = HtmlContent(messages.decompose(s"${key.mkString(".")}.heading"))
+                ),
+                hint = messages.get(s"${key.mkString(".")}.hint").fold(Option.empty[Hint]){ hint =>
+                    Some(Hint(
+                        content = HtmlContent(hint)
+                    ))
+                },
+                errorMessage =  errors.valueAtRootList.headOption.fold(Option.empty[ErrorMessage]) { error =>
+                    Some(ErrorMessage(
+                    content = HtmlContent(s"${error.prefixWith(key).render(messages)}")
+                    ))
+                },
+               classes = inputClass,
+                autocomplete = if(autoComplete.nonEmpty){Some(autoComplete)} else autoFields,
+                pattern = if(telInput || percentageInput){Some("[0-9]*")} else None
+            ))
+
+@*            <input *@
+@*                class="@{inputClass}@if(errors){ form-control-error}"*@
+@*                id="@{key.mkString("_")}-input"*@
+@*                @if(telInput){ inputmode="numeric" pattern="[0-9]*" }*@
+@*                name="@{key.mkString(".")}"*@
+@*                value="@{values}"*@
+@*                @autoFields.map { f => autocomplete=@f }*@
+@*                @if(autoComplete){autocomplete="@{autoComplete}"}*@
+@*                @if(currencyInput){inputMode="decimal"}*@
+@*                @if(percentageInput){inputMode="numeric" pattern="[0-9]*"}*@
+@*            />*@
+
             @if(percentageInput) {
                 <div class="govuk-input__suffix" aria-hidden="true">%</div>
             }
