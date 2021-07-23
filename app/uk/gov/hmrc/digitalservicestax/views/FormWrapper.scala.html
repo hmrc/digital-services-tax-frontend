@@ -28,9 +28,16 @@
 )
 
 @(keyList: List[String], errors: ErrorTree, content: Html, breadcrumbs: UfBreadcrumbs = Nil)(implicit messages: UniformMessages[Html], request: Request[AnyContent])
-  
-  @key = @{keyList.last}
 
+@key = @{keyList.last}
+@isKickout= @{
+    List(
+        "global-revenues-not-eligible",
+        "uk-revenues-not-eligible",
+        "details-not-correct",
+    ).contains(key)
+}
+@if(!isKickout){
   @for(back <- breadcrumbs.headOption.flatMap{_.headOption}) {
     @govukBackLink(BackLink(
         href = s"$back",
@@ -44,7 +51,7 @@
         content = HtmlContent(messages(List(s"back-to-service-page","back")))
     ))
   }
-
+}
   @formHelper(action = play.api.mvc.Call("post", key), 'novalidate -> "novalidate") {
     @errorSummary(keyList, errors, messages)
     @defining((messages.get(s"$key.hint").isDefined, errors.definedAtRoot, messages.get(s"$key.intro").isDefined)){ case (hasHint, hasErrors, hasIntro) =>
@@ -59,5 +66,7 @@
         ))
 
     }
-    @button(List(s"$key.save-continue", "common.continue"))
+    @if(!isKickout) {
+        @button(List(s"$key.save-continue", "common.continue"))
+    }
   }

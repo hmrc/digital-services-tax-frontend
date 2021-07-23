@@ -46,9 +46,9 @@ object RegJourney {
 
     for {
       globalRevenues <- ask[Boolean]("global-revenues")
-      _ <- if (!globalRevenues) { end("global-revenues-not-eligible", Kickout("global-revenues-not-eligible")) } else { pure(()) }
+      _ <- end("global-revenues-not-eligible", Kickout("global-revenues-not-eligible")) unless globalRevenues
       ukRevenues <- ask[Boolean]("uk-revenues")
-      _ <- if (!ukRevenues) { end("uk-revenues-not-eligible", Kickout("uk-revenues-not-eligible")) } else { pure(()) }
+      _ <- end("uk-revenues-not-eligible", Kickout("uk-revenues-not-eligible")) unless ukRevenues
       companyRegWrapper <- convert(backendService.lookupCompany()) flatMap { // gets a CompanyRegWrapper but converts to a company
 
         // found a matching company

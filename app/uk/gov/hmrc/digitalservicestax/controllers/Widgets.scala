@@ -62,18 +62,18 @@ trait Widgets {
     ): Option[Html] = tell
   }
 
-  implicit val blah4: WebInteraction[Html,Kickout,Nothing] = new WebInteraction[Html,Kickout,Nothing] {
-    override def apply(
-      id: String,
-      tell: Option[Kickout],
-      defaultIn: Option[Nothing],
-      validationIn: Rule[Nothing],
-      customContent: Map[String, (String, List[Any])]
-    ): WebMonad[Html, Nothing] = new WebMonad[Html, Nothing] {
-      override def apply(pageIn: PageIn[Html])(implicit ec: ExecutionContext): Future[PageOut[Html, Nothing]] =
-        ??? //TODO implement this
-    }
-  }
+//  implicit val blah4: WebInteraction[Html,Kickout,Nothing] = new WebInteraction[Html,Kickout,Nothing] {
+//    override def apply(
+//      id: String,
+//      tell: Option[Kickout],
+//      defaultIn: Option[Nothing],
+//      validationIn: Rule[Nothing],
+//      customContent: Map[String, (String, List[Any])]
+//    ): WebMonad[Html, Nothing] = new WebMonad[Html, Nothing] {
+//      override def apply(pageIn: PageIn[Html])(implicit ec: ExecutionContext): Future[PageOut[Html, Nothing]] =
+//        ??? //TODO implement this
+//    }
+//  }
 
   implicit val twirlDateField: WebAsk[Html, LocalDate] =
     new WebAsk[Html, LocalDate] {

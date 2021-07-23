@@ -66,7 +66,6 @@
     HtmlContent(HtmlFormat.fill(Seq(headHint, label)))
 }
 
-@*<div class="form-group@if(errors.definedAtRoot){ form-group-error}">*@
     @standard_field(key, errors, "string", messages, false, true) {
 
         @if(currencyInput){
@@ -76,6 +75,7 @@
         @if(percentageInput){
             <div class="govuk-input__wrapper">
         }
+    @key.length
 
             @govukInput(Input(
                 id = s"${key.mkString("_")}-input",
@@ -84,7 +84,7 @@
                 inputmode = if(telInput || percentageInput){Some("numeric")} else if(currencyInput){Some("decimal")} else None,
                 label = Label(
                     isPageHeading = if(key.length == 1) true else false,
-                    classes = "govuk-label--xl",
+                    classes = if(key.length == 1){"govuk-label--xl"}else{"govuk-label"},
                     content = headHintAndLabel
                 ),
                 hint = messages.get(s"${key.mkString(".")}.hint").fold(Option.empty[Hint]){ hint =>
@@ -127,4 +127,3 @@
             </div>
         }
     }
-@*</div>*@
