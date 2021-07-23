@@ -16,11 +16,13 @@
 
 @import cats.implicits._
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
-@import ltbs.uniform._
+@import ltbs.uniform.{Input => _, _}
 
-@this()
+@this(
+        govukInput: GovukInput
+)
 
-@(key: List[String], values: UfInput, errors: ErrorTree, messages: UniformMessages[Html], addressKey: String = "")
+@(key: List[String], values: UfInput, errors: ErrorTree, messages: UniformMessages[Html], addressKey: String = "", inputClass: String = "govuk-!-width-two-thirds")
 
 @fieldList = @{if(addressKey == "UkAddress") {
     List("line1", "line2", "line3", "line4", "postalCode")
@@ -28,6 +30,7 @@
     List("line1", "line2", "line3", "line4", "countryCode")
     }
 }
+
 
   @for(field <- fieldList) {
     @defining(
@@ -60,25 +63,22 @@
 
             @country_select(key.mkString(".") ++ ".countryCode", values.valueAt("countryCode").flatMap{_.headOption}, errors.valueAt("countryCode").nonEmpty, messages)
         } else {
-          <div class="form-group@if(errorOpt.nonEmpty) { form-group-error}">
-
-            <label class="form-label" for="@{(key :+field).mkString("_")}-input">
-                @messages((key :+ field :+ "heading").mkString("."))
-            </label>
-            
-            @for(err <- errorOpt.fold(List.empty[ErrorMsg])(_.toList)) {
-              @error_message({(key :+field).mkString("-")}, err.prefixWith(key :+ field).render(messages), messages)
-            }
-            <input
-              class="@{"form-control " + formControlClass} @if(errorOpt.nonEmpty){ form-control-error }"
-              id="@{(key :+field).mkString("_")}-input"
-              type="text"
-              @if(errorOpt.nonEmpty){aria-describedBy="@key-@field-error"}
-              name="@{key.mkString(".")}.@{field}"
-              value="@{values.valueAt(field).headOption}"
-              @if(autoComplete){autocomplete="@{autoComplete}"}
-            />
-          </div>
+          @govukInput(Input(
+              id = s"${(key :+field).mkString("_")}-input",
+              name = s"${key.mkString(".")}.$field",
+              value = Some(s"${values.valueAt(field).flatMap(_.headOption.map(_.trim)).getOrElse("")}"),
+              label = Label(
+                  isPageHeading = false,
+                  content = HtmlContent(messages((key :+ field :+ "heading").mkString(".")))
+              ),
+              errorMessage = errorOpt.fold(Option.empty[ErrorMessage]){errors =>
+                  Some(ErrorMessage(
+                      content = HtmlContent(s"${errors.head.prefixWith(key :+ field).render(messages)}")
+                  ))
+              },
+              classes = inputClass,
+              autocomplete = if(autoComplete.nonEmpty){Some(autoComplete)} else Option.empty
+          ))
         }
       }
   }

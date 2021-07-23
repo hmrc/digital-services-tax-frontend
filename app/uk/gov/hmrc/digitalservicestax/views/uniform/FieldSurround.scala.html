@@ -27,29 +27,30 @@
 }
 
     @* There are more than one fieldset/formgroup on the page *@
-    @if(true /*FIXME stats.compoundChildren >= 2*/) {
+    @*@if(true /*FIXME stats.compoundChildren >= 2*/) {*@
         @*<h1 class="govuk-heading-xl @if(key == "loan-amount"){margin-bottom-20}">*@
-            @messages.get(s"$key.heading.hint").map { headHint =>
-                <span class="govuk-caption-l@if(hasErrors){ flush--top}">
-                @headHint
-                </span>
-            }
+            @*@messages.get(s"$key.heading.hint").map { headHint =>*@
+                @*<span class="govuk-caption-l@if(hasErrors){ flush--top}">*@
+                @*@headHint*@
+                @*</span>*@
+            @*}*@
 @*//            @messages(s"$key.heading")*@
 @*//        </h1>*@
            @**@
 
-        @for(msg <- messages.list(s"$key.intro")) {
-            <p class="govuk-body">
-            @msg
-            </p>
-        }
+        @*@for(msg <- messages.list(s"$key.intro")) {*@
+            @*<p class="govuk-body">*@
+            @*@msg*@
+            @*</p>*@
+        @*}*@
 
-        @*
-        * Will need to query if the content is a compound or standard field
-        * so that we know how to wrap?
-        *@
-        @content
-    } else { @if(isCompoundField){
+        @**@
+        @** Will need to query if the content is a compound or standard field*@
+        @** so that we know how to wrap?*@
+        @**@
+        @*@content*@
+    @*} else { *@
+    @if(isCompoundField){
         <div class="form-group@if(hasErrors){ form-group-error}">
             <fieldset
                 class="fieldset"
@@ -97,16 +98,16 @@
             * labels & their inputs
             *@
             @if(messages.get(s"$key.listing.heading").isDefined) {
-                <h1 class="govuk-heading-xl">
                     @messages.get(s"$key.heading.hint").map { headHint =>
                         <span class="govuk-caption-xl@if(hasErrors){ flush--top}">
                         @headHint
                         </span>
                     }
+                    <h1 class="govuk-heading-xl">
                     @messages.get(s"$key.listing.heading")
-                </h1>
+                    </h1>
             }
             @content
         }
-    }
+
 

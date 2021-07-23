@@ -226,13 +226,16 @@ class DSTInterpreter @Inject()(
 
     }
 
-  implicit def twirlUKAddressField[T](
-    implicit gen: shapeless.LabelledGeneric.Aux[UkAddress,T],
-    ffhlist: WebAsk[Html, T]
-  ): WebAsk[Html, UkAddress] = new WebAsk[Html, UkAddress] {
 
-    def decode(out: Input): Either[ErrorTree, UkAddress] = ffhlist.decode(out).map(gen.from)
-    def encode(in: UkAddress): Input = ffhlist.encode(gen.to(in))
+
+  implicit val twirlUKAddressField: WebAsk[Html, UkAddress] = new WebAsk[Html, UkAddress] {
+    implicit val a: Codec[Postcode] = postcodeField
+    implicit val b: Codec[AddressLine] = mandatoryAddressField
+    implicit val c: Codec[Option[AddressLine]] = optAddressField
+
+    override val codec: Codec[UkAddress] = common.web.InferCodec.gen[UkAddress]
+    def decode(out: Input): Either[ErrorTree, UkAddress] = codec.decode(out)
+    def encode(in: UkAddress): Input = codec.encode(in)
 
     def render(
       pagekey: List[String],
