@@ -37,6 +37,7 @@ import uk.gov.hmrc.digitalservicestax.views
 import uk.gov.hmrc.digitalservicestax.views.html.{FormWrapper, Layout}
 import uk.gov.hmrc.digitalservicestax.views.html.uniform._
 import tag.@@
+import uk.gov.hmrc.digitalservicestax.views.html.helpers.CountrySelect
 
 
 class DSTInterpreter @Inject()(
@@ -48,7 +49,8 @@ class DSTInterpreter @Inject()(
   phonenumber: phonenumber,
   stringField: StringField,
   radios: Radios,
-  address: AddressField
+  address: AddressField,
+  countrySelect: CountrySelect
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
@@ -130,7 +132,7 @@ class DSTInterpreter @Inject()(
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]): Option[Html] =
-      views.html.helpers.country_select(
+      countrySelect(
         fieldKey.mkString("."),
         data.values.flatten.headOption,
         errors.nonEmpty,
@@ -257,13 +259,15 @@ class DSTInterpreter @Inject()(
     }
   }
 
-  implicit def twirlForeignAddressField[T](
-    implicit gen: shapeless.LabelledGeneric.Aux[ForeignAddress,T],
-    ffhlist: WebAsk[Html, T]
-  ): WebAsk[Html, ForeignAddress] = new WebAsk[Html, ForeignAddress] {
+  implicit val twirlForeignAddressField: WebAsk[Html, ForeignAddress] = new WebAsk[Html, ForeignAddress] {
+    implicit val a: Codec[CountryCode] = twirlCountryCodeField
+    implicit val b: Codec[AddressLine] = mandatoryAddressField
+    implicit val c: Codec[Option[AddressLine]] = optAddressField
 
-    def decode(out: Input): Either[ErrorTree, ForeignAddress] = ffhlist.decode(out).map(gen.from)
-    def encode(in: ForeignAddress): Input = ffhlist.encode(gen.to(in))
+    override val codec: Codec[ForeignAddress] = common.web.InferCodec.gen[ForeignAddress]
+
+    def decode(out: Input): Either[ErrorTree, ForeignAddress] = codec.decode(out)
+    def encode(in: ForeignAddress): Input = codec.encode(in)
 
     def render(
       pagekey: List[String],

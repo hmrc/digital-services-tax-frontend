@@ -196,7 +196,7 @@ check-if-group.details.text=<p>For the Digital Services Tax, a group is a parent
     <li>not a member of a GAAP group</li>\
   </ul>\
   <p>You can find a list of acceptable GAAP in the \
-    <a href="https://www.gov.uk/hmrc-internal-manuals/digital-services-tax" target="_blank">Digital Services Tax Manual (opens in a new window or tab)</a>\
+    <a href="https://www.gov.uk/hmrc-internal-manuals/digital-services-tax" target="_blank" class="govuk-link">Digital Services Tax Manual (opens in a new window or tab)</a>\
   </p>
 check-if-group.TRUE=Yes
 check-if-group.FALSE=No

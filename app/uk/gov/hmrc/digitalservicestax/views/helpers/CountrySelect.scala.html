@@ -17,6 +17,8 @@
 @import uk.gov.hmrc.digitalservicestax.frontend.Country
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers.error_message
 
+@this()
+
 @(path: String, selectedCode: Option[String], hasErrors: Boolean, messages: UniformMessages[Html])
 
 <div class="country-code-wrapper form-group@if(hasErrors){ form-group-error}">

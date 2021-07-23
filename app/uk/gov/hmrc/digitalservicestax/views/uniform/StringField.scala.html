@@ -15,6 +15,7 @@
  *@
 
 @import cats.implicits._
+@import play.twirl.api.HtmlFormat
 
 @this(
         standard_field: StandardField,
@@ -23,6 +24,7 @@
 
 @(key: List[String], values: String, errors: ErrorTree, messages: UniformMessages[Html], autoFields: Option[String] = None, inputClass: String = "govuk-!-width-two-thirds")
 
+@keyWithDots=@{key.mkString(".")}
 @headKey=@{key.headOption.getOrElse("")}
 
 @percentageInput=@{
@@ -54,7 +56,17 @@
     case _ => ""
 }}
 
-<div class="form-group@if(errors.definedAtRoot){ form-group-error}">
+@headHintAndLabel=@{
+    import collection.immutable.Seq
+
+    val headHint = messages.get(s"${key.mkString(".")}.heading.hint").fold(HtmlFormat.empty) { headHint =>
+        Html(s"<span class='govuk-caption-l'>$headHint</span>")
+    }
+    val label = messages.decompose(s"${key.mkString(".")}.heading")
+    HtmlContent(HtmlFormat.fill(Seq(headHint, label)))
+}
+
+@*<div class="form-group@if(errors.definedAtRoot){ form-group-error}">*@
     @standard_field(key, errors, "string", messages, false, true) {
 
         @if(currencyInput){
@@ -73,7 +85,7 @@
                 label = Label(
                     isPageHeading = if(key.length == 1) true else false,
                     classes = "govuk-label--xl",
-                    content = HtmlContent(messages.decompose(s"${key.mkString(".")}.heading"))
+                    content = headHintAndLabel
                 ),
                 hint = messages.get(s"${key.mkString(".")}.hint").fold(Option.empty[Hint]){ hint =>
                     Some(Hint(
@@ -115,4 +127,4 @@
             </div>
         }
     }
-</div>
+@*</div>*@

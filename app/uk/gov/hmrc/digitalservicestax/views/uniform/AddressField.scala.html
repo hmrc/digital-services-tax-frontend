@@ -19,7 +19,8 @@
 @import ltbs.uniform.{Input => _, _}
 
 @this(
-        govukInput: GovukInput
+        govukInput: GovukInput,
+        countrySelect: CountrySelect
 )
 
 @(key: List[String], values: UfInput, errors: ErrorTree, messages: UniformMessages[Html], addressKey: String = "", inputClass: String = "govuk-!-width-two-thirds")
@@ -61,7 +62,7 @@
     ) { case (formControlClass, autoComplete, errorOpt) =>
 		@if(field == "countryCode") {
 
-            @country_select(key.mkString(".") ++ ".countryCode", values.valueAt("countryCode").flatMap{_.headOption}, errors.valueAt("countryCode").nonEmpty, messages)
+            @countrySelect(key.mkString(".") ++ ".countryCode", values.valueAt("countryCode").flatMap{_.headOption}, errors.valueAt("countryCode").nonEmpty, messages)
         } else {
           @govukInput(Input(
               id = s"${(key :+field).mkString("_")}-input",

@@ -91,6 +91,17 @@
     } else Option.empty[Hint]
 }
 
+@headHintAndLegend=@{
+    import collection.immutable.Seq
+
+    val headHint = messages.get(s"$keyWithDots.heading.hint").fold(HtmlFormat.empty) { headHint =>
+        Html(s"<span class='govuk-caption-l'>$headHint</span>")
+    }
+    val title = messages.get(s"$keyWithDots.heading").getOrElse(HtmlFormat.empty)
+
+    HtmlContent(HtmlFormat.fill(Seq(headHint, title)))
+}
+
 @standard_field(key, errors, "radios", messages, false, false) {
 
     @govukRadios(Radios(
@@ -99,7 +110,7 @@
                         legend = messages.get(s"$keyWithDots.heading").fold(Option.empty[Legend]){ leg =>
                             Some(
                                 Legend(
-                                    content = HtmlContent(leg),
+                                    content = headHintAndLegend,
                                     classes = "govuk-fieldset__legend--l",
                                     isPageHeading = true
                                 )
