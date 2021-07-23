@@ -14,6 +14,9 @@ $hmrc-assets-path: "/digital-services-tax/assets/lib/hmrc-frontend/hmrc/";
   font-family: "nta",Arial,sans-serif;
 }
 
+.country-code-wrapper.govuk-form-group--error input {
+  border: 2px solid #d4351c;
+}
 .govuk-input__wrapper {
   display: -webkit-box;
   display: -ms-flexbox;
