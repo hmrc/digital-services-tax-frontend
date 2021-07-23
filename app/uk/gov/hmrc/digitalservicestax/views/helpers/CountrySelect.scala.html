@@ -21,8 +21,8 @@
 
 @(path: String, selectedCode: Option[String], hasErrors: Boolean, messages: UniformMessages[Html])
 
-<div class="country-code-wrapper form-group@if(hasErrors){ form-group-error}">
-    <label class="label" for="location-autocomplete">@messages(s"$path.heading")</label>
+<div class="country-code-wrapper govuk-form-group@if(hasErrors){ govuk-form-group--error}">
+    <label class="govuk-label" for="location-autocomplete">@messages(s"$path.heading")</label>
     @{if(hasErrors) {error_message(path, messages(s"$path.invalid"), messages)}}
     <select
       id="location-autocomplete"

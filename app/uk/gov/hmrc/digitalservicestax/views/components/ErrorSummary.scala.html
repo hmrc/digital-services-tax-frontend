@@ -31,7 +31,6 @@
 }
 
 @if(errors.nonEmpty) {
-
     @govukErrorSummary(
 
         ErrorSummary(
@@ -40,6 +39,8 @@
                    s"""#${keyList.last ++ "_" ++ path.head.mkString("_")}-input"""
                } else if(radioKeys.contains(keyList.head)) {
                    s"""#${(keyList ++ path.head).mkString("_")}-0"""
+               } else if((keyList ++ path.head).mkString("_").endsWith("countryCode")) {
+                   "#location-autocomplete"
                } else {
                    s"""#${(keyList ++ path.head).mkString("_")}-input"""
                }
