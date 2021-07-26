@@ -46,11 +46,11 @@ class DSTInterpreter @Inject()(
   formWrapper: FormWrapper,
   standardField: StandardField,
   checkboxes: checkboxes,
-  phonenumber: phonenumber,
   stringField: StringField,
   radios: Radios,
   address: AddressField,
-  countrySelect: CountrySelect
+  countrySelect: CountrySelect,
+  date: Date
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
@@ -183,9 +183,6 @@ class DSTInterpreter @Inject()(
     validatedString(
       PhoneNumber,
       24
-    )(
-      twirlStringFields(
-        customRender = Some(phonenumber.apply(_:List[String],_:String,_:ErrorTree,_:UniformMessages[Html], _:Option[String])(messages(request), request)))
     )
 
 
@@ -286,6 +283,64 @@ class DSTInterpreter @Inject()(
       ).some
     }
   }
+
+
+  implicit val twirlDateField: WebAsk[Html, LocalDate] =
+    new WebAsk[Html, LocalDate] {
+
+      def decode(out: Input): Either[ErrorTree, LocalDate] = {
+
+        def stringAtKey(key: String): Validated[List[String], String] =
+          Validated.fromOption(
+            out.valueAt(key).flatMap{_.find(_.trim.nonEmpty)},
+            List(key)
+          )
+
+        (
+          stringAtKey("year"),
+          stringAtKey("month"),
+          stringAtKey("day")
+          ).tupled
+          .leftMap{x => ErrorMsg(x.reverse.mkString("-and-") + ".empty").toTree}
+          .toEither
+          .flatMap{ case (ys,ms,ds) =>
+
+            val asNumbers: Either[Exception, (Int,Int,Int)] =
+              Either.catchOnly[NumberFormatException]{
+                (ys.toInt, ms.toInt, ds.toInt)
+              }
+
+            asNumbers.flatMap { case (y,m,d) =>
+              Either.catchOnly[java.time.DateTimeException]{
+                LocalDate.of(y,m,d)
+              }
+            }.leftMap(_ => ErrorTree.oneErr(ErrorMsg("not-a-date")))
+          }
+      }
+
+      def encode(in: LocalDate): Input = Map(
+        List("year") → in.getYear(),
+        List("month") → in.getMonthValue(),
+        List("day") → in.getDayOfMonth()
+      ).mapValues(_.toString.pure[List])
+
+      def render(
+        pageKey: List[String],
+        fieldKey: List[String],
+        tell: Option[Html],
+        path: Breadcrumbs,
+        data: Input,
+        errors: ErrorTree,
+        messages: UniformMessages[Html]
+      ): Option[Html] = {
+        date(
+          fieldKey,
+          data,
+          errors,
+          messages
+        ).some
+      }
+    }
 
   implicit def blah: WebAsk[Html, Unit] = new WebAsk[Html, Unit] {
     def decode(out: Input): Either[ErrorTree,Unit] = Right(())

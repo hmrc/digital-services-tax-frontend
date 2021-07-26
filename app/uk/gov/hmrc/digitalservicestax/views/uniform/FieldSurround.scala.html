@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *@
+
+@import play.twirl.api.HtmlFormat
 @this(
-    govukHint: GovukHint // TODO remove if unused
+    govukFieldSet: GovukFieldset
 )
 @(key: String, content: Html, isCompoundField: Boolean, hasHint: Boolean, hasErrors: Boolean, hasIntro: Boolean)(implicit messages: UniformMessages[Html])
 
@@ -25,7 +27,21 @@
     val ariaContent = if(content.toString().contains(s"id='${key}--sfer-content'")) Some(s"$key--sfer-content") else None
     List(ariaHint, ariaErrors, ariaIntro, ariaContent).collect{ case Some(s) => s }.mkString(" ")
 }
+@isCompoundField= @{
+    List(
+        "contact-details"
+    ).contains(key)
+}
+@headHintAndLegend=@{
+    import collection.immutable.Seq
 
+    val headHint = messages.get(s"$key.heading.hint").fold(HtmlFormat.empty) { headHint =>
+        Html(s"<span class='govuk-caption-l'>$headHint</span>")
+    }
+    val title = messages.get(s"$key.heading").getOrElse(HtmlFormat.empty)
+
+    HtmlContent(HtmlFormat.fill(Seq(headHint, title)))
+}
     @* There are more than one fieldset/formgroup on the page *@
     @*@if(true /*FIXME stats.compoundChildren >= 2*/) {*@
         @*<h1 class="govuk-heading-xl @if(key == "loan-amount"){margin-bottom-20}">*@
@@ -51,47 +67,61 @@
         @*@content*@
     @*} else { *@
     @if(isCompoundField){
-        <div class="form-group@if(hasErrors){ form-group-error}">
-            <fieldset
-                class="fieldset"
-                @if(describedByClass.nonEmpty){aria-describedby="@describedByClass"}
-                id="@key-input"
-            >
-                <legend class="fieldset__legend fieldset__legend--xl">
-                    @messages.get(s"$key.heading.hint").map { headHint =>
-                        <span class="govuk-caption-xl@if(hasErrors){ flush--top}">
-                        @headHint
-                        </span>
-                    }
+@*        <div class="form-group@if(hasErrors){ form-group-error}">*@
+            @govukFieldSet(Fieldset(
+                legend = messages.get(s"$key.heading").fold(Option.empty[Legend]){ leg =>
+                    Some(
+                        Legend(
+                            content = headHintAndLegend,
+                            classes = "govuk-fieldset__legend--l",
+                            isPageHeading = true
+                        )
+                    )
+                },
+                html = content
+            ))
 
-                    <h1 class="fieldset__heading@if(hasErrors){ flush--top}@if(messages.get(s"$key.heading.hint").isDefined) { fieldset__heading--no-span}">
-                        @messages(s"$key.heading")
-                    </h1>
-                </legend>
+@*            <fieldset*@
+@*                class="fieldset"*@
+@*                @if(describedByClass.nonEmpty){aria-describedby="@describedByClass"}*@
+@*                id="@key-input"*@
+@*            >*@
+@*                <legend class="fieldset__legend fieldset__legend--xl">*@
+@*                    @messages.get(s"$key.heading.hint").map { headHint =>*@
+@*                        <span class="govuk-caption-xl@if(hasErrors){ flush--top}">*@
+@*                        @headHint*@
+@*                        </span>*@
+@*                    }*@
 
-                @for(msg <- messages.list(s"$key.intro")) {
-                    <p class="govuk-body" id="@key-intro">
-                        @msg
-                    </p>
-                }
-                
-                @messages.get(s"$key.intro.hint").map { introHint =>
-                    <p class="govuk-body">
-                        @introHint
-                    </p>
-                }
+@*                    <h1 class="fieldset__heading@if(hasErrors){ flush--top}@if(messages.get(s"$key.heading.hint").isDefined) { fieldset__heading--no-span}">*@
+@*                        @messages(s"$key.heading")*@
+@*                    </h1>*@
+@*                </legend>*@
 
-                    @messages.get(s"$key.list").map { list =>
-                        <ul class="list list-bullet">
-                            @for(msg <- messages.list(s"$key.list")) {
-                                <li>@msg</li>
-                            }
-                        </ul>
-                    }
 
-                    @content
-                </fieldset>
-            </div>
+@*                @for(msg <- messages.list(s"$key.intro")) {*@
+@*                    <p class="govuk-body" id="@key-intro">*@
+@*                        @msg*@
+@*                    </p>*@
+@*                }*@
+@*                *@
+@*                @messages.get(s"$key.intro.hint").map { introHint =>*@
+@*                    <p class="govuk-body">*@
+@*                        @introHint*@
+@*                    </p>*@
+@*                }*@
+
+@*                    @messages.get(s"$key.list").map { list =>*@
+@*                        <ul class="list list-bullet">*@
+@*                            @for(msg <- messages.list(s"$key.list")) {*@
+@*                                <li>@msg</li>*@
+@*                            }*@
+@*                        </ul>*@
+@*                    }*@
+
+@*                    @content*@
+@*                </fieldset>*@
+@*            </div>*@
         } else {
             @*
             * Note: Intro messages and message lists should ideally not appear between
