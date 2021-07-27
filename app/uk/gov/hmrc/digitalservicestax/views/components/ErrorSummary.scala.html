@@ -1,4 +1,5 @@
 @import cats.implicits._
+@import cats.data.NonEmptyList
 @import ltbs.uniform._
 @import uk.gov.hmrc.digitalservicestax.data.Activity
 
@@ -30,7 +31,19 @@
     )
 }
 
+@dateKeys=@{
+    List(
+        "accounting-period-end-date"
+    )
+}
+
+@dateFieldAnchor(path: NonEmptyList[InputPath], errMsg: NonEmptyList[ErrorMsg])=@{
+    val field = List("day", "month", "year").find(x => errMsg.head.msg.contains(x))
+    field.map(x => s"""#${(keyList ++ path.head).mkString("_")}-$x""").getOrElse("")
+}
+
 @if(errors.nonEmpty) {
+    @errors
     @govukErrorSummary(
 
         ErrorSummary(
@@ -41,6 +54,8 @@
                    s"""#${(keyList ++ path.head).mkString("_")}-0"""
                } else if((keyList ++ path.head).mkString("_").endsWith("countryCode")) {
                    "#location-autocomplete"
+               } else if(dateKeys.contains(keyList.head)) {
+                   dateFieldAnchor(path, errormsg)
                } else {
                    s"""#${(keyList ++ path.head).mkString("_")}-input"""
                }
