@@ -115,7 +115,10 @@ object ReturnJourney {
     }
 
     for {
-      groupCos <- ask[List[GroupCompany]]("manage-companies", validation = Rule.minLength(1)) when isGroup
+      groupCos <- askList[GroupCompany]("manage-companies", validation = Rule.minLength(1)) {
+        case (index: Option[Int], existing: List[GroupCompany]) =>
+          ask[GroupCompany]("ev1", default = index.map(existing))
+      } when isGroup
       activities <- ask[Set[Activity]]("select-activities", validation = Rule.minLength(1))
       dstReturn <- for {
         alternateCharge         <- askAlternativeCharge(activities)

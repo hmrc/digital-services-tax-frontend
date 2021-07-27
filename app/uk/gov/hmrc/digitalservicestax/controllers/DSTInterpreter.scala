@@ -19,8 +19,8 @@ package uk.gov.hmrc.digitalservicestax.controllers
 import cats.data.Validated
 import cats.implicits._
 import enumeratum.{Enum, EnumEntry}
-
 import java.time.LocalDate
+
 import javax.inject.Inject
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages}
@@ -56,7 +56,7 @@ class DSTInterpreter @Inject()(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
   with InferWebAsk[Html]
-  with AutoListingPage[Html]
+//  with AutoListingPage[Html]
   with Widgets {
 
   implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, A] =
@@ -359,13 +359,25 @@ class DSTInterpreter @Inject()(
   }
 
 
+  def tellList[A](f: A => Html) = new WebTell[Html, WebAskList.ListingTable[A]] {
+    def render(in: WebAskList.ListingTable[A], key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(Html(""))
+//      Some(table(
+//      in.value.zipWithIndex.map{case (row, index) => tr(
+//        td(row.toString), td(a(href:=s"$key/edit/$index")("Edit")), td(a(href:=s"$key/delete/$index")("Delete"))
+//      )}
+//    ))
+  }
+
+  implicit val tellListGroupCompany = tellList{groupCompany: GroupCompany => Html(groupCompany.toString)}
+
 
   // TODO implement twirl versions
   // Members declared in ltbs.uniform.common.web.AutoListingPage
   def renderListPage[A](
     pageKey: List[String],
     breadcrumbs: Breadcrumbs,
-    existingEntries: List[ListingRow[Html]],
+//    existingEntries: List[ListingRow[Html]],
     data: Input,
     errors: ErrorTree,
     messages: UniformMessages[Html],
