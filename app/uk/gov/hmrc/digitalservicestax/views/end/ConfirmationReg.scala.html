@@ -16,12 +16,16 @@
 
 @import uk.gov.hmrc.digitalservicestax.data.Email
 
+@this(
+        govukPanel : GovukPanel
+)
+
 @(key: String, companyName: String, email: Email)(messages: UniformMessages[Html])
 
-<div class="govuk-box-highlight">
-    <h1 class="heading-xlarge">@messages(s"$key.heading")</h1>
-    <span class="heading-large">@messages(s"$key.detail", companyName)</span>
-</div>
+@govukPanel(Panel(
+    title = HtmlContent(messages(s"$key.heading")),
+    content = HtmlContent(messages(s"$key.detail", companyName))
+))
 
 <p class="govuk-body">@messages(s"$key.email", email)</p>
 
@@ -33,10 +37,13 @@
 <p class="govuk-body">@messages(s"$key.what-happens-next.p1", email)</p>
 
 <h2 class="govuk-heading-m">@messages(s"$key.help-using-this-service.title")</h2>
-<p class="govuk-body">@messages(s"$key.help-using-this-service.p1", "https://www.gov.uk/topic/business-tax/digital-services-tax")</p>
+<p class="govuk-body">@messages(
+    s"$key.help-using-this-service.p1",
+    "https://www.gov.uk/topic/business-tax/digital-services-tax"
+)</p>
 
 <p class="govuk-body">@messages(s"$key.help-using-this-service.list.title")</p>
-<ul class="list list-bullet">
+<ul class="govuk-list govuk-list--bullet">
     <li>@messages(s"$key.help-using-this-service.list.1")</li>
     <li>@messages(s"$key.help-using-this-service.list.2")</li>
 </ul>
@@ -44,7 +51,7 @@
 <p class="govuk-body">
     @messages(
         s"$key.ccm-email",
-        Html("<a href=mailto:ccgdstmailbox@hmrc.gov.uk>ccgdstmailbox@hmrc.gov.uk</a>")
+        Html("<a class='govuk-link' href=mailto:ccgdstmailbox@hmrc.gov.uk>ccgdstmailbox@hmrc.gov.uk</a>")
     )
 </p>
 

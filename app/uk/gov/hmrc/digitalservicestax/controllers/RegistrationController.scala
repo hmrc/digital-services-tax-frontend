@@ -31,14 +31,14 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
 import views.html.cya._
+import views.html.end._
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-
 import data._
 import connectors.{DSTConnector, MongoPersistence}
+import uk.gov.hmrc.digitalservicestax.views.html.Layout
 
 class RegistrationController @Inject()(
   authorisedAction: AuthorisedAction,
@@ -48,7 +48,9 @@ class RegistrationController @Inject()(
   interpreter: DSTInterpreter,
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi,
-  cyaReg: CheckYourAnswersReg
+  cyaReg: CheckYourAnswersReg,
+  confirmationReg: ConfirmationReg,
+  layout: Layout
 )(implicit
   ec: ExecutionContext
 ) extends ControllerHelpers
@@ -75,7 +77,7 @@ class RegistrationController @Inject()(
   private implicit val confirmRegTell = new WebTell[Html, Confirmation[Registration]] {
     override def render(in: Confirmation[Registration], key: String, messages: UniformMessages[Html]): Option[Html] = {
       val reg = in.value
-      Some(views.html.end.confirmation(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages))
+      Some(confirmationReg(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages))
     }
   }
 
@@ -112,10 +114,11 @@ class RegistrationController @Inject()(
         )
       case Some(reg) =>
         Future.successful(
-          Ok(views.html.main_template(
-            title =
+          Ok(layout(
+            pageTitle = Some(
               s"${msg("registration-sent.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
-          )(views.html.end.confirmation("registration-sent", reg.companyReg.company.name, reg.contact.email)(msg)))
+            )
+          )(confirmationReg("registration-sent", reg.companyReg.company.name, reg.contact.email)(msg)))
         )
     }
   }
