@@ -360,13 +360,9 @@ class DSTInterpreter @Inject()(
 
 
   def tellList[A](f: A => Html) = new WebTell[Html, WebAskList.ListingTable[A]] {
-    def render(in: WebAskList.ListingTable[A], key: String, messages: UniformMessages[Html]): Option[Html] =
-      Some(Html(""))
-//      Some(table(
-//      in.value.zipWithIndex.map{case (row, index) => tr(
-//        td(row.toString), td(a(href:=s"$key/edit/$index")("Edit")), td(a(href:=s"$key/delete/$index")("Delete"))
-//      )}
-//    ))
+    def render(in: WebAskList.ListingTable[A], key: String, messages: UniformMessages[Html]): Option[Html] = {
+      Some(views.html.uniform.listing(key, in.value.map(f), messages))
+    }
   }
 
   implicit val tellListGroupCompany = tellList{groupCompany: GroupCompany => Html(groupCompany.toString)}

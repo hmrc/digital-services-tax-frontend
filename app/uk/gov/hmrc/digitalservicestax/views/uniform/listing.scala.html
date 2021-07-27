@@ -16,26 +16,26 @@
 
 @import cats.implicits._
 @import ltbs.uniform.common.web._
-@(items: List[(Html, String, String)], messages: UniformMessages[Html])
+@(key: String, items: List[Html], messages: UniformMessages[Html])
 
 @if(items.nonEmpty) {
 
 <div class="subsection--wide">
     <dl class="summary-list">
 
-        @for(((item, editLink, deleteLink), id) <- items.zipWithIndex) {
+        @for((item, index) <- items.zipWithIndex) {
             <div class="summary-list__row">
                 <dt class="summary-list__key">
                     @item
                 </dt>
                 <dd class="summary-list__value">
-                    <a class="govuk-link" href="@{editLink}/">
+                    <a class="govuk-link" href="@{key}/edit/@{index}" >
                         <span aria-hidden="true">@messages("common.change")</span>
                         <span class="visually-hidden">@messages("common.change") @item</span>
                     </a>
                 </dd>
                 <dd class="summary-list__value">
-                    <a href="@deleteLink">
+                    <a class="govuk-link" href="@{key}/delete/@{index}">
                         <span aria-hidden="true">@messages("common.delete")</span>
                         <span class="visually-hidden">@messages("common.remove") @item</span>
                     </a>
