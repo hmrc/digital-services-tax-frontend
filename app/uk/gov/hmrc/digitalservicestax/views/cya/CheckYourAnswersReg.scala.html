@@ -1,4 +1,5 @@
 @*
+@*
  * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +19,27 @@
 @import uk.gov.hmrc.digitalservicestax.data._
 @import uk.gov.hmrc.digitalservicestax.frontend._
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
+@import play.twirl.api.{Html, HtmlFormat}
+@import collection.immutable.Seq
 
+@this(
+    govukSummaryList : GovukSummaryList
+)
 
 @(key: String, in: Registration)(implicit messages: UniformMessages[Html])
 
+@address(address: Address) = @{
+   val lines = address.lines.map { line =>
+       Html(s"<span>$line</span><br/>")
+   }.toSeq
+   HtmlFormat.fill(lines)
+}
+
 @company = @{in.companyReg.company}
+
+@companyNameAndAddress(company: Company)=@{
+   HtmlFormat.fill(Seq(Html(s"<span>${company.name}</span><br/>"), address(company.address)))
+}
 
 @serviceUrl = @{"/digital-services-tax/register"}
 
@@ -31,6 +48,69 @@
 
     <div class="subsection--wide">
         <h2 class="govuk-heading-m">@messages(s"$key.company.title")</h2>
+
+        @govukSummaryList(SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = HtmlContent(messages(s"$key.company-name-and-reg-address.question"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(companyNameAndAddress(company))
+                    ),
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = s"$serviceUrl/confirm-company-details",
+                                content = HtmlContent(messages("common.change")),
+                                visuallyHiddenText = Some(messages(s"$key.company-name-and-reg-address.change").toString)
+                            )
+                        )
+                    ))
+                )
+                ,
+                 SummaryListRow(
+                    key = Key(
+                        content = Text("Date of birth")
+                    ),
+                    value = Value(
+                        content = Text("5 January 1978")
+                    ),
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = "#",
+                                content = HtmlContent(messages("common.change")),
+                                visuallyHiddenText = Some("date of birth")
+                            )
+                        )
+                    ))
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = Text("Contact information")
+                    ),
+                    value = Value(
+                        content = HtmlContent("""72 Guild Street<br>London<br>SE23 6FH""")
+                    ),
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = "#",
+                                content = HtmlContent(messages("common.change")),
+                                visuallyHiddenText = Some("contact information")
+                            )
+                        )
+                    ))
+                )
+            )
+        ))
+
+
+
+
+
+
 
         <dl class="govuk-check-your-answers cya-questions-short">
             <div>
@@ -48,6 +128,8 @@
                     </a>
                 </dd>
             </div>
+
+
             @if(in.alternativeContact.isDefined){
                 @in.alternativeContact.map{ ac =>
                     <div>

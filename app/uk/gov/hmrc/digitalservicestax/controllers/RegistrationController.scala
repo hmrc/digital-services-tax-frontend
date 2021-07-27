@@ -32,6 +32,8 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
+import views.html.cya._
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,7 +47,8 @@ class RegistrationController @Inject()(
   mongo: ReactiveMongoApi,
   interpreter: DSTInterpreter,
   val authConnector: AuthConnector,
-  val messagesApi: MessagesApi
+  val messagesApi: MessagesApi,
+  cyaReg: CheckYourAnswersReg
 )(implicit
   ec: ExecutionContext
 ) extends ControllerHelpers
@@ -66,7 +69,7 @@ class RegistrationController @Inject()(
 
   private implicit val cyaRegTell = new WebTell[Html, CYA[Registration]] {
     override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Option[Html] =
-      Some(views.html.cya.check_your_registration_answers(s"$key.reg", in.value)(messages))
+      Some(cyaReg(s"$key.reg", in.value)(messages))
   }
 
   private implicit val confirmRegTell = new WebTell[Html, Confirmation[Registration]] {
