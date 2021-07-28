@@ -46,7 +46,7 @@ class DSTInterpreter @Inject()(
   layout: Layout,
   formWrapper: FormWrapper,
   standardField: StandardField,
-  checkboxes: checkboxes,
+  checkboxes: Checkboxes,
   stringField: StringField,
   radios: Radios,
   address: AddressField,

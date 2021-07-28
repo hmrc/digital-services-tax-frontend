@@ -27,7 +27,9 @@
         s"report-${Activity.toUrl(Activity.OnlineMarketplace)}-alternative-charge",
         "report-alternative-charge",
         "report-cross-border-transaction-relief",
-        "repayment"
+        "repayment",
+        "manage-companies",
+        "select-activities"
     )
 }
 
@@ -43,7 +45,6 @@
 }
 
 @if(errors.nonEmpty) {
-    @errors
     @govukErrorSummary(
 
         ErrorSummary(
@@ -75,7 +76,7 @@
                     )
                }
             }.toSeq,
-            title = Text(messages("vatcheck.common.errorSummary").toString)
+            title = HtmlContent(messages(List(s"${keyList.mkString(".")}.there.is.a.problem", "there.is.a.problem")))
         )
     )
 

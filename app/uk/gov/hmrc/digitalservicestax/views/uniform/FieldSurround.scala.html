@@ -29,7 +29,8 @@
 }
 @isCompoundField= @{
     List(
-        "contact-details"
+        "contact-details",
+        "company"
     ).contains(key)
 }
 @headHintAndLegend=@{
@@ -73,7 +74,7 @@
                     Some(
                         Legend(
                             content = headHintAndLegend,
-                            classes = "govuk-fieldset__legend--l",
+                            classes = "govuk-fieldset__legend--xl",
                             isPageHeading = true
                         )
                     )
@@ -127,6 +128,7 @@
             * Note: Intro messages and message lists should ideally not appear between
             * labels & their inputs
             *@
+
             @if(messages.get(s"$key.listing.heading").isDefined) {
                     @messages.get(s"$key.heading.hint").map { headHint =>
                         <span class="govuk-caption-xl@if(hasErrors){ flush--top}">

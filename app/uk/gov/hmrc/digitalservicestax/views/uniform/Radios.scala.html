@@ -33,7 +33,7 @@
     key.head == "company-registered-office-address" ||
     key.head == "ultimate-parent-company-address"
 }
-@showOuterTell = @{key.contains("manage-companies")}
+@isListing = @{key.contains("manage-companies")}
 
 @indexedOptions=@{if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}}
 @radios=@{indexedOptions.map{case (opt,num) =>
@@ -83,7 +83,7 @@
         inner.map{ i =>
             Html(s"<p class='govuk-body-m'>$i</p>")
         }
-   val showInnerTell = if(!showOuterTell) tell else Option.empty[Html]
+   val showInnerTell = if(!isListing) tell else Option.empty[Html]
 
     val textSeq = Seq(introStyling(intro), hint, showInnerTell, details).flatten
     if(textSeq.nonEmpty) {
@@ -105,7 +105,7 @@
 }
 
 @standard_field(key, errors, "radios", messages, false, false) {
-    @if(showOuterTell){
+    @if(isListing){
         @tell
     }
     @govukRadios(Radios(
@@ -115,8 +115,8 @@
                             Some(
                                 Legend(
                                     content = headHintAndLegend,
-                                    classes = "govuk-fieldset__legend--l",
-                                    isPageHeading = true
+                                    classes = if(!isListing) "govuk-fieldset__legend--l" else "",
+                                    isPageHeading = !isListing
                                 )
                             )
                         },
