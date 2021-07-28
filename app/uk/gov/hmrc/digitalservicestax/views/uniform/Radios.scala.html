@@ -33,6 +33,7 @@
     key.head == "company-registered-office-address" ||
     key.head == "ultimate-parent-company-address"
 }
+@showOuterTell = @{key.contains("manage-companies")}
 
 @indexedOptions=@{if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}}
 @radios=@{indexedOptions.map{case (opt,num) =>
@@ -82,8 +83,9 @@
         inner.map{ i =>
             Html(s"<p class='govuk-body-m'>$i</p>")
         }
+   val showInnerTell = if(!showOuterTell) tell else Option.empty[Html]
 
-    val textSeq = Seq(introStyling(intro), hint, tell, details).flatten
+    val textSeq = Seq(introStyling(intro), hint, showInnerTell, details).flatten
     if(textSeq.nonEmpty) {
         Some(Hint(
             content = HtmlContent(HtmlFormat.fill(textSeq))
@@ -103,7 +105,9 @@
 }
 
 @standard_field(key, errors, "radios", messages, false, false) {
-
+    @if(showOuterTell){
+        @tell
+    }
     @govukRadios(Radios(
         fieldset =
                 Some(Fieldset(

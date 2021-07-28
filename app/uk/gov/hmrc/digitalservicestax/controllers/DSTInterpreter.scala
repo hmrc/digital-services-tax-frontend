@@ -51,12 +51,12 @@ class DSTInterpreter @Inject()(
   radios: Radios,
   address: AddressField,
   countrySelect: CountrySelect,
-  date: Date
+  date: Date,
+  listing: Listing
 )(
   implicit val appConfig: AppConfig
 ) extends PlayInterpreter[Html]
   with InferWebAsk[Html]
-//  with AutoListingPage[Html]
   with Widgets {
 
   implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, A] =
@@ -361,25 +361,13 @@ class DSTInterpreter @Inject()(
 
   def tellList[A](f: A => Html) = new WebTell[Html, WebAskList.ListingTable[A]] {
     def render(in: WebAskList.ListingTable[A], key: String, messages: UniformMessages[Html]): Option[Html] = {
-      Some(views.html.uniform.listing(key, in.value.map(f), messages))
+      Some(listing(key, in.value.map(f), messages))
     }
   }
 
-  implicit val tellListGroupCompany = tellList{groupCompany: GroupCompany => Html(groupCompany.toString)}
-
-
-  // TODO implement twirl versions
-  // Members declared in ltbs.uniform.common.web.AutoListingPage
-  def renderListPage[A](
-    pageKey: List[String],
-    breadcrumbs: Breadcrumbs,
-//    existingEntries: List[ListingRow[Html]],
-    data: Input,
-    errors: ErrorTree,
-    messages: UniformMessages[Html],
-    validation: Rule[List[A]]): Html =
-    //TODO Implement this
-    Html("")
+  implicit val tellListGroupCompany = tellList{
+    groupCompany: GroupCompany => Html(groupCompany.name)
+  }
 
   // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
   def unitAsk = new WebAsk[Html, Unit] {
@@ -433,7 +421,8 @@ class DSTInterpreter @Inject()(
       messages,
       alternatives.collect {
         case (name, Some(html)) => name -> html
-      }.toMap
+      }.toMap,
+      tell
     )
   }
 

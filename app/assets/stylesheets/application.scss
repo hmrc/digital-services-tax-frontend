@@ -23,6 +23,10 @@ $hmrc-assets-path: "/digital-services-tax/assets/lib/hmrc-frontend/hmrc/";
   display: flex;
 }
 
+.dst-listing .govuk-summary-list__value {
+  display: none;
+}
+
 .govuk-input__suffix {
   font-size: 19px;
   line-height: 1.31579;
