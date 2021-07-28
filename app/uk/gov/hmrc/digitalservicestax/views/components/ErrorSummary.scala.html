@@ -43,13 +43,17 @@
     val field = List("day", "month", "year").find(x => errMsg.head.msg.contains(x))
     field.map(x => s"""#${(keyList ++ path.head).mkString("_")}-$x""").getOrElse("")
 }
-
+@keyList
 @if(errors.nonEmpty) {
     @govukErrorSummary(
 
         ErrorSummary(
             errorList = errors.flatMap { case (path, errormsg) =>
-               val target = if((keyList ++ path.head).mkString("_") == "manage-companies_add_add_name" || (keyList ++ path.head).mkString("_") == "manage-companies_add_add_utr") {
+               val target = if(
+                   (keyList ++ path.head).mkString("_") == "manage-companies_add_company_name" ||
+                   (keyList ++ path.head).mkString("_") == "manage-companies_add_company_utr" ||
+                   (keyList ++ path.head).mkString("_").matches("^manage-companies_edit_([0-9].*)_company_(name|utr)$")
+               ) {
                    s"""#${keyList.last ++ "_" ++ path.head.mkString("_")}-input"""
                } else if(radioKeys.contains(keyList.head)) {
                    s"""#${(keyList ++ path.head).mkString("_")}-0"""

@@ -30,17 +30,17 @@
 
 @key=@{keyList.mkString(".")}
 @errorKey=@{s"${keyList.mkString(".")}-error"}
-@hasFieldset=@{key == "bank-details.bankAccount"}
+@*@hasFieldset=@{key == "bank-details.bankAccount"}*@
 @*//@noShowErrors=@{key == "manage-companies"}*@
 
-@if(hasFieldset) {
-    <div class="form-group@if(errors.definedAtRoot){ form-group-error}">
-        <fieldset
-        class="fieldset"
-        id="@{keyList.mkString("_")}-input"
-        @if(errors.definedAtRoot){aria-describedby='@errorKey'}
-        >
-}
+@*@if(hasFieldset) {*@
+@*    <div class="form-group@if(errors.definedAtRoot){ form-group-error}">*@
+@*        <fieldset*@
+@*        class="fieldset"*@
+@*        id="@{keyList.mkString("_")}-input"*@
+@*        @if(errors.definedAtRoot){aria-describedby='@errorKey'}*@
+@*        >*@
+@*}*@
 
 @messages.get(s"$key.heading.large").map { largeHead =>
   @if(keyList.length == 1) {
@@ -121,7 +121,7 @@
   </p>
 }
 
-@if(hasFieldset) {
-    </fieldset>
-</div>
-}
+@*@if(hasFieldset) {*@
+@*    </fieldset>*@
+@*</div>*@
+@*}*@

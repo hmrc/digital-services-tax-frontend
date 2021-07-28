@@ -727,7 +727,7 @@ bank-details.accountName.required=Enter the account name
 bank-details.accountName.invalid=Account name must only include letters a to z
 bank-details.accountName.length.exceeded=Account name must be 35 characters or fewer
 
-bank-details.bankAccount.heading.large.label=Is this a UK bank account?
+bank-details.bankAccount.heading=Is this a UK bank account?
 bank-details.bankAccount.DomesticBankAccount=Yes
 bank-details.bankAccount.ForeignBankAccount=No
 bank-details.bankAccount.required=Select yes if this is a UK bank account
