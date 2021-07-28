@@ -24,13 +24,6 @@
 
 @keyNoDots=@{key.mkString("-")}
 @inlineCheckboxKeys=@{(key.mkString(".") == "loan-amount.estimate")}
-@errMessage=@{
-    errors.valueAtRootList.headOption.map { error =>
-        ErrorMessage(
-            content = HtmlContent(error.prefixWith(key).render(messages))
-        )
-    }
-}
 
 @standard_field(key, errors, "checkboxes", messages, false) {
 
@@ -42,7 +35,7 @@
                 isPageHeading = true
             ))
         )),
-        errorMessage = errMessage,
+        errorMessage = errMessage(errors, key, messages),
         hint = Some(Hint(
             content = HtmlContent(messages(s"${key.head}.hint"))
         )),
