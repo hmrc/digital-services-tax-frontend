@@ -58,13 +58,6 @@
         } else None
     )
 }.toSeq}
-@errMessage=@{
-    errors.valueAtRootList.headOption.map { error =>
-        ErrorMessage(
-            content = HtmlContent(error.prefixWith(key).render(messages))
-        )
-    }
-}
 
 @hint=@{messages.get(s"$keyWithDots.hint")}
 @intro=@{messages.get(s"$keyWithDots.radio.intro")}
@@ -123,7 +116,7 @@
                         attributes = Map("id" -> s"$keyWithDots-input")
                 )),
         hint = hintAndIntro,
-        errorMessage = errMessage,
+        errorMessage = errMessage(errors, key, messages),
         idPrefix = Some(keyWithDots),
         name = keyWithDots,
         items = radios,

@@ -18,8 +18,7 @@
 @import uk.gov.hmrc.digitalservicestax.data.Registration
 @import uk.gov.hmrc.digitalservicestax.data._
 @import uk.gov.hmrc.digitalservicestax.frontend._
-@import uk.gov.hmrc.digitalservicestax.views.html.helpers._
-@import play.twirl.api.{Html, HtmlFormat}
+@import play.twirl.api.Html
 @import collection.immutable.Seq
 
 @this(
@@ -29,17 +28,6 @@
 @(key: String, in: Registration)(implicit messages: UniformMessages[Html])
 
 @company = @{in.companyReg.company}
-
-@companyNameAndAddress(company: Company)=@{
-   HtmlFormat.fill(Seq(Html(s"<span>${company.name}</span><br/>"), address(company.address)))
-}
-
-@address(address: Address) = @{
-    val lines = address.lines.map { line =>
-        Html(s"<span>$line</span><br/>")
-    }.toSeq
-    HtmlFormat.fill(lines)
-}
 
 @serviceUrl = @{"/digital-services-tax/register"}
 
