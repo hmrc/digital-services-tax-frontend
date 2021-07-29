@@ -57,13 +57,6 @@ class DSTConnector (
   def lookupAllReturns(): Future[Set[Period]] =
     http.GET[List[Period]](s"$backendURL/returns/all").map{_.toSet}
 
-  def lookupFinancialDetails(): Future[List[FinancialTransaction]] = {
-    http.GET[List[FinancialTransaction]](s"$backendURL/financial-transactions").recoverWith {
-      case _: NotFoundException => Future.successful(Nil)
-      case _ => throw MicroServiceConnectionException("Invalid response from financial transactions microservice.")
-    }
-  }
-
   case class MicroServiceConnectionException(msg: String) extends Exception(msg)
 
 }

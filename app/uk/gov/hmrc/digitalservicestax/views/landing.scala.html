@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.digitalservicestax.data.Registration
 @import uk.gov.hmrc.digitalservicestax.frontend.formatDate
 
-@(reg: Registration, outstanding: List[Period], amended: List[Period], financialDetailsPeriods: List[FinancialTransaction] = Nil)(implicit messages: UniformMessages[Html])
+@(reg: Registration, outstanding: List[Period], amended: List[Period])(implicit messages: UniformMessages[Html])
 
 @company = @{reg.companyReg.company}
 
@@ -97,31 +97,32 @@
                     </div>
             }
 
-            @if(financialDetailsPeriods.nonEmpty || amended.nonEmpty) {
-                <div class="column-one-third">
-                    <div class="card" id="cardAmount">
-                        <div class="card-body" style="border-bottom: 0px;">
-                            <h2 class="govuk-heading-m" style="margin-top: 0px">@messages("landing.account-history")</h2>
-                            <ul class="list">
-                                @if(financialDetailsPeriods.nonEmpty) {
-                                    <li>
-                                        <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.financialDetails" class="govuk-link">
-                                            @messages("landing.balance")
-                                        </a>
-                                    </li>
-                                }
-                                @if(amended.nonEmpty) {
-                                    <li>
+            <div class="column-one-third">
+                <div class="card" id="cardAmount">
+                    <div class="card-body" style="border-bottom: 0px;">
+                        <h2 class="govuk-heading-m" style="margin-top: 0px">@messages("landing.account-history")</h2>
+                        <ul class="list">
+                            @if(amended.nonEmpty) {
+                                <li>
+                                    <p>
                                         <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.ReturnsController.showAmendments" class="govuk-link">
                                             @messages("landing.amendments")
                                         </a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
+                                    </p>
+                                </li>
+                            }
+                            <li>
+                                <p>
+                                    @messages(
+                                        "landing.previous-payments",
+                                        Html("<a class='govuk-link' href='mailto:ccgdstmailbox@hmrc.gov.uk'>ccgdstmailbox@hmrc.gov.uk</a>")
+                                    )
+                                </p>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            }
+            </div>
         </div>
     </div>
 </div>
