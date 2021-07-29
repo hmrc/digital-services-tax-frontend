@@ -1,0 +1,366 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.digitalservicestax.views.html.helpers._
+@import uk.gov.hmrc.digitalservicestax.frontend.formatDate
+
+@this(
+        govukSummaryList : GovukSummaryList
+)
+
+@(key: String, ret: Return, per: Period, displayName: CompanyName, isPrint: Boolean = false)(implicit messages: UniformMessages[Html])
+
+@serviceUrl = @{ if (isPrint) "" else "/digital-services-tax/submit-return"}
+
+@liabilitySwitch = @{
+    if (ret.companiesAmount.keys.size > 0) {
+        ("group-liability", List.empty[String])
+    } else {
+        ("liability", List(displayName))
+    }
+}
+@liabilitySummaryListRows= @{
+
+    val totalLiabilityRow = SummaryListRow(
+        key = Key(
+            content = HtmlContent(messages(s"$key.${liabilitySwitch._1}.question", liabilitySwitch._2))
+        ),
+        value = Value(
+            content = HtmlContent(s"£${ret.totalLiability}")
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"$serviceUrl/${per.key}/group-liability",
+                    content = HtmlContent(messages("common.change")),
+                    visuallyHiddenText = Some(messages(s"$key.${liabilitySwitch._1}.change").toString)
+                )
+            )
+        ))
+    )
+
+    val allowanceAmountRow = ret.allowanceAmount.fold(Seq.empty[SummaryListRow]) { allAm =>
+        Seq(
+            SummaryListRow(
+                key = Key(
+                    content = HtmlContent(messages(s"$key.allowance-deducted.question"))
+                ),
+                value = Value(
+                    content = HtmlContent(s"£$allAm")
+                ),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = s"$serviceUrl/${per.key}/allowance-deducted",
+                            content = HtmlContent(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.allowance-deducted.change").toString)
+                        )
+                    )
+                ))
+            )
+        )
+    }
+
+    val crossBorderRow = SummaryListRow(
+        key = Key(
+            content = HtmlContent(messages(s"$key.report-cross-border-transaction-relief.question"))
+        ),
+        value = Value(
+            content = HtmlContent(if(ret.crossBorderReliefAmount != Money(0)){ messages("common.yes")} else { messages("common.no")})
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"$serviceUrl/${per.key}/report-cross-border-transaction-relief",
+                    content = HtmlContent(messages("common.change")),
+                    visuallyHiddenText = Some(messages(s"$key.report-cross-border-transaction-relief.change").toString)
+                )
+            )
+        ))
+    )
+
+    val companiesAmountRows = ret.companiesAmount.zipWithIndex.map { case (co, i) =>
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.group-company", co._1.name))
+            ),
+            value = Value(
+                content = HtmlContent(s"£ ${co._2}")
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/${per.key}/company-liabilities-$i",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.group-company.change", co._1.name).toString)
+                    )
+                )
+            ))
+        )
+    }.toSeq
+
+    (totalLiabilityRow +: allowanceAmountRow :+ crossBorderRow) ++ companiesAmountRows
+}
+
+@bankDetailsRows = @{
+    ret.repayment.fold(Seq.empty[SummaryListRow]){ rep =>
+        rep.bankAccount match {
+            case dba: DomesticBankAccount =>
+                Seq(
+                    SummaryListRow(
+                        key = Key(
+                            content = HtmlContent(messages(s"$key.account-type.question"))
+                        ),
+                        value = Value(
+                            content = HtmlContent(messages("common.yes"))
+                        ),
+                        actions = Some(Actions(
+                            items = Seq(
+                                ActionItem(
+                                    href = s"$serviceUrl/${per.key}/bank-details",
+                                    content = HtmlContent(messages("common.change")),
+                                    visuallyHiddenText = Some(messages(s"$key.account-type.change").toString)
+                                )
+                            )
+                        ))
+                    ),
+                    SummaryListRow(
+                        key = Key(
+                            content = HtmlContent(messages(s"$key.sort-code.question"))
+                        ),
+                        value = Value(
+                            content = HtmlContent(s"${dba.sortCode.replaceAll(".{2}", "$0-").init}")
+                        ),
+                        actions = Some(Actions(
+                            items = Seq(
+                                ActionItem(
+                                    href = s"$serviceUrl/${per.key}/bank-details",
+                                    content = HtmlContent(messages("common.change")),
+                                    visuallyHiddenText = Some(messages(s"$key.sort-code.change").toString)
+                                )
+                            )
+                        ))
+                    ),
+                    SummaryListRow(
+                        key = Key(
+                            content = HtmlContent(messages(s"$key.account-number.question"))
+                        ),
+                        value = Value(
+                            content = HtmlContent(dba.accountNo)
+                        ),
+                        actions = Some(Actions(
+                            items = Seq(
+                                ActionItem(
+                                    href = s"$serviceUrl/${per.key}/bank-details",
+                                    content = HtmlContent(messages("common.change")),
+                                    visuallyHiddenText = Some(messages(s"$key.account-number.change").toString)
+                                )
+                            )
+                        ))
+                    )
+                ) ++ dba.buildingSocietyNumber.fold(Seq.empty[SummaryListRow]){ bsn =>
+                    Seq(
+                        SummaryListRow(
+                            key = Key(
+                                content = HtmlContent(messages(s"$key.building-society.question"))
+                            ),
+                            value = Value(
+                                content = HtmlContent(bsn)
+                            ),
+                            actions = Some(Actions(
+                                items = Seq(
+                                    ActionItem(
+                                        href = s"$serviceUrl/${per.key}/bank-details",
+                                        content = HtmlContent(messages("common.change")),
+                                        visuallyHiddenText = Some(messages(s"$key.building-society.change").toString)
+                                    )
+                                )
+                            ))
+                        )
+                    )
+                }
+            case fba: ForeignBankAccount =>
+                Seq(
+                    SummaryListRow(
+                        key = Key(
+                            content = HtmlContent(messages(s"$key.account-type.question"))
+                        ),
+                        value = Value(
+                            content = HtmlContent(messages("common.no"))
+                        ),
+                        actions = Some(Actions(
+                            items = Seq(
+                                ActionItem(
+                                    href = s"$serviceUrl/${per.key}/bank-details",
+                                    content = HtmlContent(messages("common.change")),
+                                    visuallyHiddenText = Some(messages(s"$key.account-type.change").toString)
+                                )
+                            )
+                        ))
+                    ),
+                    SummaryListRow(
+                        key = Key(
+                            content = HtmlContent(messages(s"$key.iban.question"))
+                        ),
+                        value = Value(
+                            content = HtmlContent(fba.iban)
+                        ),
+                        actions = Some(Actions(
+                            items = Seq(
+                                ActionItem(
+                                    href = s"$serviceUrl/${per.key}/bank-details",
+                                    content = HtmlContent(messages("common.change")),
+                                    visuallyHiddenText = Some(messages(s"$key.iban.change").toString)
+                                )
+                            )
+                        ))
+                    )
+                )
+        }
+    }
+}
+
+@if(isPrint) {
+    <h1 class="govuk-heading-m">@messages(s"$key.title.print", displayName, formatDate(per.start), formatDate(per.end))</h1>
+} else {
+    <h1 class="govuk-heading-xl">@messages(s"$key.title", formatDate(per.start), formatDate(per.end))</h1>
+}
+<h2 class="govuk-heading-m print-hide">@messages(s"$key.company.title", displayName)</h2>
+
+@govukSummaryList(SummaryList(
+    rows = liabilitySummaryListRows
+))
+@ret.alternateCharge.map { alt =>
+    <h2 class="govuk-heading-m">@messages(s"$key.${Activity.toUrl(alt._1)}.title")</h2>
+    @govukSummaryList(SummaryList(
+        rows = Seq(
+            SummaryListRow(
+                key = Key(
+                    content = HtmlContent(messages(s"$key.report-alternative-charge.question"))
+                ),
+                value = Value(
+                    content = HtmlContent(messages("common.yes"))
+                ),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = s"$serviceUrl/${per.key}/report-alternative-charge",
+                            content = HtmlContent(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.report-alternative-charge.change").toString)
+                        )
+                    )
+                ))
+            ),
+            SummaryListRow(
+                key = Key(
+                    content = HtmlContent(messages(s"$key.report-${Activity.toUrl(alt._1)}-alternative-charge.question"))
+                ),
+                value = Value(
+                    content = HtmlContent(messages("common.yes"))
+                ),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = s"$serviceUrl/${per.key}/report-${Activity.toUrl(alt._1)}-alternative-charge",
+                            content = HtmlContent(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.report-${Activity.toUrl(alt._1)}-alternative-charge.change").toString)
+                        )
+                    )
+                ))
+            ),
+            SummaryListRow(
+                key = Key(
+                    content = HtmlContent(messages(s"$key.report-${Activity.toUrl(alt._1)}-loss.question"))
+                ),
+                value = Value(
+                    content = HtmlContent(if(alt._2 == 0){ messages("common.yes")} else { messages("common.no")})
+                ),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = s"$serviceUrl/${per.key}/report-${Activity.toUrl(alt._1)}-loss",
+                            content = HtmlContent(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.report-${Activity.toUrl(alt._1)}-loss.change").toString)
+                        )
+                    )
+                ))
+            ),
+            SummaryListRow(
+                key = Key(
+                    content = HtmlContent(messages(s"$key.report-${Activity.toUrl(alt._1)}-operating-margin.question"))
+                ),
+                value = Value(
+                    content = HtmlContent(s"${alt._2}%")
+                ),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = s"$serviceUrl/${per.key}/report-${Activity.toUrl(alt._1)}-operating-margin",
+                            content = HtmlContent(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.report-${Activity.toUrl(alt._1)}-operating-margin.change").toString)
+                        )
+                    )
+                ))
+            )
+        )
+    ))
+}
+
+<h2 class="govuk-heading-m">@messages(s"$key.repayment.title")</h2>
+@govukSummaryList(SummaryList(
+    rows = Seq(
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.repayment.question"))
+            ),
+            value = Value(
+                content = HtmlContent(ret.repayment.fold(messages("common.no"))(_ => messages("common.yes")))
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/${per.key}/repayment",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.repayment.change").toString)
+                    )
+                )
+            ))
+        )) ++ ret.repayment.fold(Seq.empty[SummaryListRow]) { rep =>
+        Seq(
+            SummaryListRow(
+                key = Key(
+                    content = HtmlContent(messages(s"$key.account-name.question"))
+                ),
+                value = Value(
+                    content = HtmlContent(rep.accountName)
+                ),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = s"$serviceUrl/${per.key}/bank-details",
+                            content = HtmlContent(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.account-name.change").toString)
+                        )
+                    )
+                ))
+            )
+        ) ++ bankDetailsRows
+    }
+))
+@if(!isPrint) {
+    <h2 class="govuk-heading-m">@messages(s"$key.submission.title")</h2>
+    <p class="govuk-body">@messages(s"$key.submission.notice")</p>
+}

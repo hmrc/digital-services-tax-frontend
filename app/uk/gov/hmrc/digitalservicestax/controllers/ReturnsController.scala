@@ -35,6 +35,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import views.html.cya.CheckYourAnswersRet
+import views.html.end.ConfirmationReturn
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,6 +48,8 @@ class ReturnsController @Inject()(
   servicesConfig: ServicesConfig,
   mongo: ReactiveMongoApi,
   interpreter: DSTInterpreter,
+  checkYourAnswersRet: CheckYourAnswersRet,
+  confirmationReturn: ConfirmationReturn,
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi
 )(implicit
@@ -68,13 +72,14 @@ class ReturnsController @Inject()(
 
   private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
     override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Option[Html] =
-      Some(views.html.cya.check_your_return_answers(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
+      Some(checkYourAnswersRet(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
   }
 
   private implicit val confirmRetTell = new WebTell[Html, Confirmation[(Return, CompanyName, Period, Period, Option[Html])]] {
     override def render(in: Confirmation[(Return, CompanyName, Period, Period, Option[Html])], key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(
-        views.html.end.confirmation_return(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period, in.value._5: Option[Html])(messages))
+        confirmationReturn(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period, in.value._5: Option[Html])(messages)
+      )
   }
 
   private def applyKey(key: Key): Period.Key = key
@@ -192,13 +197,13 @@ class ReturnsController @Inject()(
         case None => NotFound
         case Some(period) =>
           val companyName = reg.fold(CompanyName(""))(_.companyReg.company.name)
-          val printableCYA: Option[Html] = ret.map { r => views.html.cya.check_your_return_answers(
+          val printableCYA: Option[Html] = ret.map { r => checkYourAnswersRet(
             "check-your-answers.ret", r, period, companyName, isPrint = true)(msg)}
           Ok(
             views.html.main_template(
             title = s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
             )(
-              views.html.end.confirmation_return(
+              confirmationReturn(
                 "confirmation",
                 companyName,
                 period,

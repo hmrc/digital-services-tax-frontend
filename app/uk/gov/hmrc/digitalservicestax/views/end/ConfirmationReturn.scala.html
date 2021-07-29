@@ -15,16 +15,21 @@
  *@
 
 @import uk.gov.hmrc.digitalservicestax.frontend.formatDate
+
+@this(
+        govukPanel : GovukPanel
+)
+
 @(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period, printableCYA: Option[Html])(implicit messages: UniformMessages[Html])
 
 @printableCYA.map { printable =>
     <div class="print-only">@printable</div>
 }
 
-<div class="govuk-box-highlight">
-    <h1 class="heading-xlarge">@messages(s"$key.heading")</h1>
-    <span class="heading-large">@messages(s"$key.detail", companyName, formatDate(submittedPeriod.start), formatDate(submittedPeriod.end))</span>
-</div>
+@govukPanel(Panel(
+    title = HtmlContent(messages(s"$key.heading")),
+    content = HtmlContent(messages(s"$key.detail", companyName, companyName, formatDate(submittedPeriod.start), formatDate(submittedPeriod.end)))
+))
 
 @printableCYA.map { _ =>
     <p class="govuk-body jsonly">

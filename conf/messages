@@ -797,12 +797,19 @@ check-your-answers.ret.report-online-marketplace-operating-margin.change=Change 
 
 check-your-answers.ret.repayment.title=Return repayments
 check-your-answers.ret.repayment.question=Do you need to be repaid any Digital Services Tax for this period? 
+check-your-answers.ret.repayment.change=Change if you need to be repaid any Digital Services Tax for this period
 check-your-answers.ret.account-name.question=Account name
+check-your-answers.ret.account-name.change=Change account name
 check-your-answers.ret.account-type.question=Is this a UK bank account?
+check-your-answers.ret.account-type.change=Change if this a UK bank account
 check-your-answers.ret.sort-code.question=Sort code
+check-your-answers.ret.sort-code.change=Change sort code
 check-your-answers.ret.account-number.question=Account number
+check-your-answers.ret.account-number.change=Change account number
 check-your-answers.ret.building-society.question=Building society roll number (if you have one)
+check-your-answers.ret.building-society.change=Change building society roll number (if you have one)
 check-your-answers.ret.iban.question=IBAN
+check-your-answers.ret.iban.change=Change IBAN
 
 check-your-answers.ret.submission.title=Now submit your return
 check-your-answers.ret.submission.notice=By submitting this notification you are confirming that, \
