@@ -37,8 +37,9 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.cya.CheckYourAnswersRet
 import views.html.end.ConfirmationReturn
-
 import javax.inject.Inject
+import uk.gov.hmrc.digitalservicestax.views.html.Layout
+
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -50,6 +51,7 @@ class ReturnsController @Inject()(
   interpreter: DSTInterpreter,
   checkYourAnswersRet: CheckYourAnswersRet,
   confirmationReturn: ConfirmationReturn,
+  layout: Layout,
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi
 )(implicit
@@ -112,9 +114,9 @@ class ReturnsController @Inject()(
                case Nil =>
                 NotFound
                case periods =>
-                Ok(views.html.main_template(
-                    title =
-                      s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
+                Ok(layout(
+                    pageTitle =
+                      Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
                 )(views.html.resubmit_a_return("resubmit-a-return", periods, periodForm)(msg, request)))
              }
             }
@@ -132,9 +134,9 @@ class ReturnsController @Inject()(
             periodForm.bindFromRequest.fold(
               formWithErrors => {
                 Future.successful(
-                  BadRequest(views.html.main_template(
-                  title =
-                    s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
+                  BadRequest(layout(
+                  pageTitle =
+                    Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
                 )(views.html.resubmit_a_return("resubmit-a-return", periods, formWithErrors)(msg, request))
                   )
                 )
@@ -200,8 +202,8 @@ class ReturnsController @Inject()(
           val printableCYA: Option[Html] = ret.map { r => checkYourAnswersRet(
             "check-your-answers.ret", r, period, companyName, isPrint = true)(msg)}
           Ok(
-            views.html.main_template(
-            title = s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
+            layout(
+              pageTitle = Some(s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
             )(
               confirmationReturn(
                 "confirmation",

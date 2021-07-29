@@ -36,12 +36,13 @@
         <a href="javascript:window.print()" class="govuk-link">@messages(s"$key.print-save")</a>
     </p>
 }
+
 <h2 class="govuk-heading-m">@messages("confirmation.what-you-do-next.title")</h2>
 <p class="govuk-body">@messages("confirmation.what-you-do-next.p1", formatDate(nextPeriod.start), formatDate(nextPeriod.end))</p>
 <p class="govuk-body">@messages("confirmation.what-you-do-next.p2", formatDate(nextPeriod.paymentDue), formatDate(nextPeriod.returnDue))</p>
 
-<p>
-    <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()">
+<p class="govuk-body">
+    <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()" class="govuk-link">
         @messages("confirmation.index")
     </a>
 </p>
