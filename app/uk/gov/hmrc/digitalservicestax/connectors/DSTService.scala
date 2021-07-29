@@ -28,7 +28,6 @@ trait DSTService[F[_]] {
   def submitReturn(period: Period, ret: Return): F[Unit]
   def lookupRegistration(): F[Option[Registration]]
   def lookupOutstandingReturns(): F[Set[Period]]
-  def lookupFinancialDetails(): F[List[FinancialTransaction]]
 
   def transform[G[_]](nat: F ~> G) = {
     val old = this
@@ -45,8 +44,6 @@ trait DSTService[F[_]] {
         nat(old.submitRegistration(reg))
       def submitReturn(period: Period,ret: Return): G[Unit] =
         nat(old.submitReturn(period, ret))
-      def lookupFinancialDetails(): G[List[FinancialTransaction]] =
-        nat(old.lookupFinancialDetails())
     }
   }
 }

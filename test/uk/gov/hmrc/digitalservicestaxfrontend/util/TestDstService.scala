@@ -30,5 +30,4 @@ trait TestDstService extends DSTService[Id] {
   def lookupRegistration(): Option[Registration] = sampleReg.some
   def lookupOutstandingReturns(): Set[Period] = Set.empty
   def get = this.transform(ToLogic)
-  def lookupFinancialDetails: List[FinancialTransaction] = Nil
 }
