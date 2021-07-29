@@ -43,7 +43,6 @@
     val field = List("day", "month", "year").find(x => errMsg.head.msg.contains(x))
     field.map(x => s"""#${(keyList ++ path.head).mkString("_")}-$x""").getOrElse("")
 }
-@keyList
 @if(errors.nonEmpty) {
     @govukErrorSummary(
 

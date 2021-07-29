@@ -5,7 +5,7 @@ import sbt._
 
 object AppDependencies {
 
-  val uniformVersion = "4.10.1-16-c001d3c-SNAPSHOT"
+  val uniformVersion = "4.10.1-17-e70b761-SNAPSHOT"
 
   val compile = Seq(
     "uk.gov.hmrc"             %% "play-frontend-hmrc"       % "0.72.0-play-26",
