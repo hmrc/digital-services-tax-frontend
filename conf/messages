@@ -29,6 +29,8 @@ common.yes=Yes
 common.no=No
 common.group=Group
 common.company=Company
+service.name=Digital Services Tax
+service.homePageUrl=/digital-services-tax
 
 # Errors
 there.is.a.problem=There is a problem

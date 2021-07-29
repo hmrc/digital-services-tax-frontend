@@ -31,9 +31,24 @@
     hmrcReportTechnicalIssue: HmrcReportTechnicalIssue
 )
 @(
-    pageTitle: Option[String] = None,
-    beforeContentBlock: Html = Html("")
+    pageTitle: Option[String] = None
 )(contentBlock: Html)(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
+
+
+@bannerFeedback = {
+    <span>
+        @messages("common.alpha-info.p1")
+        <a class="govuk-link" href="@appConfig.betaFeedbackUrlAuth">@messages("common.alpha-info.link")</a>
+        @messages("common.alpha-info.p2")
+    </span>
+}
+@beforeContentBlock= @{
+
+    govukPhaseBanner(PhaseBanner(
+        tag = Some(Tag(content = Text("beta"))),
+        content = HtmlContent(bannerFeedback)
+    ))
+}
 
 @content = {
     @contentBlock
