@@ -33,13 +33,15 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.controllers.routes
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views
-import uk.gov.hmrc.digitalservicestax.views.html.main_template
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, main_template}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisedAction @Inject()(
   mcc: MessagesControllerComponents,
+  layout: Layout,
   val authConnector: AuthConnector
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext, val messagesApi: MessagesApi)
   extends ActionBuilder[AuthorisedRequest, AnyContent] with ActionRefiner[Request, AuthorisedRequest] with AuthorisedFunctions {
@@ -67,9 +69,9 @@ class AuthorisedAction @Inject()(
         Logger.warn(s"invalid account affinity type, with message ${af.msg}, for reason ${af.reason}",
           af)
         Left(Ok(
-          main_template(
-            title =
-              s"${msg("common.title.short")} - ${msg("common.title")}"
+          layout(
+            pageTitle =
+              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
           )(views.html.errors.incorrect_account_affinity()(msg))
         ))
       case ex: UnsupportedCredentialRole =>
@@ -77,9 +79,9 @@ class AuthorisedAction @Inject()(
           s"unsupported credential role on account, with message ${ex.msg}, for reason ${ex.reason}",
           ex)
         Left(Ok(
-          main_template(
-            title =
-              s"${msg("common.title.short")} - ${msg("common.title")}"
+          layout(
+            pageTitle =
+              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
           )(views.html.errors.incorrect_account_cred_role()(msg))
         ))
       case _ : NoActiveSession =>

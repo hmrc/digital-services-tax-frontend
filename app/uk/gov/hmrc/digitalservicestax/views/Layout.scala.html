@@ -28,10 +28,13 @@
     govukPhaseBanner : GovukPhaseBanner,
     hmrcFooter: HmrcFooter,
     hmrcStandardFooter: HmrcStandardFooter,
-    hmrcReportTechnicalIssue: HmrcReportTechnicalIssue
+    hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
+    layoutGrid: TwoThirdsOneThirdMainContent,
+    defaultMainContentLayout: TwoThirdsMainContent
 )
 @(
-    pageTitle: Option[String] = None
+    pageTitle: Option[String] = None,
+    useFullWidth: Boolean = false,
 )(contentBlock: Html)(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
 
 
@@ -64,10 +67,21 @@
     )
 }
 
-@govukLayout(
+@if(useFullWidth) {
+    @govukLayout(
+        pageTitle = pageTitle,
+        headBlock = Some(head()),
+        beforeContentBlock = Some(beforeContentBlock),
+        footerBlock = Some(hmrcStandardFooter()),
+        bodyEndBlock = Some(scripts()),
+        mainContentLayout = None // n.b. play-frontend-govuk uses both None/Some to alter the default behaviour so have to unset
+    )(content)
+} else {
+    @govukLayout(
     pageTitle = pageTitle,
     headBlock = Some(head()),
     beforeContentBlock = Some(beforeContentBlock),
     footerBlock = Some(hmrcStandardFooter()),
     bodyEndBlock = Some(scripts())
-)(content)
+    )(content))
+}

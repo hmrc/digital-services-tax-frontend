@@ -91,3 +91,27 @@ $hmrc-assets-path: "/digital-services-tax/assets/lib/hmrc-frontend/hmrc/";
 input[type="text"].autocomplete__input {
   width: 100%;
 }
+
+.card {
+  background: #f8f8f8;
+  margin-bottom: 10px;
+  padding: 20px;
+}
+
+.card .card-body > *:last-child, .card > *:last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 40.0625em) {
+  .card {
+    margin-bottom: 0;
+  }
+}
+
+.no-padding-left {
+  padding-left: 0px;
+}
+
+.padding-bottom-50 {
+  padding-bottom: 50px;
+}

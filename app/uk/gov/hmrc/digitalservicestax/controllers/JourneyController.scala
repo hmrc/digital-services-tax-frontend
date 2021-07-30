@@ -19,19 +19,19 @@ package controllers
 
 import data._
 import connectors._
-
 import akka.http.scaladsl.model.headers.LinkParams.title
 import cats.implicits._
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
-import play.api.i18n.{I18nSupport, MessagesApi, Messages}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.Html
+
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, Landing}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
@@ -44,6 +44,8 @@ class JourneyController @Inject()(
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
+  layout: Layout,
+  landing: Landing,
   val mongo: play.modules.reactivemongo.ReactiveMongoApi
 )(
   implicit ec: ExecutionContext,
@@ -72,18 +74,18 @@ class JourneyController @Inject()(
           amendedPeriods <- backend.lookupAmendableReturns()
           lineItems <- backend.lookupFinancialDetails()
         } yield {
-          Ok(views.html.main_template(
-            title = s"${msg("landing.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}",
-            mainClass = Some("full-width")
-          )(views.html.landing(
+          Ok(layout(
+            pageTitle = Some(s"${msg("landing.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"),
+            useFullWidth = true
+          )(landing(
             reg, outstandingPeriods.toList.sortBy(_.start), amendedPeriods.toList.sortBy(_.start), lineItems)))
           }
 
       case Some(reg) =>
         Future.successful(
-          Ok(views.html.main_template(
-            title =
-              s"${msg("common.title.short")} - ${msg("common.title")}"
+          Ok(layout(
+            pageTitle =
+              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
           )(views.html.end.pending()(msg)))
         )
     }
