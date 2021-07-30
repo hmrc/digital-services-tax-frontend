@@ -544,6 +544,7 @@ landing.submit-return=Submit a return
 landing.account-history=Account History
 landing.balance=View your balance and transactions history
 landing.amendments=Resubmit a previous return
+landing.previous-payments= If you have a question regarding a payment, email {0} with your HMRC Customer Compliance Manager (CCM) copied in, if you have one.
 
 #pay your dst page
 pay-your-dst.heading=Pay your Digital Services Tax

@@ -72,13 +72,12 @@ class JourneyController @Inject()(
         for {
           outstandingPeriods <- backend.lookupOutstandingReturns()
           amendedPeriods <- backend.lookupAmendableReturns()
-          lineItems <- backend.lookupFinancialDetails()
         } yield {
           Ok(layout(
             pageTitle = Some(s"${msg("landing.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"),
             useFullWidth = true
           )(landing(
-            reg, outstandingPeriods.toList.sortBy(_.start), amendedPeriods.toList.sortBy(_.start), lineItems)))
+            reg, outstandingPeriods.toList.sortBy(_.start), amendedPeriods.toList.sortBy(_.start))))
           }
 
       case Some(reg) =>
@@ -88,26 +87,6 @@ class JourneyController @Inject()(
               Some(s"${msg("common.title.short")} - ${msg("common.title")}")
           )(views.html.end.pending()(msg)))
         )
-    }
-  }
-
-  def financialDetails: Action[AnyContent] = authorisedAction.async { implicit request =>
-    implicit val msg: UniformMessages[Html] =
-      implicitly[Messages].convertMessagesTwirlHtml(false)
-
-    backend.lookupRegistration().flatMap {
-      case Some(reg) if reg.registrationNumber.isDefined =>
-        backend.lookupFinancialDetails().map{ lineItems =>
-          Ok(views.html.main_template(
-            title =
-              s"${msg("landing.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}",
-            mainClass = Some("full-width")
-          )(views.html.financial_details(lineItems, msg)))
-        }
-      case _ =>
-        Future.successful(
-          Redirect(routes.RegistrationController.registerAction(" "))
-        )        
     }
   }
 
