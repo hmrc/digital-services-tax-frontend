@@ -20,10 +20,10 @@ $hmrc-assets-path: "/digital-services-tax/assets/lib/hmrc-frontend/hmrc/";
   .phase-banner a {
     display: inline;
   }
-  .content__body > div.print-only {
+  .govuk-grid-column-two-thirds > div.print-only {
     display: block;
   }
-  .content__body > :not(.print-only), a {
+  .govuk-grid-column-two-thirds > :not(.print-only), a {
     display: none;
   }
 }
