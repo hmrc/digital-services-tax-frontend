@@ -16,25 +16,34 @@
 
 @import uk.gov.hmrc.digitalservicestax.frontend.formatDate
 
+@this(
+        govukBackLink: GovukBackLink
+)
+
 @(regNo: Option[DSTRegNumber], outstanding: List[Period])(implicit message: UniformMessages[Html])
 
 
-<a href="@{uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()}" class="govuk link-back">
-    @message("common.back")
-</a>
+@govukBackLink(BackLink(
+    href = s"${uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()}",
+    content = HtmlContent(message("common.back"))
+))
+
+@*<a href="@{uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()}" class="govuk link-back">*@
+@*    @message("common.back")*@
+@*</a>*@
 
 <h1 class="govuk-heading-xl">@message("pay-your-dst.heading")</h1>
 
 @outstanding.headOption.map { period =>
-    <p>@message("pay-your-dst.due-date", s"${formatDate(period.paymentDue)}") </p>
+    <p class="govuk-body">@message("pay-your-dst.due-date", s"${formatDate(period.paymentDue)}") </p>
 }
 @regNo.map { rn =>
-    <p>@message("pay-your-dst.include-reg-no", s"<strong>$rn</strong>")</p>
+    <p class="govuk-body">@message("pay-your-dst.include-reg-no", s"<strong>$rn</strong>")</p>
 }
-<p>@message("pay-your-dst.how-to-pay.1")
+<p class="govuk-body">@message("pay-your-dst.how-to-pay.1")
     <a href="https://www.gov.uk/guidance/pay-your-digital-services-tax" target="_blank">@message("pay-your-dst.how-to-pay.2")</a>.
 </p>
-<p>
+<p class="govuk-body">
     <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()" class="govuk-link">
         @message("pay-your-dst.back-to-details")
     </a>

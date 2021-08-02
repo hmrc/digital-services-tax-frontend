@@ -22,6 +22,7 @@ import connectors._
 import akka.http.scaladsl.model.headers.LinkParams.title
 import cats.implicits._
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
@@ -31,7 +32,7 @@ import play.twirl.api.Html
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.digitalservicestax.views.html.{Layout, Landing}
+import uk.gov.hmrc.digitalservicestax.views.html.{AccessibilityStatement, Landing, Layout}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
@@ -46,6 +47,7 @@ class JourneyController @Inject()(
   servicesConfig: ServicesConfig,
   layout: Layout,
   landing: Landing,
+  accessibilityStatement: AccessibilityStatement,
   val mongo: play.modules.reactivemongo.ReactiveMongoApi
 )(
   implicit ec: ExecutionContext,
@@ -93,7 +95,7 @@ class JourneyController @Inject()(
   def accessibilityStatement: Action[AnyContent] = Action { implicit request =>
     implicit val msg: UniformMessages[Html] =
       implicitly[Messages].convertMessagesTwirlHtml(false)
-    Ok(views.html.accessibility_statement(s"${msg("accessibility-statement.title")}"))
+    Ok(accessibilityStatement(s"${msg("accessibility-statement.title")}"))
   }
 
 }

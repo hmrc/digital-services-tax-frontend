@@ -33,7 +33,7 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.controllers.routes
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views
-import uk.gov.hmrc.digitalservicestax.views.html.{Layout, main_template}
+import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 

@@ -24,11 +24,12 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import ltbs.uniform.interpreters.playframework._
 import cats.syntax.semigroup._
+import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut
 
 import scala.concurrent.ExecutionContext
 import play.twirl.api.HtmlFormat
 
-class AuthenticationController @Inject()(mcc: MessagesControllerComponents)
+class AuthenticationController @Inject()(mcc: MessagesControllerComponents, timeOutView: TimeOut)
   (implicit appConfig: AppConfig, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
@@ -46,6 +47,6 @@ class AuthenticationController @Inject()(mcc: MessagesControllerComponents)
 
   def timeOut: Action[AnyContent] = Action { implicit request =>
     implicit val msg = messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+| UniformMessages.bestGuess.map(HtmlFormat.escape)
-    Ok(uk.gov.hmrc.digitalservicestax.views.html.end.time_out()).withNewSession
+    Ok(timeOutView()).withNewSession
   }
 }

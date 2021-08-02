@@ -37,6 +37,8 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import views.html.cya.CheckYourAnswersRet
 import views.html.end.ConfirmationReturn
+import views.html.ResubmitAReturn
+
 import javax.inject.Inject
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 
@@ -52,6 +54,7 @@ class ReturnsController @Inject()(
   checkYourAnswersRet: CheckYourAnswersRet,
   confirmationReturn: ConfirmationReturn,
   layout: Layout,
+  resubmitAReturn: ResubmitAReturn,
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi
 )(implicit
@@ -98,6 +101,7 @@ class ReturnsController @Inject()(
       implicit val msg: UniformMessages[Html] = messages(request)
 
       //TODO Check print feature from returns
+      //TODO Cache radio button selection
 
        implicit val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
          MongoPersistence[AuthorisedRequest[AnyContent]](
@@ -117,7 +121,7 @@ class ReturnsController @Inject()(
                 Ok(layout(
                     pageTitle =
                       Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
-                )(views.html.resubmit_a_return("resubmit-a-return", periods, periodForm)(msg, request)))
+                )(resubmitAReturn("resubmit-a-return", periods, periodForm)(msg, request)))
              }
             }
           }
@@ -137,7 +141,7 @@ class ReturnsController @Inject()(
                   BadRequest(layout(
                   pageTitle =
                     Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
-                )(views.html.resubmit_a_return("resubmit-a-return", periods, formWithErrors)(msg, request))
+                )(resubmitAReturn("resubmit-a-return", periods, formWithErrors)(msg, request))
                   )
                 )
               },

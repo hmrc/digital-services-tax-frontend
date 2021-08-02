@@ -16,14 +16,15 @@
 
 @import uk.gov.hmrc.digitalservicestax.config.AppConfig
 
-@()(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
+@this(
+ layout: Layout
+)
 
-@uk.gov.hmrc.digitalservicestax.views.html.main_template(title = messages("time-out.title").toString()) {
-    <h1>@messages("time-out.title")</h1>
-    <p>@messages("time-out.save")</p>
+@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
 
-    <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.AuthenticationController.timeIn(
-        request.headers.get("Referer").getOrElse(appConfig.dstIndexPage))" class="button" role="button">
-        @messages("common.sign-in")
-    </a>
+@mainContent = {
+ <h1 class="govuk-heading-xl">@heading</h1>
+ <p class="govuk-body">@message</p>
 }
+
+@layout(Some(pageTitle))(mainContent)(request, messages, appConfig)

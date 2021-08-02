@@ -1,0 +1,85 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.digitalservicestax.views.html.helpers._
+@import uk.gov.hmrc.digitalservicestax.frontend.formatDate
+@import uk.gov.hmrc.digitalservicestax.views.html.components.Button
+
+@this(
+    formHelper: FormWithCSRF,
+    govukBackLink: GovukBackLink,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    button: Button
+)
+
+@(key: String, periods: List[Period], form: Form[Period.Key])(implicit messages: UniformMessages[Html], request: Request[AnyContent])
+
+    @govukBackLink(BackLink(
+        href = s"${uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index}",
+        content = HtmlContent(messages("common.back"))
+    ))
+    @formHelper(action = play.api.mvc.Call("post",  "resubmit-a-return"), 'novalidate -> "novalidate") {
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(
+                ErrorSummary(
+                    errorList = Seq(
+                        ErrorLink(
+                            href = Some(s"#$key-${periods.head.key}"),
+                            content = HtmlContent(messages(s"$key.required"))
+                        )
+                    ),
+                    title = HtmlContent(messages("there.is.a.problem"))
+                )
+            )
+        }
+
+        @govukRadios(Radios(
+            fieldset =
+                Some(Fieldset(
+                    legend =
+                        Some(
+                            Legend(
+                                content = HtmlContent(messages(s"$key.title")),
+                                isPageHeading = true,
+                                classes = "govuk-fieldset__legend--xl"
+                            )
+                        ),
+                    attributes = Map("id" -> s"$key-input")
+                )),
+            hint = Some(Hint(
+                classes = "govuk-body",
+                content = HtmlContent(s"<p class='govuk-body'>${messages("resubmit-a-return.amend-a-return").toString}</p>")
+            )),
+            errorMessage = form.errors.headOption.map { error =>
+                ErrorMessage(
+                    content = HtmlContent(messages(s"$key.required"))
+                )
+            },
+            name = "key",
+            items = periods.map(period =>
+                RadioItem(
+                    content = HtmlContent(
+                        messages(s"$key.radio-label", formatDate(period.start), formatDate(period.end))
+                    ),
+                    id = Some(s"$key-${period.key}"),
+                    value = Some(s"${period.key}"),
+                    checked = form.value.contains(period.key)
+                )
+            ).toSeq
+        ))
+        @button(List("common.save-continue"))
+    }
