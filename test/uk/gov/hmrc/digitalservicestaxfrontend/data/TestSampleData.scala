@@ -22,7 +22,7 @@ import cats.implicits._
 import uk.gov.hmrc.digitalservicestax.data.Activity.{OnlineMarketplace, SearchEngine, SocialMedia}
 
 
-object SampleData {
+object TestSampleData {
 
   val sampleAddress = UkAddress (
     AddressLine("12 The Street"),
@@ -92,10 +92,15 @@ object SampleData {
     sampleDomesticBankAccount
   )
   val samplePercent: Percent = Percent(50)
-  val sampleGroupCompanyList: List[GroupCompany] = List(GroupCompany(
+
+  val sampleGroupCompany: GroupCompany = GroupCompany(
     sampleCompanyName,
     Some(UTR("1234567891"))
-  ))
+  )
+
+  val sampleGroupCompanyList: List[GroupCompany] = List(
+    sampleGroupCompany
+  )
 
   val samplePeriod: Period = Period(
     LocalDate.now,

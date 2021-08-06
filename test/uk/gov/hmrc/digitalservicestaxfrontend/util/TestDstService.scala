@@ -19,7 +19,7 @@ package uk.gov.hmrc.digitalservicestaxfrontend.util
 import cats.Id
 import cats.implicits._
 import uk.gov.hmrc.digitalservicestax.connectors.DSTService
-import uk.gov.hmrc.digitalservicestax.data.SampleData.{sampleCompanyRegWrapper, sampleReg, utrLookupCompanyRegWrapper}
+import uk.gov.hmrc.digitalservicestax.data.TestSampleData.{sampleCompanyRegWrapper, sampleReg, utrLookupCompanyRegWrapper}
 import uk.gov.hmrc.digitalservicestax.data._
 
 trait TestDstService extends DSTService[Id] {

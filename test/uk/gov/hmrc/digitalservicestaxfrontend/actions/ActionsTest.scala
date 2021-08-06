@@ -36,6 +36,7 @@ import uk.gov.hmrc.auth.core.{AffinityGroup, CredentialRole, Enrolments, PlayAut
 import uk.gov.hmrc.digitalservicestax.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
+import uk.gov.hmrc.digitalservicestax.views.html.{ErrorTemplate, Layout}
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
@@ -62,7 +63,9 @@ class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with Confi
     wireMockServer.stop()
   }
 
-  lazy val action = new AuthorisedAction(mcc, authConnector)(appConfig, global, messagesApi)
+  lazy val layout = app.injector.instanceOf[Layout]
+  lazy val errorTemplate = app.injector.instanceOf[ErrorTemplate]
+  lazy val action = new AuthorisedAction(mcc, layout, authConnector)(appConfig, global, messagesApi)
 
   "it should test an authorised action against auth connector retrievals" in {
     forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole, ag: AffinityGroup) =>
@@ -195,8 +198,6 @@ class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with Confi
 
     implicit val conf: AppConfig = appConfig
 
-    import uk.gov.hmrc.digitalservicestax.views
-
-    msg mustEqual views.html.error_template(page, heading, message)
+    msg mustEqual errorTemplate(page, heading, message)
   }
 }
