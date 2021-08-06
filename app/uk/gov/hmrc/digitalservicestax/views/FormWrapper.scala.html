@@ -45,7 +45,7 @@
     ))
   }
 
-  @if(breadcrumbs.isEmpty){
+  @if(breadcrumbs.flatten.isEmpty && !keyList.headOption.contains("global-revenues") ){
     @govukBackLink(BackLink(
         href = "/digital-services-tax/",
         content = HtmlContent(messages(List(s"back-to-service-page","back")))
