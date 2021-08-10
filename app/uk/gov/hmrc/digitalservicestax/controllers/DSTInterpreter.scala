@@ -34,7 +34,6 @@ import play.twirl.api.{Html, HtmlFormat}
 import shapeless.tag
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.views
 import uk.gov.hmrc.digitalservicestax.views.html.{FormWrapper, Layout}
 import uk.gov.hmrc.digitalservicestax.views.html.uniform._
 import tag.@@
@@ -221,7 +220,7 @@ class DSTInterpreter @Inject()(
           existingValues,
           errors,
           messages
-        )(messages, request).some
+        )(request).some
       }
 
     }
@@ -355,7 +354,7 @@ class DSTInterpreter @Inject()(
       data: Input,
       errors: ErrorTree,
       messages: UniformMessages[Html]
-    ): Option[Html] = Some(standardField(pageKey,errors,"",messages)(tell.getOrElse(Html(""))))
+    ): Option[Html] = Some(standardField(pageKey,errors,messages)(tell.getOrElse(Html(""))))
   }
 
 

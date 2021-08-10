@@ -20,12 +20,12 @@
 )
 
 
-@(key: List[String], options: Seq[String], existing: Set[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty )(implicit messagesDupe: UniformMessages[Html], request: Request[AnyContent])
+@(key: List[String], options: Seq[String], existing: Set[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty )(implicit request: Request[AnyContent])
 
 @keyNoDots=@{key.mkString("-")}
 @inlineCheckboxKeys=@{(key.mkString(".") == "loan-amount.estimate")}
 
-@standard_field(key, errors, "checkboxes", messages, false) {
+@standard_field(key, errors, messages, false) {
 
     @govukCheckboxes(Checkboxes(
         fieldset = Some(Fieldset(

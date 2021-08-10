@@ -22,8 +22,7 @@ import ltbs.uniform.interpreters.playframework._
 import play.api.i18n.MessagesApi
 import play.api.mvc.Request
 import play.twirl.api.Html
-import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
-import uk.gov.hmrc.digitalservicestax.views
+import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import uk.gov.hmrc.digitalservicestax.views.html.ErrorTemplate
 
 @Singleton

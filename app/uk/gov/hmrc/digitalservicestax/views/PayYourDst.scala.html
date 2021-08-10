@@ -24,7 +24,7 @@
 
 
 @govukBackLink(BackLink(
-    href = s"${uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()}",
+    href = s"${uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index}",
     content = HtmlContent(message("common.back"))
 ))
 
@@ -44,7 +44,7 @@
     <a href="https://www.gov.uk/guidance/pay-your-digital-services-tax" target="_blank">@message("pay-your-dst.how-to-pay.2")</a>.
 </p>
 <p class="govuk-body">
-    <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()" class="govuk-link">
+    <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index" class="govuk-link">
         @message("pay-your-dst.back-to-details")
     </a>
 </p>

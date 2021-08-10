@@ -53,6 +53,7 @@ class JourneyStateStoreImpl @Inject() (
 )(implicit appConfig: AppConfig, ec: ExecutionContext) extends JourneyStateStore with Store {
   import JsonConversion.journeyStateFormatter
 
+  val logger = Logger(getClass)
   override val expireAfterSeconds: Long = appConfig.mongoJourneyStoreExpireAfter.toSeconds
   override val cacheRepository: CacheMongoRepository =
     new CacheMongoRepository("journeyStateStore", expireAfterSeconds)(mongo.mongoConnector.db, ec)
@@ -66,7 +67,7 @@ class JourneyStateStoreImpl @Inject() (
       Try((b \ cacheRepositoryKey).as[JourneyState]) match {
         case Success(state) => state
         case Failure(NonFatal(ex)) => {
-          Logger.info(s"Problem reading JourneyState from db, ${ex.getMessage}")
+          logger.info(s"Problem reading JourneyState from db, ${ex.getMessage}")
           JourneyState()
         }
       }

@@ -21,7 +21,7 @@ import ltbs.uniform.UniformMessages
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import ltbs.uniform.interpreters.playframework._
 import cats.syntax.semigroup._
 import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut

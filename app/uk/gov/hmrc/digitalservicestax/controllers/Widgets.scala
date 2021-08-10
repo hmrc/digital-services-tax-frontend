@@ -16,28 +16,14 @@
 
 package uk.gov.hmrc.digitalservicestax.controllers
 
-import cats.data.Validated
-import cats.implicits._
-import enumeratum._
 import ltbs.uniform._
-import ltbs.uniform.common.web.{PageIn, PageOut, WebAsk, WebInteraction, WebMonad, WebTell}
+import ltbs.uniform.common.web.{WebAsk, WebTell}
 import ltbs.uniform.interpreters.playframework.Breadcrumbs
-import ltbs.uniform.validation.Rule._
-import ltbs.uniform.validation._
 import play.twirl.api.Html
-import play.twirl.api.HtmlFormat.Appendable
-import shapeless.tag
 import uk.gov.hmrc.digitalservicestax._
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.frontend.Kickout
-import uk.gov.hmrc.digitalservicestax.frontend.RichAddress
-import java.time.LocalDate
-
-import play.api.mvc.{AnyContent, Request}
-import tag.@@
-
-import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.digitalservicestax.frontend.{Kickout, RichAddress}
 
 //@ImplementedBy(classOf[WidgetsImpl])
 trait Widgets {

@@ -35,7 +35,7 @@ import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,10 +46,11 @@ class AuthorisedAction @Inject()(
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext, val messagesApi: MessagesApi)
   extends ActionBuilder[AuthorisedRequest, AnyContent] with ActionRefiner[Request, AuthorisedRequest] with AuthorisedFunctions {
 
+  val logger = Logger(getClass)
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
     import ltbs.uniform.interpreters.playframework.RichPlayMessages
     implicit val req: Request[A] = request
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     implicit val msg: UniformMessages[Html] = messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+|
       UniformMessages.bestGuess.map(HtmlFormat.escape)
 
@@ -66,7 +67,7 @@ class AuthorisedAction @Inject()(
 
     } recover {
       case af: UnsupportedAffinityGroup =>
-        Logger.warn(s"invalid account affinity type, with message ${af.msg}, for reason ${af.reason}",
+        logger.warn(s"invalid account affinity type, with message ${af.msg}, for reason ${af.reason}",
           af)
         Left(Ok(
           layout(
@@ -75,7 +76,7 @@ class AuthorisedAction @Inject()(
           )(views.html.errors.incorrect_account_affinity()(msg))
         ))
       case ex: UnsupportedCredentialRole =>
-        Logger.warn(
+        logger.warn(
           s"unsupported credential role on account, with message ${ex.msg}, for reason ${ex.reason}",
           ex)
         Left(Ok(
@@ -85,7 +86,7 @@ class AuthorisedAction @Inject()(
           )(views.html.errors.incorrect_account_cred_role()(msg))
         ))
       case _ : NoActiveSession =>
-        Logger.info(s"Recover - no active session")
+        logger.info(s"Recover - no active session")
         Left(
           Redirect(routes.AuthenticationController.signIn())
         )

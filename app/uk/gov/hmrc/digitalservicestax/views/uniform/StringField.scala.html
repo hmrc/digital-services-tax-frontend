@@ -86,7 +86,7 @@
     } else Option.empty[Hint]
 }
 
-    @standardField(key, errors, "string", messages, false, false) {
+    @standardField(key, errors, messages, false, false) {
 
             @govukInput(Input(
                 id = s"${key.mkString("_")}-input",

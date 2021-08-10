@@ -17,8 +17,8 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.data
 
 import java.time.LocalDate
-
 import com.outworkers.util.samplers._
+import enumeratum.EnumFormats
 import enumeratum.scalacheck._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Assertion, FlatSpec, Matchers, OptionValues}

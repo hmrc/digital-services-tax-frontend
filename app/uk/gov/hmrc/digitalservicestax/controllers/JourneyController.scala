@@ -35,8 +35,8 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.views.html.{AccessibilityStatement, Landing, Layout}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
+import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HeaderCarrier
 
 @Singleton
@@ -48,7 +48,8 @@ class JourneyController @Inject()(
   layout: Layout,
   landing: Landing,
   accessibilityStatement: AccessibilityStatement,
-  val mongo: play.modules.reactivemongo.ReactiveMongoApi
+  val mongo: play.modules.reactivemongo.ReactiveMongoApi,
+  defaultActionBuilder: DefaultActionBuilder
 )(
   implicit ec: ExecutionContext,
   val messagesApi: MessagesApi,
@@ -92,7 +93,7 @@ class JourneyController @Inject()(
     }
   }
 
-  def accessibilityStatement: Action[AnyContent] = Action { implicit request =>
+  def accessibilityStatement: Action[AnyContent] = defaultActionBuilder { implicit request =>
     implicit val msg: UniformMessages[Html] =
       implicitly[Messages].convertMessagesTwirlHtml(false)
     Ok(accessibilityStatement(s"${msg("accessibility-statement.title")}"))
