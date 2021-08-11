@@ -29,7 +29,7 @@
 
 <p class="govuk-body">@messages(s"$key.email", email)</p>
 
-<p class="govuk-body jsonly">
+<p class="govuk-body jsonly print-hide">
     <a href="javascript:window.print()" class="govuk-link">@messages(s"$key.print-save")</a>
 </p>
 
@@ -51,11 +51,11 @@
 <p class="govuk-body">
     @messages(
         s"$key.ccm-email",
-        Html("<a class='govuk-link' href=mailto:ccgdstmailbox@hmrc.gov.uk>ccgdstmailbox@hmrc.gov.uk</a>")
+        Html("<a class='govuk-link' href='mailto:ccgdstmailbox@hmrc.gov.uk'>ccgdstmailbox@hmrc.gov.uk</a>")
     )
 </p>
 
-<p class="govuk-body">
+<p class="govuk-body print-hide">
     <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.AuthenticationController.signOut()">
         @messages("common.feedback")
     </a>

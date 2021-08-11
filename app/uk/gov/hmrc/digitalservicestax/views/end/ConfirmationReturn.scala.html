@@ -21,6 +21,7 @@
 )
 
 @(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period, printableCYA: Option[Html])(implicit messages: UniformMessages[Html])
+<div id="print-submission">
 
 @printableCYA.map { printable =>
     <div class="print-only">@printable</div>
@@ -53,3 +54,4 @@
     </a>
     @messages("common.thirty-seconds")
 </p>
+</div>

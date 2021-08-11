@@ -11,19 +11,20 @@ $hmrc-assets-path: "/digital-services-tax/assets/lib/hmrc-frontend/hmrc/";
 }
 
 @media print {
-  #global-header {
+  .govuk-header {
     display: none;
   }
-  .print-hide, a {
+  .print-hide, .govuk-footer a {
     display: none;
   }
   .phase-banner a {
     display: inline;
   }
-  .govuk-grid-column-two-thirds > div.print-only {
+  .govuk-grid-column-two-thirds #print-submission > div.print-only {
     display: block;
   }
-  .govuk-grid-column-two-thirds > :not(.print-only), a {
+  .govuk-grid-column-two-thirds #print-submission > :not(.print-only),
+  .govuk-grid-column-two-thirds #print-submission a {
     display: none;
   }
 }
