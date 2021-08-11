@@ -18,7 +18,7 @@ package uk.gov.hmrc.digitalservicestax
 package controllers
 
 import cats.implicits.catsKernelOrderingForOrder
-import ltbs.uniform.{UniformMessages, _}
+import ltbs.uniform._
 import ltbs.uniform.common.web._
 import play.api.data.Form
 import play.api.data.Forms._
@@ -69,13 +69,6 @@ class ReturnsController @Inject()(
   import interpreter._
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
-  // private implicit def autoGroupListingTell = new ListingTell[Html, GroupCompany] {
-  //   def apply(rows: List[ListingTellRow[GroupCompany]], messages: UniformMessages[Html]): Html =
-  //     views.html.uniform.listing(rows.map {
-  //       case ListingTellRow(value, editLink, deleteLink) => (HtmlFormat.escape(value.name), editLink, deleteLink)
-  //     }, messages)
-  // }
-
   private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
     override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(checkYourAnswersRet(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
@@ -101,7 +94,6 @@ class ReturnsController @Inject()(
     implicit request: AuthorisedRequest[AnyContent] =>
       implicit val msg: UniformMessages[Html] = messages(request)
 
-      //TODO Check print feature from returns
       //TODO Cache radio button selection
 
        implicit val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =

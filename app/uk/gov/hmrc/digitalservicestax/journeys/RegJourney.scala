@@ -45,18 +45,19 @@ object RegJourney {
   ) = {
 
     for {
-      globalRevenues <- ask[Boolean]("global-revenues")
-      _ <- end("global-revenues-not-eligible", Kickout("global-revenues-not-eligible")) unless globalRevenues
-      ukRevenues <- ask[Boolean]("uk-revenues")
-      _ <- end("uk-revenues-not-eligible", Kickout("uk-revenues-not-eligible")) unless ukRevenues
+//      globalRevenues <- ask[Boolean]("global-revenues")
+      _ <- end("global-revenues-not-eligible", Kickout("global-revenues-not-eligible")) unless ask[Boolean]("global-revenues")
+//      ukRevenues <- ask[Boolean]("uk-revenues")
+      _ <- end("uk-revenues-not-eligible", Kickout("uk-revenues-not-eligible")) unless ask[Boolean]("uk-revenues")
       companyRegWrapper <- convert(backendService.lookupCompany()) flatMap { // gets a CompanyRegWrapper but converts to a company
 
         // found a matching company
         case Some(companyRW) =>
           for {
-            confirmCompany <- interact[Boolean]("confirm-company-details", companyRW.company)
+//            confirmCompany <- interact[Boolean]("confirm-company-details", companyRW.company)
             //TODO Here we need to sign the user out
-            _ <- if (!confirmCompany) { end("details-not-correct", Kickout("details-not-correct")) } else { pure(()) }
+//            _ <- if (!confirmCompany) { end("details-not-correct", Kickout("details-not-correct")) } else { pure(()) }
+            _ <- end("details-not-correct", Kickout("details-not-correct")) unless interact[Boolean]("confirm-company-details", companyRW.company)
           } yield companyRW // useSafeId is false, no utr or safeId sent
 
         // no matching company found

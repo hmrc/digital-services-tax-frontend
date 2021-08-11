@@ -119,16 +119,4 @@
                 } else Option.empty[PrefixOrSuffix]
             ))
 
-@*            <input *@
-@*                class="@{inputClass}@if(errors){ form-control-error}"*@
-@*                id="@{key.mkString("_")}-input"*@
-@*                @if(telInput){ inputmode="numeric" pattern="[0-9]*" }*@
-@*                name="@{key.mkString(".")}"*@
-@*                value="@{values}"*@
-@*                @autoFields.map { f => autocomplete=@f }*@
-@*                @if(autoComplete){autocomplete="@{autoComplete}"}*@
-@*                @if(currencyInput){inputMode="decimal"}*@
-@*                @if(percentageInput){inputMode="numeric" pattern="[0-9]*"}*@
-@*            />*@
-
     }

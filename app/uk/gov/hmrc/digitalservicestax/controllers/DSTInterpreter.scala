@@ -245,7 +245,6 @@ class DSTInterpreter @Inject()(
       errors: ErrorTree,
       messages: UniformMessages[Html]
     ): Option[Html] = {
-      // TODO pass thru fieldKey
       address(
         fieldKey,
         data,
@@ -513,7 +512,6 @@ class DSTInterpreter @Inject()(
     }{x => x: BigDecimal}
 
   implicit def postcodeField= validatedString(Postcode)(twirlStringFields(
-    //TODO Check 'form-control-1-4' class it could be 'postcode' instead
     customRender = Some(stringField(_,_,_,_,_,"form-control form-control-1-4"))
   ))
 

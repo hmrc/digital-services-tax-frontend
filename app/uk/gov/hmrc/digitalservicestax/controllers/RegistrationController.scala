@@ -61,7 +61,6 @@ class RegistrationController @Inject()(
 
   import interpreter._
 
-  /// TODO: Make Luke fix rerunOnPriorStateChange
   implicit val futureAdapter = FutureAdapter[Html].alwaysRerun
 
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
