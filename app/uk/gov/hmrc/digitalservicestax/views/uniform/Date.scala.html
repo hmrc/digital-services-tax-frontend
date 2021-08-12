@@ -23,14 +23,14 @@
 
 @(key: List[String], values: UfInput, errors: ErrorTree, messages: UniformMessages[Html])
 
+@nonFieldSpecificErrors=@{List("maximum-date","minimum-date", "not-a-date","fixed-maximum-date")}
 
 @fields = @{List("day","month","year")}
 @fieldError(field:String) = {
     @{if(errors.values.flatMap(_.toList).map(_.msg.toLowerCase).mkString.contains(field.toLowerCase)) {
-        "govuk-input--error"
-    } else if (errors.values.map(_.toList).nonEmpty &&
-            !errors.values.flatMap(_.toList).map(_.msg.toLowerCase.split('.')(0)).toList.intersect(fields)) {
-        "govuk-input--error"
+        s"govuk-input--error foo-$field FOOO"
+    } else if (errors.values.flatMap(_.toList).map(_.msg.toLowerCase).toList.intersect(nonFieldSpecificErrors)) {
+        s"govuk-input--error bar-$field BAR"
     }}
 }
 
@@ -73,7 +73,9 @@
             value = Some(s"${values.valueAt(field).flatMap(_.headOption.map(_.trim)).getOrElse("")}"),
             pattern = Some("[0-9]*"),
             inputmode = Some("numeric"),
-            classes = if(field == "year"){"govuk-input--width-4"} else {"govuk-input--width-2"}
+            classes = if(field == "year"){s"govuk-input--width-4 ${fieldError(field)}"}
+                      else {s"govuk-input--width-2 ${fieldError(field)}"}
+
 
         )
     }.toSeq

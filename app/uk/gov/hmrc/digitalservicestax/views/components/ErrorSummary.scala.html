@@ -36,13 +36,15 @@
 
 @dateKeys=@{
     List(
-        "accounting-period-end-date"
+        "accounting-period-end-date",
+        "liability-start-date"
     )
 }
 
 @dateFieldAnchor(path: NonEmptyList[InputPath], errMsg: NonEmptyList[ErrorMsg])=@{
     val field = List("day", "month", "year").find(x => errMsg.head.msg.contains(x))
-    field.map(x => s"""#${(keyList ++ path.head).mkString("_")}-$x""").getOrElse("")
+    val anchorPrefix = s"""#${(keyList ++ path.head).mkString("_")}"""
+    field.map(x => s"""$anchorPrefix-$x""").getOrElse(s"""$anchorPrefix-day""")
 }
 @if(errors.nonEmpty) {
     @govukErrorSummary(
