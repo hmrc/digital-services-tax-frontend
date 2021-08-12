@@ -52,34 +52,4 @@
             }
         )
     )
-
-@*<div class="checkboxes@if(inlineCheckboxKeys){--inline}">*@
-  @*@for((opt,num) <- if(key.head == "about-loan"){options.reverse.zipWithIndex} else {options.zipWithIndex}) {*@
-    @*<div class="checkboxes__item multiple-choice" data-target="@keyNoDots-@opt">*@
-
-      @*<input*@
-        @*class="checkboxes__input"*@
-        @*id="@keyNoDots-@num"*@
-        @*name="@{key.mkString(".")}"*@
-        @*type="checkbox"*@
-        @*value="@opt"*@
-        @*@if(existing.exists(_.toUpperCase == opt.toUpperCase())){ checked }*@
-      @*>*@
-      @*<label class="label checkboxes__label form-label" for="@keyNoDots-@num">*@
-        @*<span>@messages.decompose({key :+ opt}.mkString("."))</span>*@
-        @*@messages.get({key :+ opt :+ "hint"}.mkString(".")).map { hint =>*@
-          @*<span id="@keyNoDots-@opt-item-hint" class="form-hint checkboxes__hint">*@
-            @*@hint*@
-          @*</span>*@
-      @*}*@
-      @*</label>*@
-    @*</div>*@
-
-    @*@if(conditional.isDefinedAt(opt)) {*@
-      @*<div id="@keyNoDots-@opt" class="checkboxes__conditional panel panel-border-narrow js-hidden">*@
-        @*@conditional(opt)*@
-      @*</div>*@
-    @*}*@
-  @*}*@
-  @*</div>*@
 }
