@@ -165,7 +165,7 @@ object RegJourney {
             "check-liability-date",
             customContent = message("check-liability-date.required", groupMessage)
           ) flatMap {
-              case true => pure(LocalDate.of(2020, 4, 1))
+              case true => pure(LocalDate.of(2020, 4, 1)) // this is the policy start and will not change
               case false =>
                 ask[LocalDate]("liability-start-date",
                   validation =
