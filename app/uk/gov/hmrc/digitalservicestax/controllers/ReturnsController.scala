@@ -17,41 +17,48 @@
 package uk.gov.hmrc.digitalservicestax
 package controllers
 
-import data._
-import data.BackendAndFrontendJson._
-import config.AppConfig
-import connectors.{DSTConnector, MongoPersistence}
 import cats.implicits.catsKernelOrderingForOrder
-
-import javax.inject.Inject
 import ltbs.uniform._
-import common.web._
-import interpreters.playframework._
+import ltbs.uniform.common.web._
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.data.FormBinding.Implicits._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
-import play.twirl.api.{Html, HtmlFormat}
-
-import scala.concurrent.{ExecutionContext, Future}
+import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, MongoPersistence}
+import uk.gov.hmrc.digitalservicestax.data.Period.Key
+import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{AuthorisedAction, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import play.api.data.Form
-import play.api.data.Forms._
-import uk.gov.hmrc.digitalservicestax.data.Period.Key
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
+import uk.gov.hmrc.http.HttpClient
+import views.html.cya.CheckYourAnswersRet
+import views.html.end.ConfirmationReturn
+import views.html.ResubmitAReturn
+
+import javax.inject.Inject
+import uk.gov.hmrc.digitalservicestax.views.html.Layout
+
+import scala.concurrent.{ExecutionContext, Future}
+
 
 class ReturnsController @Inject()(
   authorisedAction: AuthorisedAction,
   http: HttpClient,
   servicesConfig: ServicesConfig,
   mongo: ReactiveMongoApi,
+  interpreter: DSTInterpreter,
+  checkYourAnswersRet: CheckYourAnswersRet,
+  confirmationReturn: ConfirmationReturn,
+  layout: Layout,
+  resubmitAReturn: ResubmitAReturn,
   val authConnector: AuthConnector,
-  val messagesApi: MessagesApi  
+  val messagesApi: MessagesApi
 )(implicit
-  appConfig: AppConfig,
   ec: ExecutionContext
 ) extends ControllerHelpers
     with I18nSupport
@@ -59,24 +66,19 @@ class ReturnsController @Inject()(
     with FrontendHeaderCarrierProvider
 {
 
-  val interpreter = DSTInterpreter(appConfig, this, messagesApi)
+  import interpreter._
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
-  private implicit def autoGroupListingTell = new ListingTell[Html, GroupCompany] {
-    def apply(rows: List[ListingTellRow[GroupCompany]], messages: UniformMessages[Html]): Html =
-      views.html.uniform.listing(rows.map {
-        case ListingTellRow(value, editLink, deleteLink) => (HtmlFormat.escape(value.name), editLink, deleteLink)
-      }, messages)
+  private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
+    override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(checkYourAnswersRet(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
   }
 
-  private implicit val cyaRetTell = new GenericWebTell[CYA[(Return, Period, CompanyName)], Html] {
-    override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Html =
-      views.html.cya.check_your_return_answers(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages)
-  }
-
-  private implicit val confirmRetTell = new GenericWebTell[Confirmation[(Return, CompanyName, Period, Period, Option[Html])], Html] {
-    override def render(in: Confirmation[(Return, CompanyName, Period, Period, Option[Html])], key: String, messages: UniformMessages[Html]): Html =
-      views.html.end.confirmation_return(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period, in.value._5: Option[Html])(messages)
+  private implicit val confirmRetTell = new WebTell[Html, Confirmation[(Return, CompanyName, Period, Period, Option[Html])]] {
+    override def render(in: Confirmation[(Return, CompanyName, Period, Period, Option[Html])], key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(
+        confirmationReturn(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period, in.value._5: Option[Html])(messages)
+      )
   }
 
   private def applyKey(key: Key): Period.Key = key
@@ -90,14 +92,16 @@ class ReturnsController @Inject()(
 
   def showAmendments(): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
-      implicit val msg: UniformMessages[Html] = interpreter.messages(request)
+      implicit val msg: UniformMessages[Html] = messages(request)
 
-      implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
-        MongoPersistence[AuthorisedRequest[AnyContent]](
-          mongo,
-          collectionName = "uf-amendments-returns",
-          appConfig.mongoJourneyStoreExpireAfter
-        )(_.internalId)
+      //TODO Cache radio button selection
+
+       implicit val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
+         MongoPersistence[AuthorisedRequest[AnyContent]](
+           mongo,
+           collectionName = "uf-amendments-returns",
+           appConfig.mongoJourneyStoreExpireAfter
+         )(_.internalId)
 
       backend.lookupRegistration().flatMap{
         case None      => Future.successful(NotFound)
@@ -107,10 +111,10 @@ class ReturnsController @Inject()(
                case Nil =>
                 NotFound
                case periods =>
-                Ok(views.html.main_template(
-                    title =
-                      s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
-                )(views.html.resubmit_a_return("resubmit-a-return", periods, periodForm)(msg, request)))
+                Ok(layout(
+                    pageTitle =
+                      Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
+                )(resubmitAReturn("resubmit-a-return", periods, periodForm)(msg, request)))
              }
             }
           }
@@ -118,7 +122,7 @@ class ReturnsController @Inject()(
 
   def postAmendments(): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
-    implicit val msg: UniformMessages[Html] = interpreter.messages(request)
+    implicit val msg: UniformMessages[Html] = messages(request)
       backend.lookupAmendableReturns().flatMap { outstandingPeriods =>
         outstandingPeriods.toList match {
           case Nil =>
@@ -127,10 +131,10 @@ class ReturnsController @Inject()(
             periodForm.bindFromRequest.fold(
               formWithErrors => {
                 Future.successful(
-                  BadRequest(views.html.main_template(
-                  title =
-                    s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
-                )(views.html.resubmit_a_return("resubmit-a-return", periods, formWithErrors)(msg, request))
+                  BadRequest(layout(
+                  pageTitle =
+                    Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
+                )(resubmitAReturn("resubmit-a-return", periods, formWithErrors)(msg, request))
                   )
                 )
               },
@@ -155,7 +159,6 @@ class ReturnsController @Inject()(
   def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
       implicit val msg: UniformMessages[Html] = interpreter.messages(request)
-    import interpreter.{appConfig => _, _}
     import journeys.ReturnJourney._
 
     val periodKey = Period.Key(periodKeyString)
@@ -167,13 +170,9 @@ class ReturnsController @Inject()(
           periods.find(_.key == periodKey) match {
             case None => Future.successful(NotFound)
             case Some(period) =>
-              val playProgram: WebMonad[Return, Html] = returnJourney[WM](
-                create[ReturnTellTypes, ReturnAskTypes](messages(request)),
-                period,
-                reg
-              )
+              interpret(returnJourney(period, reg)).run(targetId){ ret =>
               val purgeStateUponCompletion = true
-              playProgram.run(targetId, purgeStateUponCompletion , config = JourneyConfig(askFirstListItem = true)) { ret =>
+
                 backend.submitReturn(period, ret).map{ _ =>
                   persistence.cacheReturn(ret, purgeStateUponCompletion)
                   Redirect(routes.ReturnsController.returnComplete(periodKeyString))
@@ -185,7 +184,7 @@ class ReturnsController @Inject()(
   }
 
   def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = authorisedAction.async { implicit request =>
-    implicit val msg: UniformMessages[Html] = interpreter.messages(request)
+    implicit val msg: UniformMessages[Html] = messages(request)
     val submittedPeriodKey = Period.Key(submittedPeriodKeyString)
     for {
       ret <- persistence.retrieveCachedReturn
@@ -197,13 +196,13 @@ class ReturnsController @Inject()(
         case None => NotFound
         case Some(period) =>
           val companyName = reg.fold(CompanyName(""))(_.companyReg.company.name)
-          val printableCYA: Option[Html] = ret.map { r => views.html.cya.check_your_return_answers(
+          val printableCYA: Option[Html] = ret.map { r => checkYourAnswersRet(
             "check-your-answers.ret", r, period, companyName, isPrint = true)(msg)}
           Ok(
-            views.html.main_template(
-            title = s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
+            layout(
+              pageTitle = Some(s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
             )(
-              views.html.end.confirmation_return(
+              confirmationReturn(
                 "confirmation",
                 companyName,
                 period,
@@ -215,5 +214,6 @@ class ReturnsController @Inject()(
       }
     }
   }
+
 
 }

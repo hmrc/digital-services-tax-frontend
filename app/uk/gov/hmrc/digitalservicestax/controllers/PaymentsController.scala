@@ -17,23 +17,24 @@
 package uk.gov.hmrc.digitalservicestax.controllers
 
 import cats.implicits.catsKernelOrderingForOrder
+
 import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.twirl.api.Html
-
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.views
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, PayYourDst}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,7 +44,9 @@ class PaymentsController @Inject()(
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
-  val mongo: play.modules.reactivemongo.ReactiveMongoApi
+  val mongo: play.modules.reactivemongo.ReactiveMongoApi,
+  layout: Layout,
+  payYourDst: PayYourDst
 )(
   implicit ec: ExecutionContext,
   val messagesApi: MessagesApi,
@@ -67,16 +70,16 @@ class PaymentsController @Inject()(
         )
       case Some(reg) if reg.registrationNumber.isDefined =>
         backend.lookupOutstandingReturns().map { periods =>
-          Ok(views.html.main_template(
-            title =
-              s"${msg("common.title.short")} - ${msg("common.title")}"
-          )(views.html.pay_your_dst(reg.registrationNumber, periods.toList.sortBy(_.start))(msg)))
+          Ok(layout(
+            pageTitle =
+              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+          )(payYourDst(reg.registrationNumber, periods.toList.sortBy(_.start))(msg)))
         }
       case Some(reg) =>
         Future.successful(
-          Ok(views.html.main_template(
-            title =
-              s"${msg("common.title.short")} - ${msg("common.title")}"
+          Ok(layout(
+            pageTitle =
+              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
           )(views.html.end.pending()(msg)))
         )
     }

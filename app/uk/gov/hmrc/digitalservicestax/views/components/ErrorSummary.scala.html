@@ -1,0 +1,90 @@
+@import cats.implicits._
+@import cats.data.NonEmptyList
+@import ltbs.uniform._
+@import uk.gov.hmrc.digitalservicestax.data.Activity
+
+@this(
+        govukErrorSummary: GovukErrorSummary
+)
+
+@(keyList: List[String], errors: ErrorTree, messages: UniformMessages[Html])
+
+@radioKeys=@{
+    List(
+        "global-revenues",
+        "uk-revenues",
+        "check-company-registered-office-address",
+        "check-unique-taxpayer-reference",
+        "confirm-company-details",
+        "check-contact-address",
+        "company-contact-address",
+        "check-liability-date",
+        s"report-${Activity.toUrl(Activity.SocialMedia)}-loss",
+        s"report-${Activity.toUrl(Activity.SearchEngine)}-loss",
+        s"report-${Activity.toUrl(Activity.OnlineMarketplace)}-loss",
+        s"report-${Activity.toUrl(Activity.SocialMedia)}-alternative-charge",
+        s"report-${Activity.toUrl(Activity.SearchEngine)}-alternative-charge",
+        s"report-${Activity.toUrl(Activity.OnlineMarketplace)}-alternative-charge",
+        "report-alternative-charge",
+        "report-cross-border-transaction-relief",
+        "repayment",
+        "manage-companies",
+        "select-activities",
+        "check-if-group"
+    )
+}
+
+@dateKeys=@{
+    List(
+        "accounting-period-end-date",
+        "liability-start-date"
+    )
+}
+
+@dateFieldAnchor(path: NonEmptyList[InputPath], errMsg: NonEmptyList[ErrorMsg])=@{
+    val field = List("day", "month", "year").find(x => errMsg.head.msg.contains(x))
+    val anchorPrefix = s"""#${(keyList ++ path.head).mkString("_")}"""
+    field.map(x => s"""$anchorPrefix-$x""").getOrElse(s"""$anchorPrefix-day""")
+}
+@if(errors.nonEmpty) {
+    @govukErrorSummary(
+
+        ErrorSummary(
+            errorList = errors.flatMap { case (path, errormsg) =>
+               val target = if(
+                   (keyList ++ path.head).mkString("_") == "manage-companies_add_company_name" ||
+                   (keyList ++ path.head).mkString("_") == "manage-companies_add_company_utr" ||
+                   (keyList ++ path.head).mkString("_").matches("^manage-companies_edit_([0-9].*)_company_(name|utr)$")
+               ) {
+                   s"""#${keyList.last ++ "_" ++ path.head.mkString("_")}-input"""
+               } else if(radioKeys.contains(keyList.head) || (keyList ++ path.head).mkString("-").endsWith("bankAccount")) {
+                   s"""#${(keyList ++ path.head).mkString("-")}-0"""
+               } else if((keyList ++ path.head).mkString("_").endsWith("countryCode")) {
+                   "#location-autocomplete"
+               } else if(dateKeys.contains(keyList.head)) {
+                   dateFieldAnchor(path, errormsg)
+               } else {
+                   s"""#${(keyList ++ path.head).mkString("_")}-input"""
+               }
+               errormsg.toList.map { msg =>
+                    ErrorLink(
+                      href = Some(target),
+                      content = Text(if(path.map(x => x.nonEmpty).head) {
+                        if(path.length > 1) {
+                            msg.prefixWith(List(s"""${keyList.head}.${path.toList.flatten.mkString(".")}""")).render(messages).toString
+                        } else {
+                            msg.prefixWith(path.map(x => s"""${keyList.head}.${x.mkString(".")}""").toList).render(messages).toString
+                        }
+                    } else {
+                        msg.prefixWith(keyList).render(messages).toString
+                    }),
+                    attributes = Map("class" ->"govuk-link")
+                    )
+               }
+            }.toSeq,
+            title = HtmlContent(messages(List(s"${keyList.mkString(".")}.there.is.a.problem", "there.is.a.problem")))
+        )
+    )
+
+}
+

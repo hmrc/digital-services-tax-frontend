@@ -19,23 +19,24 @@ package controllers
 
 import data._
 import connectors._
-
 import akka.http.scaladsl.model.headers.LinkParams.title
 import cats.implicits._
 import config.AppConfig
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
-import play.api.i18n.{I18nSupport, MessagesApi, Messages}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.Html
+
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.digitalservicestax.views.html.{AccessibilityStatement, Landing, Layout}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
+import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HeaderCarrier
 
 @Singleton
@@ -44,7 +45,11 @@ class JourneyController @Inject()(
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
-  val mongo: play.modules.reactivemongo.ReactiveMongoApi
+  layout: Layout,
+  landing: Landing,
+  accessibilityStatement: AccessibilityStatement,
+  val mongo: play.modules.reactivemongo.ReactiveMongoApi,
+  defaultActionBuilder: DefaultActionBuilder
 )(
   implicit ec: ExecutionContext,
   val messagesApi: MessagesApi,
@@ -71,27 +76,27 @@ class JourneyController @Inject()(
           outstandingPeriods <- backend.lookupOutstandingReturns()
           amendedPeriods <- backend.lookupAmendableReturns()
         } yield {
-          Ok(views.html.main_template(
-            title = s"${msg("landing.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}",
-            mainClass = Some("full-width")
-          )(views.html.landing(
+          Ok(layout(
+            pageTitle = Some(s"${msg("landing.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"),
+            useFullWidth = true
+          )(landing(
             reg, outstandingPeriods.toList.sortBy(_.start), amendedPeriods.toList.sortBy(_.start))))
           }
 
       case Some(reg) =>
         Future.successful(
-          Ok(views.html.main_template(
-            title =
-              s"${msg("common.title.short")} - ${msg("common.title")}"
+          Ok(layout(
+            pageTitle =
+              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
           )(views.html.end.pending()(msg)))
         )
     }
   }
 
-  def accessibilityStatement: Action[AnyContent] = Action { implicit request =>
+  def accessibilityStatement: Action[AnyContent] = defaultActionBuilder { implicit request =>
     implicit val msg: UniformMessages[Html] =
       implicitly[Messages].convertMessagesTwirlHtml(false)
-    Ok(views.html.accessibility_statement(s"${msg("accessibility-statement.title")}"))
+    Ok(accessibilityStatement(s"${msg("accessibility-statement.title")}"))
   }
 
 }

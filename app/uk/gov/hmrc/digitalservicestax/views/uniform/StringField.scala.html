@@ -1,0 +1,122 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import cats.implicits._
+@import play.twirl.api.HtmlFormat
+
+@this(
+        standardField: StandardField,
+        govukDetails: GovukDetails,
+        govukInput: GovukInput
+)
+
+@(key: List[String], values: String, errors: ErrorTree, messages: UniformMessages[Html], autoFields: Option[String] = None, inputClass: String = "govuk-!-width-two-thirds")
+
+@keyWithDots=@{key.mkString(".")}
+@headKey=@{key.headOption.getOrElse("")}
+
+@percentageInput=@{
+    headKey === "report-social-media-operating-margin" ||
+    headKey === "report-search-engine-operating-margin" ||
+    headKey === "report-online-marketplace-operating-margin"
+}
+
+@currencyInput=@{
+    headKey === "relief-deducted"||
+    headKey === "allowance-deducted"||
+    headKey === "group-liability"||
+    headKey.contains("company-liabilities")
+}
+
+@telInput=@{key.contains("phoneNumber")}
+
+@autoComplete=@{key match {
+    case k if k.contains("forename") => "given-name"
+    case k if k.contains("surname") => "family-name"
+    case k if k.contains("phoneNumber") => "tel"
+    case k if k.contains("line1") => "address-line1"
+    case k if k.contains("line2") => "address-line2"
+    case k if k.contains("line3") => "address-line3"
+    case k if k.contains("line4") => "address-level4"
+    case k if k.contains("postcode") | k.contains("company-registered-office-postcode") => "postal-code"
+    case k if k.contains("country") => "country-name"
+    case k if k.contains("email") => "email"
+    case _ => ""
+}}
+
+@headHintAndLabel=@{
+    import collection.immutable.Seq
+
+    val headHint = messages.get(s"${key.mkString(".")}.heading.hint").fold(HtmlFormat.empty) { headHint =>
+        Html(s"<span class='govuk-caption-l'>$headHint</span>")
+    }
+    val label = messages.decompose(s"${key.mkString(".")}.heading")
+    HtmlContent(HtmlFormat.fill(Seq(headHint, label)))
+}
+
+@hintAndDetails=@{
+    import collection.immutable.Seq
+
+    val hint = messages.get(s"${key.mkString(".")}.hint")
+    val details = messages.get(s"$keyWithDots.details").map { details =>
+        govukDetails(Details(
+            summary = HtmlContent(messages(s"$keyWithDots.details")),
+            content = HtmlContent(messages(s"$keyWithDots.details.text"))
+        ))
+    }
+    val textSeq = Seq(hint, details).flatten
+
+    if(textSeq.nonEmpty) {
+        Some(Hint(
+            content = HtmlContent(HtmlFormat.fill(textSeq))
+        ))
+    } else Option.empty[Hint]
+}
+
+    @standardField(key, errors, messages, false, false) {
+
+            @govukInput(Input(
+                id = s"${key.mkString("_")}-input",
+                name = s"${key.mkString(".")}",
+                value = Some(values),
+                inputmode = if(telInput || percentageInput){Some("numeric")} else if(currencyInput){Some("decimal")} else None,
+                label = Label(
+                    isPageHeading = if(key.length == 1) true else false,
+                    classes = if(key.length == 1){"govuk-label--l"}else{"govuk-label"},
+                    content = headHintAndLabel
+                ),
+                hint = hintAndDetails,
+                errorMessage =  errors.valueAtRootList.headOption.fold(Option.empty[ErrorMessage]) { error =>
+                    Some(ErrorMessage(
+                    content = HtmlContent(s"${error.prefixWith(key).render(messages)}")
+                    ))
+                },
+               classes = inputClass,
+                autocomplete = if(autoComplete.nonEmpty){Some(autoComplete)} else autoFields,
+                pattern = if(telInput || percentageInput){Some("[0-9]*")} else None,
+                prefix = if(currencyInput){
+                    Some(PrefixOrSuffix(
+                        content = Text("£")
+                    ))
+                } else Option.empty[PrefixOrSuffix],
+                suffix = if(percentageInput){
+                    Some(PrefixOrSuffix(
+                        content = Text("%")
+                    ))
+                } else Option.empty[PrefixOrSuffix]
+            ))
+
+    }

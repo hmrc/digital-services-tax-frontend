@@ -17,12 +17,12 @@
 @()(messages: UniformMessages[Html])
 
 
-<h1 class="heading-xlarge">@messages("registration.pending.title")</h1>
+<h1 class="govuk-heading-l">@messages("registration.pending.title")</h1>
 <p class="govuk-body">@messages("registration.pending.send-email")</p>
 <p class="govuk-body">@messages("registration.pending.not-received")</p>
 <p class="govuk-body">
     @messages("registration.pending.ccm-content")
-    <a href=@messages("registration.pending.ccm-email")>
+    <a href='@messages("registration.pending.ccm-email")' class="govuk-link">
         @messages("registration.pending.ccm-link")
     </a>.
 </p>

@@ -18,10 +18,7 @@ package uk.gov.hmrc.digitalservicestaxfrontend.util
 
 import java.io.File
 import java.time.Clock
-
-import com.softwaremill.macwire.wire
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.bootstrap.config.RunMode
 
 trait TestWiring {
   val appName: String = configuration.get[String]("appName")
@@ -30,7 +27,6 @@ trait TestWiring {
     "auditing.enabled" -> "false",
     "services.auth.port" -> "11111"
   ))
-  lazy val runMode: RunMode = wire[RunMode]
   lazy val environment: Environment = Environment.simple(new File("."))
   lazy val mode = environment.mode
 

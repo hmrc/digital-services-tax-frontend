@@ -29,34 +29,34 @@ case class CachedDstService(
   hodCache: SimpleCaching[(InternalId, String)] = SimpleCaching[(InternalId, String)]()
 )(
   internalId: InternalId
-)(implicit ec: ExecutionContext) extends DSTService[WebMonad[*, Html]] {
+)(implicit ec: ExecutionContext) extends DSTService[WebMonad[Html, *]] {
     val fa = FutureAdapter[Html]()
     import fa._
 
-    def lookupCompany(utr: UTR, postcode: Postcode): WebMonad[Option[CompanyRegWrapper],Html] =
+    def lookupCompany(utr: UTR, postcode: Postcode): WebMonad[Html, Option[CompanyRegWrapper]] =
       alwaysRerun(hodCache[Option[CompanyRegWrapper]]((internalId, "lookup-company-args"), utr, postcode)(
         backend.lookupCompany(utr, postcode)
       ))
 
-    def lookupCompany(): WebMonad[Option[CompanyRegWrapper],Html] =
+    def lookupCompany(): WebMonad[Html, Option[CompanyRegWrapper]] =
       alwaysRerun(hodCache[Option[CompanyRegWrapper]]((internalId, "lookup-company"))(
         backend.lookupCompany()
       ))
 
-    def lookupOutstandingReturns(): WebMonad[Set[Period],Html] = 
+    def lookupOutstandingReturns(): WebMonad[Html, Set[Period]] =
       alwaysRerun(hodCache[Set[Period]]((internalId, "lookup-outstanding-returns"))(
         backend.lookupOutstandingReturns()
       ))
 
-    def lookupRegistration(): WebMonad[Option[Registration],Html] = 
+    def lookupRegistration(): WebMonad[Html, Option[Registration]] =
       alwaysRerun(hodCache[Option[Registration]]((internalId, "lookup-reg"))(
         backend.lookupRegistration()
       ))
 
-    def submitRegistration(reg: Registration): WebMonad[Unit,Html] =
+    def submitRegistration(reg: Registration): WebMonad[Html, Unit] =
       alwaysRerun(backend.submitRegistration(reg))
 
-    def submitReturn(period: Period,ret: Return): WebMonad[Unit,Html] = 
+    def submitReturn(period: Period,ret: Return): WebMonad[Html, Unit] =
       alwaysRerun(backend.submitReturn(period, ret))
 
   }

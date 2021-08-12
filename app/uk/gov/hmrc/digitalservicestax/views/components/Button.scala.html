@@ -1,0 +1,7 @@
+@import uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages
+
+@this(govukButton: GovukButton)
+
+@(msg: List[String])(implicit uniformMessages: UniformMessages[Html], request: Request[_])
+
+@govukButton(Button(content = Text(ufMessagesToPlayMessages.apply(msg))))

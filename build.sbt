@@ -38,8 +38,15 @@ lazy val microservice = Project(appName, file("."))
     resolvers += Resolver.bintrayRepo("hmrc", "releases"),
     scalacOptions -= "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
     TwirlKeys.templateImports ++= Seq(
-      "ltbs.uniform._",
-      "ltbs.uniform.interpreters.playframework._"
+      "ltbs.uniform.{Input => UfInput, _}",
+      "ltbs.uniform.common.web.{Breadcrumbs => UfBreadcrumbs, _}",
+      "ltbs.uniform.interpreters.playframework._",
+      "uk.gov.hmrc.digitalservicestax.views.html.helpers._",
+      "uk.gov.hmrc.digitalservicestax.views.html.Layout",
+      "uk.gov.hmrc.govukfrontend.views.html.components._",
+      "uk.gov.hmrc.govukfrontend.views.html.helpers._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
+      "uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages"
     )
   ).settings(scoverageSettings)
 

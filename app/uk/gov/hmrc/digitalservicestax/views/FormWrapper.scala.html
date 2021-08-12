@@ -1,0 +1,72 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uniform._
+
+@import uk.gov.hmrc.govukfrontend.views.html.components
+
+@this(
+        formHelper: FormWithCSRF,
+        button: components.Button,
+        errorSummary: components.ErrorSummary,
+        govukDetails: GovukDetails,
+        govukBackLink: GovukBackLink,
+        fieldsurround: FieldSurround
+)
+
+@(keyList: List[String], errors: ErrorTree, content: Html, breadcrumbs: UfBreadcrumbs = Nil)(implicit messages: UniformMessages[Html], request: Request[AnyContent])
+
+@key = @{keyList.last}
+@isKickout= @{
+    List(
+        "global-revenues-not-eligible",
+        "uk-revenues-not-eligible",
+        "details-not-correct",
+    ).contains(key)
+}
+@if(!isKickout){
+  @for(back <- breadcrumbs.headOption.flatMap{_.headOption}) {
+    @govukBackLink(BackLink(
+        href = s"$back",
+        content = HtmlContent(messages(List("back-to-" + back.mkString("-"),"common.back")))
+    ))
+  }
+
+  @if(breadcrumbs.flatten.isEmpty && !keyList.headOption.contains("global-revenues") ){
+    @govukBackLink(BackLink(
+        href = "/digital-services-tax/",
+        content = HtmlContent(messages(List(s"back-to-service-page","back")))
+    ))
+  }
+}
+  @formHelper(action = play.api.mvc.Call("post", key), 'novalidate -> "novalidate") {
+    @errorSummary(keyList, errors, messages)
+    @defining((messages.get(s"$key.hint").isDefined, errors.definedAtRoot, messages.get(s"$key.intro").isDefined)){ case (hasHint, hasErrors, hasIntro) =>
+      @fieldsurround(key, content, false /* FIXME */, hasHint, hasErrors, hasIntro)
+    }
+
+    @for((k :: v :: _) <- messages.list(s"$key.details").collect { case x if x.toString.contains("|") => x.toString.split("[|]").toList }) {
+
+        @govukDetails(Details(
+            summary = Text(ufMessagesToPlayMessages.apply(k)),
+            content = Text(ufMessagesToPlayMessages.apply(v))
+        ))
+
+    }
+    @if(!isKickout) {
+        @button(List(s"$key.save-continue", "common.continue"))
+    }
+  }

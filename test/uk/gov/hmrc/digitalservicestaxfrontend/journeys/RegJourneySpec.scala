@@ -18,10 +18,10 @@ package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
 import java.time.LocalDate
 
-import cats.implicits._
 import ltbs.uniform.interpreters.logictable._
 import org.scalatest.{FlatSpec, Matchers}
-import uk.gov.hmrc.digitalservicestax.data._, SampleData._
+import uk.gov.hmrc.digitalservicestax.data._
+import TestSampleData._
 import uk.gov.hmrc.digitalservicestax.journeys.RegJourney
 import uk.gov.hmrc.digitalservicestaxfrontend.util.TestDstService
 
@@ -40,16 +40,9 @@ class RegJourneySpec extends FlatSpec with Matchers {
     case _ => List(CompanyName("Foo Ltd"))
   }
 
-  val defaultInterpreter: TestRegInterpreter = new TestRegInterpreter
-
   "when the global revenue is under £500m we" should "kick the user out" in {
     implicit val sampleBooleanAsk = instances(false)
-
-    val caught = intercept[IllegalStateException] {
-      RegJourney.registrationJourney(new TestRegInterpreter, testService).value.run
-    }
-
-    assert(caught.getMessage.contains("Journey end at global-revenues-not-eligible"))
+    assert(LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.isEmpty)
   }
 
   "when the UK revenue is under £25m we" should "kick the user out" in {
@@ -57,19 +50,12 @@ class RegJourneySpec extends FlatSpec with Matchers {
       case "uk-revenues" => List(false)
       case _ => List(true)
     }
-    val caught = intercept[IllegalStateException] {
-      RegJourney.registrationJourney(new TestRegInterpreter, testService).value.run
-    }
-
-    assert(caught.getMessage.contains("Journey end at uk-revenues-not-eligible"))
+    assert(LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.isEmpty)
   }
 
   "when there is a Company from sign in accepting this" should "give you a Registration for that Company " in {
-    val reg: Registration = RegJourney.registrationJourney(
-      defaultInterpreter,
-      testService).value.run.asOutcome()
-
-    reg.companyReg.company shouldBe sampleCompany
+    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.asOutcome()
+    assert(reg.companyReg.company == sampleCompany)
   }
 
   "when there is no Company from sign in and the user does not supply a UTR we" should "get a Registration with the supplied Company name" in {
@@ -78,12 +64,11 @@ class RegJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
 
-    val reg = RegJourney.registrationJourney(
-      new TestRegInterpreter,
+    val reg = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       new TestDstService {
         override def lookupCompany(): Option[CompanyRegWrapper] = None
       }.get
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.companyReg.company.name shouldBe "Supplied company name"
   }
@@ -94,12 +79,11 @@ class RegJourneySpec extends FlatSpec with Matchers {
       case "check-company-registered-office-address" => List(false)
       case _ => List(true)
     }
-    val reg = RegJourney.registrationJourney(
-      new TestRegInterpreter,
+    val reg = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       new TestDstService {
         override def lookupCompany(): Option[CompanyRegWrapper] = None
       }.get
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.companyReg.company.address shouldBe a[ForeignAddress]
   }
@@ -110,23 +94,21 @@ class RegJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
 
-    val reg = RegJourney.registrationJourney(
-      new TestRegInterpreter,
+    val reg = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       new TestDstService {
         override def lookupCompany(): Option[CompanyRegWrapper] = None
       }.get
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.companyReg.company.address shouldBe a[UkAddress]
   }
 
   "when there is no Company from sign in, but one is found using the UTR, and the user confirms it we" should "get a Registration for that company" in {
-    val reg: Registration = RegJourney.registrationJourney(
-      defaultInterpreter,
+    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       new TestDstService {
         override def lookupCompany(): Option[CompanyRegWrapper] = None
       }.get
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.companyReg.company.name shouldBe utrLookupCompanyName
   }
@@ -137,22 +119,17 @@ class RegJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
 
-    val caught = intercept[IllegalStateException] {
-      RegJourney.registrationJourney(new TestRegInterpreter, testService).value.run
-    }
-
-    assert(caught.getMessage.contains("Journey end at details-not-correct"))
+    assert(LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.isEmpty)
   }
 
   "when there is no Company from sign in, and none found for a supplied UTR we" should "ask the user for a companyName and Address" in {
-    val reg = RegJourney.registrationJourney(
-        defaultInterpreter,
+    val reg = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
         new TestDstService {
           override def lookupCompany(): Option[CompanyRegWrapper] = None
           override def lookupCompany(utr: UTR, postcode: Postcode): Option[CompanyRegWrapper] = None
         }.get
-      ).value.run.asOutcome()
-    
+      )).value.run.asOutcome()
+
     reg.companyReg.company.address shouldBe a[UkAddress]
   }
 
@@ -162,16 +139,11 @@ class RegJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
 
-    val caught = intercept[IllegalStateException] {
-      RegJourney.registrationJourney(
-        new TestRegInterpreter,
+    assert(LogicTableInterpreter.interpret(RegJourney.registrationJourney(
         new TestDstService {
           override def lookupCompany(): Option[CompanyRegWrapper] = None
         }.get
-      ).value.run.asOutcome()
-    }
-
-    assert(caught.getMessage.contains("Journey end at details-not-correct"))
+      )).value.run.isEmpty)
   }
 
   "the Registration" should "have an alternativeContact when user elected to provide one" in {
@@ -180,28 +152,25 @@ class RegJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
 
-    val reg: Registration = RegJourney.registrationJourney(
-      new TestRegInterpreter,
+    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       testService
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.alternativeContact should be ('defined)
   }
 
   "the Registration" should "not have an alternativeContact when user elected not to provide one" in {
-    val reg: Registration = RegJourney.registrationJourney(
-      new TestRegInterpreter,
+    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       testService
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.alternativeContact should be ('empty)
   }
 
   "the Registation" should "have an ultimateParent when the user elected to provide one" in {
-    val reg: Registration = RegJourney.registrationJourney(
-      defaultInterpreter,
+    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       testService
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.ultimateParent should be ('defined)
   }
@@ -212,19 +181,17 @@ class RegJourneySpec extends FlatSpec with Matchers {
       case _ => List(true)
     }
 
-    val reg: Registration = RegJourney.registrationJourney(
-      new TestRegInterpreter,
+    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       testService
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.ultimateParent should be ('empty)
   }
 
   "when the user chooses not to provide a liability start it " should "be set to 2020-04-06 " in {
-    val reg: Registration = RegJourney.registrationJourney(
-      defaultInterpreter,
+    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       testService
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     reg.dateLiable shouldBe LocalDate.of(2020,4, 1)
   }

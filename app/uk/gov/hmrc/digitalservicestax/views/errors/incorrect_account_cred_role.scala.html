@@ -16,10 +16,12 @@
 
 @()(implicit messages: UniformMessages[Html])
 
-<h1 class="govuk-heading-xl">@messages("wrong-creds.heading")</h1>
+<h1 class="govuk-heading-l">@messages("wrong-creds.heading")</h1>
 <p class="govuk-body">@messages("wrong-creds.sign-out.reason")</p>
 <p class="govuk-body">@messages("wrong-creds.contact-admin")</p>
 
-<a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.AuthenticationController.signIn()" class="button" role="button">
-    @messages("common.sign-in")
-</a>
+<p class="govuk-body">
+    <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.AuthenticationController.signIn()" class="govuk-button" role="button">
+        @messages("common.sign-in")
+    </a>
+</p>

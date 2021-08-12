@@ -1,0 +1,250 @@
+@*
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.digitalservicestax.data.Registration
+@import uk.gov.hmrc.digitalservicestax.data._
+@import uk.gov.hmrc.digitalservicestax.frontend._
+@import play.twirl.api.Html
+@import collection.immutable.Seq
+
+@this(
+    govukSummaryList : GovukSummaryList
+)
+
+@(key: String, in: Registration)(implicit messages: UniformMessages[Html])
+
+@company = @{in.companyReg.company}
+
+@serviceUrl = @{"/digital-services-tax/register"}
+
+<h1 class="govuk-heading-xl">@messages(s"$key.title")</h1>
+<h2 class="govuk-heading-m">@messages(s"$key.company.title")</h2>
+@govukSummaryList(SummaryList(
+    rows = Seq(
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.company-name-and-reg-address.question"))
+            ),
+            value = Value(
+                content = HtmlContent(companyNameAndAddress(company))
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/confirm-company-details",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.company-name-and-reg-address.change").toString)
+                    )
+                )
+            ))
+        ),
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.company-contact-address.question"))
+            ),
+            value = Value(
+                content = HtmlContent(
+                    in.alternativeContact.fold(
+                        address(company.address)
+                    ){ ac =>
+                      address(ac)
+                    }
+                )
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/company-contact-address",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.company-contact-address.change").toString)
+                    )
+                )
+            ))
+        ),
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.check-if-group.question"))
+            ),
+            value = Value(
+                content = HtmlContent(messages(s"common.${in.ultimateParent.fold("no")(_ => "yes")}"))
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/check-if-group",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.company-name-and-reg-address.change").toString)
+                    )
+                )
+            ))
+        )
+    )
+))
+
+@in.ultimateParent.map { up =>
+    <h2 class="govuk-heading-m">@messages(s"$key.ultimate-parent-company.title")</h2>
+
+    @govukSummaryList(SummaryList(
+        rows = Seq(
+            SummaryListRow(
+                key = Key(
+                    content = HtmlContent(messages(s"$key.ultimate-parent-company-name.question"))
+                ),
+                value = Value(
+                    content = Text(s"${up.name}")
+                ),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = s"$serviceUrl/ultimate-parent-company-name",
+                            content = HtmlContent(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.ultimate-parent-company-name.change").toString)
+                        )
+                    )
+                ))
+            ),
+            SummaryListRow(
+                key = Key(
+                    content = HtmlContent(messages(s"$key.ultimate-parent-company-address.question"))
+                ),
+                value = Value(
+                    content = HtmlContent(address(up.address))
+                ),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = s"$serviceUrl/check-ultimate-parent-company-address",
+                            content = HtmlContent(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.ultimate-parent-company-address.change").toString)
+                        )
+                    )
+                ))
+            )
+        )
+    ))
+}
+
+<h2 class="govuk-heading-m">@messages(s"$key.contact-details.title")</h2>
+@govukSummaryList(SummaryList(
+    rows = Seq(
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.contact-details-name.question"))
+            ),
+            value = Value(
+                content = Text(s"${in.contact.forename} ${in.contact.surname}")
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/contact-details#contact-details_forename-input",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.contact-details.change.name").toString)
+                    )
+                )
+            ))
+        ),
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.contact-details-phone-number.question"))
+            ),
+            value = Value(
+                content = HtmlContent(in.contact.phoneNumber)
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/contact-details#contact-details_phoneNumber-input",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.contact-details.change.phone-number").toString)
+                    )
+                )
+            ))
+        ),
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.contact-details-email.question"))
+            ),
+            value = Value(
+                content = HtmlContent(in.contact.email)
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/contact-details#contact-details_email-input",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.contact-details.change.email").toString)
+                    )
+                )
+            ))
+        )
+    )
+))
+
+<h2 class="govuk-heading-m">@messages(s"$key.liability-date.title")</h2>
+@govukSummaryList(SummaryList(
+    rows = Seq(
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.liability-start-date.question"))
+            ),
+            value = Value(
+                content = Text(s"${formatDate(in.dateLiable)}")
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/check-liability-date",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.check-liability-date.change").toString)
+                    )
+                )
+            ))
+        ),
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.accounting-end-date.question"))
+            ),
+            value = Value(
+                content = HtmlContent(formatDate(in.accountingPeriodEnd))
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/accounting-period-end-date",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.accounting-period-end-date.change").toString)
+                    )
+                )
+            ))
+        )
+    )
+))
+
+<h2 class="govuk-heading-m">@messages(s"$key.submission.title")</h2>
+@if(in.ultimateParent.isDefined) {
+    <p class="govuk-body">@messages(s"$key.submission.group")</p>
+    @in.ultimateParent.map { ultParent =>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages(s"$key.submission.group.list.1", in.companyReg.company.name, ultParent.name)</li>
+            <li>@messages(s"$key.submission.group.list.2", ultParent.name, in.companyReg.company.name)</li>
+            <li>@messages(s"$key.submission.group.list.3")</li>
+        </ul>
+    }
+} else {
+    <p class="govuk-body">@messages(s"$key.submission-notice")</p>
+}

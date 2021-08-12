@@ -19,7 +19,7 @@ package uk.gov.hmrc.digitalservicestax.connectors
 import ltbs.uniform._
 import interpreters.playframework._
 import common.web.Codec
-import reactivemongo.api.commands.{WriteResult}
+import reactivemongo.api.commands.WriteResult
 import uk.gov.hmrc.digitalservicestax.data.Return
 
 import scala.concurrent.duration._

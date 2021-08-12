@@ -19,8 +19,6 @@ package uk.gov.hmrc.digitalservicestaxfrontend
 import ltbs.uniform.ErrorTree
 import ltbs.uniform.interpreters.logictable._
 import uk.gov.hmrc.digitalservicestax.connectors.DSTService
-import uk.gov.hmrc.digitalservicestax.journeys.RegJourney.{RegAskTypes, RegTellTypes}
-import uk.gov.hmrc.digitalservicestax.journeys.ReturnJourney.{ReturnAskTypes, ReturnTellTypes}
 import uk.gov.hmrc.digitalservicestaxfrontend.util.TestDstService
 
 package object journeys {
@@ -34,9 +32,6 @@ package object journeys {
   def instancesF[A](value: String => List[A]): SampleData[A] = new SampleData[A] {
     def apply(key: String): List[A] = value(key)
   }
-
-  type TestRegInterpreter = LogicTableInterpreter[RegTellTypes, RegAskTypes]
-  type TestReturnInterpreter = LogicTableInterpreter[ReturnTellTypes, ReturnAskTypes]
 
   implicit class RichJourney[A] (in: List[(List[_], Either[ErrorTree, A])]) {
     def asOutcome(debug: Boolean = false): A = {

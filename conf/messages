@@ -29,6 +29,8 @@ common.yes=Yes
 common.no=No
 common.group=Group
 common.company=Company
+service.name=Digital Services Tax
+service.homePageUrl=/digital-services-tax
 
 # Errors
 there.is.a.problem=There is a problem
@@ -50,14 +52,14 @@ global-revenues-not-eligible.kickout.heading=You do not need to register
 global-revenues-not-eligible.kickout.update-details.p1=This is because your annual global revenues from search engines, \
   social media platforms or online marketplaces are not more than £500 million.
 global-revenues-not-eligible.kickout.change-answers=If this is not correct, \
-  <a href="{0}">\
+  <a class="govuk-link" href="{0}">\
   go back and change your answers\
   </a>.
-global-revenues-not-eligible.kickout.when-to-register=Find out about <a href="{0}">when to register for Digital Services Tax</a>.
+global-revenues-not-eligible.kickout.when-to-register=Find out about <a class="govuk-link" href="{0}">when to register for Digital Services Tax</a>.
 global-revenues-not-eligible.kickout.tax-return.heading=If you need to file a Self Assessment tax return
 global-revenues-not-eligible.kickout.tax-return.p1=You need to use a different service.
 global-revenues-not-eligible.kickout.tax-return.p2=Find out how to \
-  <a href="{0}">\
+  <a class="govuk-link" href="{0}">\
   file your Self Assessment tax return online\
   </a>.
 
@@ -80,14 +82,14 @@ uk-revenues-not-eligible.kickout.heading=You do not need to register
 uk-revenues-not-eligible.kickout.update-details.p1=This is because your annual revenues from search engine, \
   social media or online marketplace activities linked to UK users are not more than £25 million.
 uk-revenues-not-eligible.kickout.change-answers=If this is not correct, \
-  <a href="{0}">\
+  <a class="govuk-link" href="{0}">\
   go back and change your answers\
   </a>.
 
 uk-revenues-not-eligible.kickout.tax-return.heading=If you need to file a Self Assessment tax return
 uk-revenues-not-eligible.kickout.tax-return.p1=You need to use a different service.
 uk-revenues-not-eligible.kickout.tax-return.p2=Find out how to \
-  <a href="{0}">\
+  <a class="govuk-link" href="{0}">\
   file your Self Assessment tax return online\
   </a>.
 
@@ -108,7 +110,7 @@ enter-utr.heading=What is the company’s UK Corporation Tax Unique Taxpayer Ref
 enter-utr.heading.hint=Your company details
 enter-utr.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. \
   It may be called ‘reference’, ‘UTR’ or ‘official use’. \
-  You can <a target=_blank href="https://www.gov.uk/find-lost-utr-number">find a lost UTR (opens in a new window or tab)</a>.
+  You can <a target=_blank class="govuk-link" href="https://www.gov.uk/find-lost-utr-number">find a lost UTR (opens in a new window or tab)</a>.
 
 company-registered-office-postcode.heading=What is the postcode of the company’s Registered Office address?
 company-registered-office-postcode.heading.hint=Your company details
@@ -156,7 +158,7 @@ not-found-company-registered-office-uk-address.postalCode.heading=Postcode
 
 confirm-company-details.heading=Is this the company you want to register as the responsible member?
 confirm-company-details.heading.hint=Your company details
-confirm-company-details.intro=If you are registering a group, this company must be the responsible member who will represent the group to HMRC.
+confirm-company-details.radio.intro=If you are registering a group, this company must be the responsible member who will represent the group to HMRC.
 confirm-company-details.TRUE=Yes
 confirm-company-details.FALSE=No
 
@@ -196,7 +198,7 @@ check-if-group.details.text=<p>For the Digital Services Tax, a group is a parent
     <li>not a member of a GAAP group</li>\
   </ul>\
   <p>You can find a list of acceptable GAAP in the \
-    <a href="https://www.gov.uk/hmrc-internal-manuals/digital-services-tax" target="_blank">Digital Services Tax Manual (opens in a new window or tab)</a>\
+    <a href="https://www.gov.uk/hmrc-internal-manuals/digital-services-tax" target="_blank" class="govuk-link">Digital Services Tax Manual (opens in a new window or tab)</a>\
   </p>
 check-if-group.TRUE=Yes
 check-if-group.FALSE=No
@@ -313,7 +315,7 @@ registration-sent.what-happens-next.p1=We will send your Digital Services Tax re
   the next 24 hours.
 registration-sent.help-using-this-service.title=Help using this service
 registration-sent.print-save=Print or save this page
-registration-sent.help-using-this-service.p1=For help with payments and returns, <a href="{0}">check the Digital Services Tax guidance</a>.
+registration-sent.help-using-this-service.p1=For help with payments and returns, <a href="{0}" class="govuk-link">check the Digital Services Tax guidance</a>.
 registration-sent.help-using-this-service.list.title=Contact your HMRC Customer Compliance Manager (CCM) if you:
 registration-sent.help-using-this-service.list.1=do not receive your registration number
 registration-sent.help-using-this-service.list.2=need to change your registered details
@@ -328,7 +330,7 @@ details-not-correct.kickout.heading=What you need to do if your company details 
 details-not-correct.kickout.update-details.p1=Make sure the user ID you entered is correct and try signing in again.
 details-not-correct.kickout.update-details.p2=If you still need to update your company details, \
   you need to \
-  <a href="https://www.gov.uk/file-changes-to-a-company-with-companies-house"> \
+  <a class="govuk-link" href="https://www.gov.uk/file-changes-to-a-company-with-companies-house"> \
     tell Companies House about the change to your company.\
   </a>
 details-not-correct.kickout.update-details.p3=You have been signed out of the service.
@@ -563,8 +565,8 @@ resubmit-a-return.required=Select the return you need to resubmit
 #Manage companies
 manage-companies-add-add.heading=Company details
 manage-companies.listing.heading=Confirm the companies in your group that have a Digital Services Tax liability
-manage-companies.radio.heading=Do you need to add another company?
-manage-companies.radio.hint=You must tell us about all the companies in your group that have a Digital Services Tax \
+manage-companies.heading=Do you need to add another company?
+manage-companies.hint=You must tell us about all the companies in your group that have a Digital Services Tax \
   liability for this return period.
 manage-companies.Add=Yes
 manage-companies.Continue=No
@@ -573,20 +575,13 @@ change-company=Change company name
 manage-companies.required=Select yes if you need to add another company to your group
 
 # Company Details
-add.heading=Company details
-add.name.heading=Company name
-add.name.hint=This is the name registered with an official company register, such as Companies House.
-add.utr.heading=What is your Corporation Tax Unique Taxpayer Reference? (optional)
-add.utr.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation \
-  Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can <a target=_blank href="https://www.gov.uk/find-lost-utr-number">find a lost UTR number (opens in a new window or tab)</a>.
-
-edit.heading=Company details
-edit.name.heading=Company name
-edit.name.hint=This is the name registered with an official company register, such as Companies House.
-edit.utr.heading=What is your Corporation Tax Unique Taxpayer Reference? (optional)
-edit.utr.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation \
-  Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can <a target=_blank href="https://www.gov.uk/find-lost-utr-number">find a lost UTR number (opens in a new window or tab)</a>.   
-
+company.heading=Company details
+company.name.heading=Company name
+company.name.hint=This is the name registered with an official company register, such as Companies House.
+company.utr.heading=What is your Corporation Tax Unique Taxpayer Reference? (optional)
+company.utr.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation \
+  Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can <a target=_blank class="govuk-link" href="https://www.gov.uk/find-lost-utr-number">find a lost UTR number (opens in a new window or tab)</a>.
+        
 #Add & edit company error messages
 name.required=Enter the company’s name
 name.invalid=Company name must only include letters a to z, numbers, full stops, apostrophes, hyphens, ampersands (&) and spaces
@@ -735,7 +730,7 @@ bank-details.accountName.required=Enter the account name
 bank-details.accountName.invalid=Account name must only include letters a to z
 bank-details.accountName.length.exceeded=Account name must be 35 characters or fewer
 
-bank-details.bankAccount.heading.large.label=Is this a UK bank account?
+bank-details.bankAccount.heading=Is this a UK bank account?
 bank-details.bankAccount.DomesticBankAccount=Yes
 bank-details.bankAccount.ForeignBankAccount=No
 bank-details.bankAccount.required=Select yes if this is a UK bank account
@@ -805,12 +800,19 @@ check-your-answers.ret.report-online-marketplace-operating-margin.change=Change 
 
 check-your-answers.ret.repayment.title=Return repayments
 check-your-answers.ret.repayment.question=Do you need to be repaid any Digital Services Tax for this period? 
+check-your-answers.ret.repayment.change=Change if you need to be repaid any Digital Services Tax for this period
 check-your-answers.ret.account-name.question=Account name
+check-your-answers.ret.account-name.change=Change account name
 check-your-answers.ret.account-type.question=Is this a UK bank account?
+check-your-answers.ret.account-type.change=Change if this a UK bank account
 check-your-answers.ret.sort-code.question=Sort code
+check-your-answers.ret.sort-code.change=Change sort code
 check-your-answers.ret.account-number.question=Account number
+check-your-answers.ret.account-number.change=Change account number
 check-your-answers.ret.building-society.question=Building society roll number (if you have one)
+check-your-answers.ret.building-society.change=Change building society roll number (if you have one)
 check-your-answers.ret.iban.question=IBAN
+check-your-answers.ret.iban.change=Change IBAN
 
 check-your-answers.ret.submission.title=Now submit your return
 check-your-answers.ret.submission.notice=By submitting this notification you are confirming that, \
@@ -963,7 +965,7 @@ financial-details.table.credits=£ Credits
 financial-details.table.debits=£ Debits
 financial-details.table.balance=£ Balance
 financial-details.back-bottom=Back to details
-financial-details.paynow=You need to pay now. Find <a href="https://www.gov.uk/guidance/pay-your-digital-services-tax" target="_blank">how to pay</a> (opens in a new window or tab).
+financial-details.paynow=You need to pay now. Find <a class="govuk-link" href="https://www.gov.uk/guidance/pay-your-digital-services-tax" target="_blank">how to pay</a> (opens in a new window or tab).
 
 # We can override the description of the line items sent from MDTP
 financial-details.line-item.cleared-by-payment=Payment received

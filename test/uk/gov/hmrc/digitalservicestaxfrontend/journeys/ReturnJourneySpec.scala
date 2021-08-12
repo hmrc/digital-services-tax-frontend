@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
-import cats.implicits._
 import ltbs.uniform.interpreters.logictable._
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.digitalservicestax.data.Activity.SocialMedia
-import uk.gov.hmrc.digitalservicestax.data.SampleData._
+import uk.gov.hmrc.digitalservicestax.data.TestSampleData._
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.journeys.ReturnJourney
 
@@ -34,42 +33,40 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
   implicit val sampleActivitySetAsk = instances(sampleActivitySet)
   implicit val sampleRepaymentDetailsAsk = instances(sampleRepaymentDetails)
   implicit val samplePercentAsk = instances(samplePercent)
+  implicit val sampleGroupCompnay = instances(sampleGroupCompany)
   implicit val sampleGroupCompanyListAsk = instances(sampleGroupCompanyList)
   implicit val sampleBooleanAsk = instancesF {
     case lossKeys(_) => List(false)
     case _ => List(true)
   }
 
-  val defaultInterpreter = new TestReturnInterpreter
+  implicit val sampleListQty = SampleListQty[GroupCompany](1)
 
   "If the registration is not for a group we" should "not see manage-companies questions" in {
     implicit val sampleGroupCompanyListAsk = instances(List.empty[GroupCompany])
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     ret.companiesAmount shouldBe 'empty
   }
 
   "If the registration is for a group we" should "see manage-companies questions" in {
-    val ret:Return = ReturnJourney.returnJourney(
-      defaultInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleRegWithParent
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     ret.companiesAmount shouldBe 'nonEmpty
   }
 
   "Return.alternativeCharge length" should "be the same as length of reported activities" in {
     implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
     ret.alternateCharge.size shouldBe 1
   }
 
@@ -78,20 +75,18 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case "report-alternative-charge" => List(false)
       case _ => List(true)
     }
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
     ret.alternateCharge  should be ('empty)
   }
 
   "Return.alternateCharge " should "not be empty when an alternate charge is reported" in {
-    val ret:Return = ReturnJourney.returnJourney(
-      defaultInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     ret.alternateCharge  should be ('nonEmpty)
   }
@@ -101,21 +96,19 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case "report-cross-border-transaction-relief" => List(false)
       case _ => List(true)
     }
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     ret.crossBorderReliefAmount shouldEqual BigDecimal(0)
   }
 
   "Return.repayment" should "be nonEmpty when the user has asked for a repayment" in {
-    val ret:Return = ReturnJourney.returnJourney(
-      defaultInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
 
     ret.repayment  should be ('nonEmpty)
   }
@@ -125,11 +118,10 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case "repayment" => List(false)
       case _ => List(true)
     }
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
     ret.repayment  should be ('empty)
   }
 
@@ -141,11 +133,10 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case "report-social-media-alternative-charge" => List(false)
       case _ => List(true)
     }
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
     ret.allowanceAmount should be ('empty)
   }
 
@@ -160,11 +151,10 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case "report-social-media-operating-margin" => List(Percent(0))
       case _ => List.empty[Percent]
     }
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
     ret.allowanceAmount should be ('empty)
   }
 
@@ -172,11 +162,10 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
     // social media only
     implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
     // no to alternative charge
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
     ret.allowanceAmount should be ('nonEmpty)
   }
 
@@ -187,11 +176,10 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
       case "report-social-media-loss" => List(false)
       case _ => List(true)
     }
-    val ret:Return = ReturnJourney.returnJourney(
-      new TestReturnInterpreter,
+    val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg
-    ).value.run.asOutcome()
+    )).value.run.asOutcome()
     ret.allowanceAmount should be ('nonEmpty)
   }
 }

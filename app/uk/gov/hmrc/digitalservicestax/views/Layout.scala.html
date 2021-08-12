@@ -1,0 +1,87 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*@
+
+@import uk.gov.hmrc.digitalservicestax.config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.Layouts
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardFooter
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukLayout
+@import uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages
+@import uk.gov.hmrc.digitalservicestax.views.html.components.Scripts
+
+@this(
+    govukLayout: GovukLayout,
+    head: Head,
+    scripts: Scripts,
+    govukPhaseBanner : GovukPhaseBanner,
+    hmrcFooter: HmrcFooter,
+    hmrcStandardFooter: HmrcStandardFooter,
+    hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
+    layoutGrid: TwoThirdsOneThirdMainContent,
+    defaultMainContentLayout: TwoThirdsMainContent
+)
+@(
+    pageTitle: Option[String] = None,
+    useFullWidth: Boolean = false,
+)(contentBlock: Html)(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
+
+
+@bannerFeedback = {
+    <span>
+        @messages("common.alpha-info.p1")
+        <a class="govuk-link" href="@appConfig.betaFeedbackUrlAuth">@messages("common.alpha-info.link")</a>
+        @messages("common.alpha-info.p2")
+    </span>
+}
+@beforeContentBlock= @{
+
+    govukPhaseBanner(PhaseBanner(
+        tag = Some(Tag(content = Text("beta"))),
+        content = HtmlContent(bannerFeedback)
+    ))
+}
+
+@content = {
+    @contentBlock
+    @hmrcReportTechnicalIssue(
+        ReportTechnicalIssue(
+            appConfig.appName,
+            appConfig.appName,
+            if (
+                ufMessagesToPlayMessages(messages, request).lang.code == "cy"
+            ) Cy else En,
+            classes = Some("get-help-action")
+        )
+    )
+}
+
+@if(useFullWidth) {
+    @govukLayout(
+        pageTitle = pageTitle,
+        headBlock = Some(head()),
+        beforeContentBlock = Some(beforeContentBlock),
+        footerBlock = Some(hmrcStandardFooter()),
+        bodyEndBlock = Some(scripts()),
+        mainContentLayout = None // n.b. play-frontend-govuk uses both None/Some to alter the default behaviour so have to unset
+    )(content)
+} else {
+    @govukLayout(
+    pageTitle = pageTitle,
+    headBlock = Some(head()),
+    beforeContentBlock = Some(beforeContentBlock),
+    footerBlock = Some(hmrcStandardFooter()),
+    bodyEndBlock = Some(scripts())
+    )(content)
+}

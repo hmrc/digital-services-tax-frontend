@@ -17,35 +17,41 @@
 package uk.gov.hmrc.digitalservicestax
 package controllers
 
-import data._
-import config.AppConfig
-import connectors.{DSTConnector, MongoPersistence}
-
-import javax.inject.Inject
-import ltbs.uniform.UniformMessages
-import ltbs.uniform.common.web.GenericWebTell
-import ltbs.uniform.interpreters.playframework.{PersistenceEngine, tellTwirlUnit}
+import cats.instances.future._
+import ltbs.uniform.{ErrorTree, Input, UniformMessages}
+import ltbs.uniform.common.web._
+import ltbs.uniform.interpreters.playframework._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
-import scala.concurrent.{Future, ExecutionContext}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{AuthorisedAction, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
+import uk.gov.hmrc.http.HttpClient
+import views.html.cya._
+import views.html.end._
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+import data._
+import connectors.{DSTConnector, MongoPersistence}
+import uk.gov.hmrc.digitalservicestax.views.html.Layout
 
 class RegistrationController @Inject()(
   authorisedAction: AuthorisedAction,
   http: HttpClient,
   servicesConfig: ServicesConfig,
   mongo: ReactiveMongoApi,
+  interpreter: DSTInterpreter,
   val authConnector: AuthConnector,
-  val messagesApi: MessagesApi  
+  val messagesApi: MessagesApi,
+  cyaReg: CheckYourAnswersReg,
+  confirmationReg: ConfirmationReg,
+  layout: Layout
 )(implicit
-  config: AppConfig,
   ec: ExecutionContext
 ) extends ControllerHelpers
     with I18nSupport
@@ -53,44 +59,44 @@ class RegistrationController @Inject()(
     with FrontendHeaderCarrierProvider
 {
 
-  val interpreter = DSTInterpreter(config, this, messagesApi)
+  import interpreter._
+
+  implicit val futureAdapter = FutureAdapter[Html].alwaysRerun
+
   private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   private def hod(id: InternalId)(implicit hc: HeaderCarrier) =
     connectors.CachedDstService(backend)(id)
 
-  private implicit val cyaRegTell = new GenericWebTell[CYA[Registration], Html] {
-    override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Html =
-      views.html.cya.check_your_registration_answers(s"$key.reg", in.value)(messages)
+  private implicit val cyaRegTell = new WebTell[Html, CYA[Registration]] {
+    override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(cyaReg(s"$key.reg", in.value)(messages))
   }
 
-  private implicit val confirmRegTell = new GenericWebTell[Confirmation[Registration], Html] {
-    override def render(in: Confirmation[Registration], key: String, messages: UniformMessages[Html]): Html = {
+  private implicit val confirmRegTell = new WebTell[Html, Confirmation[Registration]] {
+    override def render(in: Confirmation[Registration], key: String, messages: UniformMessages[Html]): Option[Html] = {
       val reg = in.value
-      views.html.end.confirmation(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages)
+      Some(confirmationReg(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages))
     }
   }
 
   def registerAction(targetId: String): Action[AnyContent] = authorisedAction.async { implicit request: AuthorisedRequest[AnyContent] =>
-    import interpreter._
     import journeys.RegJourney._
+
+    implicit val msg: UniformMessages[Html] = messages(request)
 
     implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
       MongoPersistence[AuthorisedRequest[AnyContent]](
         mongo,
         collectionName = "uf-registrations",
-        config.mongoJourneyStoreExpireAfter        
+        appConfig.mongoJourneyStoreExpireAfter
       )(_.internalId)
 
     backend.lookupRegistration().flatMap {
       case None =>
-        val playProgram = registrationJourney[WM](
-          create[RegTellTypes, RegAskTypes](messages(request)),
-          hod(request.internalId)
-        )
-        playProgram.run(targetId, purgeStateUponCompletion = true) {
-          backend.submitRegistration(_).map { _ => Redirect(routes.RegistrationController.registrationComplete) }
-      }
+        interpret(registrationJourney(backend)).run(targetId) { ret => 
+          backend.submitRegistration(ret).map { _ => Redirect(routes.RegistrationController.registrationComplete) }
+        }
 
       case Some(_) =>
         Future.successful(Redirect(routes.JourneyController.index))
@@ -98,7 +104,7 @@ class RegistrationController @Inject()(
   }
 
   def registrationComplete: Action[AnyContent] = authorisedAction.async { implicit request =>
-    implicit val msg: UniformMessages[Html] = interpreter.messages(request)
+    implicit val msg: UniformMessages[Html] = messages(request)
 
     backend.lookupRegistration().flatMap {
       case None =>
@@ -107,11 +113,12 @@ class RegistrationController @Inject()(
         )
       case Some(reg) =>
         Future.successful(
-          Ok(views.html.main_template(
-            title =
+          Ok(layout(
+            pageTitle = Some(
               s"${msg("registration-sent.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
-          )(views.html.end.confirmation("registration-sent", reg.companyReg.company.name, reg.contact.email)(msg)))
+            )
+          )(confirmationReg("registration-sent", reg.companyReg.company.name, reg.contact.email)(msg)))
         )
     }
-  }  
+  }
 }

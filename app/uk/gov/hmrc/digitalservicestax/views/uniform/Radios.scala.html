@@ -1,0 +1,126 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.digitalservicestax.views.html.helpers._
+@import play.twirl.api.HtmlFormat
+
+@this(
+        standard_field: StandardField,
+        govukRadios : GovukRadios,
+        govukDetails: GovukDetails
+)
+
+@(key: List[String], options: Seq[String], existing: Option[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty, tell: Option[Html] = None)
+
+@keyWithDots=@{key.mkString(".")}
+@keyNoDots=@{key.mkString("-")}
+@inlineRadioKeys=@{key.mkString(".") == "manage-companies"}
+@reverseRadios=@{
+    key.head == "alternate-contact" ||
+    key.head == "company-registered-office-address" ||
+    key.head == "ultimate-parent-company-address"
+}
+@isListing = @{key.contains("manage-companies")}
+
+@indexedOptions=@{if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}}
+@radios=@{indexedOptions.map{case (opt,num) =>
+    RadioItem(
+        content = HtmlContent(messages.decompose({key :+ opt}.mkString("."))),
+        id = Some(s"$keyNoDots-$num"),
+        value = Some(opt),
+        label = Some(Label(
+            forAttr = Some(s"$keyNoDots-$num"),
+            content = HtmlContent(messages.decompose({key :+ opt}.mkString(".")))
+        )),
+        hint = messages.get({key :+ opt :+ "hint"}.mkString(".")).fold(Option.empty[Hint]){ hint =>
+            Some(Hint(
+                Some(hint.toString())
+            ))
+        },
+        checked = if(existing.exists(_.toUpperCase == opt.toUpperCase())){true}else{false},
+        conditionalHtml = if(conditional.isDefinedAt(opt)){
+            Some(Html(
+                s"${conditional(opt)}"
+            ))
+        } else None
+    )
+}.toSeq}
+
+@hint=@{messages.get(s"$keyWithDots.hint")}
+@intro=@{messages.get(s"$keyWithDots.radio.intro")}
+
+@hintAndIntro=@{
+    import collection.immutable.Seq
+
+    val details = messages.get(s"$keyWithDots.details").map { details =>
+        govukDetails(Details(
+            summary = HtmlContent(messages(s"$keyWithDots.details")),
+            content = HtmlContent(messages(s"$keyWithDots.details.text"))
+        ))
+    }
+
+    def introStyling(inner: Option[Html]) =
+        inner.map{ i =>
+            Html(s"<p class='govuk-body-m'>$i</p>")
+        }
+   val showInnerTell = if(!isListing) tell else Option.empty[Html]
+
+    val textSeq = Seq(introStyling(intro), hint, showInnerTell, details).flatten
+    if(textSeq.nonEmpty) {
+        Some(Hint(
+            content = HtmlContent(HtmlFormat.fill(textSeq))
+        ))
+    } else Option.empty[Hint]
+}
+
+@headHintAndLegend=@{
+    import collection.immutable.Seq
+
+    val headHint = messages.get(s"$keyWithDots.heading.hint").fold(HtmlFormat.empty) { headHint =>
+        Html(s"<span class='govuk-caption-l'>$headHint</span>")
+    }
+    val title = messages.get(s"$keyWithDots.heading").getOrElse(HtmlFormat.empty)
+
+    HtmlContent(HtmlFormat.fill(Seq(headHint, title)))
+}
+
+@standard_field(key, errors, messages, false, false) {
+    @if(isListing){
+        @tell
+    }
+    @govukRadios(Radios(
+        fieldset =
+                Some(Fieldset(
+                        legend = messages.get(s"$keyWithDots.heading").fold(Option.empty[Legend]){ leg =>
+                            Some(
+                                Legend(
+                                    content = headHintAndLegend,
+                                    classes = if(!isListing) "govuk-fieldset__legend--l" else "",
+                                    isPageHeading = !isListing
+                                )
+                            )
+                        },
+                        attributes = Map("id" -> s"$keyWithDots-input")
+                )),
+        hint = hintAndIntro,
+        errorMessage = errMessage(errors, key, messages),
+        idPrefix = Some(keyWithDots),
+        name = keyWithDots,
+        items = radios,
+        classes = if(inlineRadioKeys){"govuk-radios--inline"} else {""}
+    ))
+
+}
