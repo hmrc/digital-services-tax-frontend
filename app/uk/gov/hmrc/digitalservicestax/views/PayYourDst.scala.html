@@ -28,10 +28,6 @@
     content = HtmlContent(message("common.back"))
 ))
 
-@*<a href="@{uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index()}" class="govuk link-back">*@
-@*    @message("common.back")*@
-@*</a>*@
-
 <h1 class="govuk-heading-xl">@message("pay-your-dst.heading")</h1>
 
 @outstanding.headOption.map { period =>
