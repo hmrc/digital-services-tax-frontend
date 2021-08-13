@@ -16,12 +16,23 @@
 
 @import views.html.helper.CSPNonce
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcHead
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTimeoutDialogHelper
+@import uk.gov.hmrc.digitalservicestax.config.AppConfig
 
-@this(hmrcHead: HmrcHead)
+@this(
+        hmrcHead: HmrcHead,
+        hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
+)
 
-@(headBlock: Option[Html] = None)(implicit request: Request[_], messages: UniformMessages[Html])
+@(headBlock: Option[Html] = None)(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
 @hmrcHead(headBlock = headBlock, nonce = CSPNonce.get)
 @headBlock
+
+@hmrcTimeoutDialogHelper(
+ signOutUrl = appConfig.signOutDstUrl,
+ keepAliveUrl = Some(appConfig.timeInUrl),
+ timeoutUrl = Some(appConfig.timeOutUrl)
+)
 
 <!--[if lte IE 8]><script src='@controllers.routes.Assets.versioned("javascripts/html5shiv.min.js")'></script><![endif]-->
 <!--[if lte IE 8]><link href='@controllers.routes.Assets.versioned("stylesheets/application-ie-8.css")' rel="stylesheet" type="text/css" /><![endif]-->
