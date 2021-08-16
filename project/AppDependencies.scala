@@ -16,7 +16,8 @@ object AppDependencies {
     "org.reactivemongo"       %% "play2-reactivemongo"          % "0.18.6-play26", // TODO fix /home/luke/hmrc/digital-services-tax-frontend/app/uk/gov/hmrc/digitalservicestax/connectors/MongoPersistence.scala:85:21 for v0.20.10 upgrade
     "commons-validator"       % "commons-validator"             % "1.6",
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-28"   % "5.10.0",
-    "fr.marcwrobel"           % "jbanking"                      % "3.1.1"
+    "fr.marcwrobel"           % "jbanking"                      % "3.1.1",
+    "org.jsoup"               % "jsoup"                         % "1.14.2"
   )
 
   val test = Seq(
