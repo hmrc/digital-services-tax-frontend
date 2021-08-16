@@ -28,6 +28,7 @@ import ltbs.uniform._
 import ltbs.uniform.validation.Rule
 import ltbs.uniform.validation.Rule.nonEmpty
 import ltbs.uniform.validation._
+import org.jsoup.Jsoup
 import play.api.mvc.{AnyContent, Request}
 import play.twirl.api.HtmlFormat.Appendable
 import play.twirl.api.{Html, HtmlFormat}
@@ -460,9 +461,10 @@ class DSTInterpreter @Inject()(
     }
 
     val errorTitle: String = if(errors.isNonEmpty) s"${messages("common.error")}: " else ""
+    val plainTextHeading = Jsoup.parse(messages(keyList.mkString("-") + ".heading").toString).body.text
 
     layout(
-      pageTitle = (errorTitle + s"${messages(keyList.mkString("-") + ".heading")} - ${messages("common.title")} - ${messages("common.title.suffix")}").some
+      pageTitle = (errorTitle + s"$plainTextHeading - ${messages("common.title")} - ${messages("common.title.suffix")}").some
     )(content)(request, messages, appConfig)
   }
 
