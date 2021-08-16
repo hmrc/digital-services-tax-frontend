@@ -52,4 +52,7 @@ class AppConfig @Inject()(val config: Configuration, servicesConfig: ServicesCon
   lazy val signOutDstUrl: String       = s"$companyAuthFrontend$companyAuthSignOutPath?continue=$feedbackSurveyUrl"
   lazy val feedbackSurveyUrl: String   = loadConfig("microservice.services.feedback-survey.url")
   lazy val betaFeedbackUrlAuth: String = s"$contactHost/contact/beta-feedback?service=$serviceName"
+  lazy val timeInUrl: String           = loadConfig("time-in.url")
+  lazy val timeOutUrl: String          = s"""/$serviceName${loadConfig("time-out.url")}"""
+
 }
