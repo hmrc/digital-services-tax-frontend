@@ -232,8 +232,9 @@ contact-details.heading=Who can we contact if we need to discuss your registrati
 contact-details.heading.hint=Contact person’s details
 contact-details.forename.heading=First name
 contact-details.surname.heading=Last name
-contact-details.phoneNumber.heading= Phone number
-contact-details.phoneNumber.hint=For international numbers include the country code.
+contact-details.phoneNumber.heading=Phone number
+contact-details.phoneNumber.hint=For international numbers include the country code number, \
+ like 0044 808 157 0192, not +44 808 157 0192.
 contact-details.email.heading=Email address
 contact-details.email.hint=We will use this email address to send confirmation of your registration.
 
@@ -476,22 +477,22 @@ countryCode.invalid=Enter a country from the list
 #contact details
 contact-details.forename.required=Enter the contact person’s first name
 contact-details.forename.length.exceeded=Contact person’s first name must be 35 characters or fewer
-contact-details.forename.invalid=First name must only include letters a to z and ampersands
+contact-details.forename.invalid=First name must only include letters a to z, apostrophes, ampersands, hyphens and spaces
 forename.length.exceeded=Contact person’s first name must be 35 characters or fewer
 forename.required=Enter the first name
-forename.invalid=First name must only include letters a to z and ampersands
+forename.invalid=First name must only include letters a to z, apostrophes, ampersands, hyphens and spaces
 
 contact-details.surname.required=Enter the contact person’s last name
 contact-details.surname.length.exceeded=Contact person’s first name must be 35 characters or fewer
-contact-details.surname.invalid=Last name must only include letters a to z, ampersands and spaces
+contact-details.surname.invalid=Last name must only include letters a to z, apostrophes, ampersands, hyphens and spaces
 surname.required=Enter the last name
 surname.length.exceeded=Contact person’s first name must be 35 characters or fewer
-surname.invalid=Last name must only include letters a to z, ampersands and spaces
+surname.invalid=Last name must only include letters a to z, apostrophes, ampersands, hyphens and spaces
 
 contact-details.phoneNumber.required=Enter a phone number
-contact-details.phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or 0044 0808 157 0192
+contact-details.phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or 0044 808 157 0192
 contact-details.phoneNumber.length.exceeded=Phone number must be 24 characters or fewer
-phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or 0044 0808 157 0192
+phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or 0044 808 157 0192
 phoneNumber.required=Enter a phone number
 phoneNumber.length.exceeded=Phone number must be 24 characters or fewer
 
