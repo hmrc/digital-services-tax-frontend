@@ -514,7 +514,7 @@ class DSTInterpreter @Inject()(
     }{x => x: BigDecimal}
 
   implicit def postcodeField= validatedString(Postcode)(twirlStringFields(
-    customRender = Some(stringField(_,_,_,_,_,"form-control form-control-1-4"))
+    customRender = Some(stringField(_,_,_,_,_,"govuk-input--width-10"))
   ))
 
   implicit def nesField                       = validatedVariant(NonEmptyString)

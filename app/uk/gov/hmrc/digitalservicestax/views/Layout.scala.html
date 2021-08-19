@@ -15,28 +15,26 @@
 *@
 
 @import uk.gov.hmrc.digitalservicestax.config.AppConfig
-@import uk.gov.hmrc.govukfrontend.views.Layouts
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardFooter
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukLayout
 @import uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages
 @import uk.gov.hmrc.digitalservicestax.views.html.components.Scripts
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
+@import views.html.helper.CSPNonce
 
 @this(
     govukLayout: GovukLayout,
     head: Head,
+    hmrcLayout: HmrcLayout,
     scripts: Scripts,
     govukPhaseBanner : GovukPhaseBanner,
-    hmrcFooter: HmrcFooter,
-    hmrcStandardFooter: HmrcStandardFooter,
     hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
-    layoutGrid: TwoThirdsOneThirdMainContent,
     defaultMainContentLayout: TwoThirdsMainContent
 )
+
 @(
     pageTitle: Option[String] = None,
     useFullWidth: Boolean = false,
 )(contentBlock: Html)(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
-
 
 @bannerFeedback = {
     <span>
@@ -45,12 +43,11 @@
         @messages("common.alpha-info.p2")
     </span>
 }
-@beforeContentBlock= @{
-
-    govukPhaseBanner(PhaseBanner(
+@betaBanner= @{
+    PhaseBanner(
         tag = Some(Tag(content = Text("beta"))),
         content = HtmlContent(bannerFeedback)
-    ))
+    )
 }
 
 @content = {
@@ -67,21 +64,17 @@
     )
 }
 
-@if(useFullWidth) {
-    @govukLayout(
-        pageTitle = pageTitle,
-        headBlock = Some(head()),
-        beforeContentBlock = Some(beforeContentBlock),
-        footerBlock = Some(hmrcStandardFooter()),
-        bodyEndBlock = Some(scripts()),
-        mainContentLayout = None // n.b. play-frontend-govuk uses both None/Some to alter the default behaviour so have to unset
-    )(content)
-} else {
-    @govukLayout(
+@hmrcLayout(
+    serviceName = Some(messages("service.name").toString()),
     pageTitle = pageTitle,
-    headBlock = Some(head()),
-    beforeContentBlock = Some(beforeContentBlock),
-    footerBlock = Some(hmrcStandardFooter()),
-    bodyEndBlock = Some(scripts())
-    )(content)
-}
+    isWelshTranslationAvailable = false,
+    signOutUrl = Some(appConfig.signOutDstUrl),
+    serviceUrl = Some(messages("service.homePageUrl").toString()),
+    displayHmrcBanner = true,
+    phaseBanner = Some(betaBanner),
+    additionalHeadBlock = Some(head()),
+    additionalScriptsBlock = Some(scripts()),
+    nonce = CSPNonce.get,
+    mainContentLayout = if(useFullWidth) None else Some(defaultMainContentLayout(_))
+)(content)
+
