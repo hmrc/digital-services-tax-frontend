@@ -20,12 +20,11 @@
 @import uk.gov.hmrc.digitalservicestax.config.AppConfig
 
 @this(
-        hmrcHead: HmrcHead,
         hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
 
 @(headBlock: Option[Html] = None)(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
-@hmrcHead(headBlock = headBlock, nonce = CSPNonce.get)
+
 @headBlock
 
 @hmrcTimeoutDialogHelper(
