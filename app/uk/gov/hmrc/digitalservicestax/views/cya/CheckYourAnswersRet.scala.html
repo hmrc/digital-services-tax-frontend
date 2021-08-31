@@ -233,6 +233,10 @@
     }
 }
 
+@multipleActivitiesSelectedSubKey(alt: Activity)=@{
+    if(ret.alternateCharge.toList.length > 1){s"${Activity.toUrl(alt)}-"} else {""}
+}
+
 @if(isPrint) {
     <h1 class="govuk-heading-m">@messages(s"$key.title.print", displayName, formatDate(per.start), formatDate(per.end))</h1>
 } else {
@@ -243,13 +247,13 @@
 @govukSummaryList(SummaryList(
     rows = liabilitySummaryListRows
 ))
-@ret.alternateCharge.map { alt =>
-    <h2 class="govuk-heading-m">@messages(s"$key.${Activity.toUrl(alt._1)}.title")</h2>
+@ret.reportedActivities.toList.map { act =>
+    <h2 class="govuk-heading-m">@messages(s"$key.${Activity.toUrl(act)}.title")</h2>
     @govukSummaryList(SummaryList(
         rows = Seq(
             SummaryListRow(
                 key = Key(
-                    content = HtmlContent(messages(s"$key.report-alternative-charge.question"))
+                    content = HtmlContent(messages(s"$key.select-activities.question"))
                 ),
                 value = Value(
                     content = HtmlContent(messages("common.yes"))
@@ -257,65 +261,67 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = s"$serviceUrl/${per.key}/report-alternative-charge",
+                            href = s"$serviceUrl/${per.key}/select-activities",
                             content = HtmlContent(messages("common.change")),
-                            visuallyHiddenText = Some(messages(s"$key.report-alternative-charge.change").toString)
+                            visuallyHiddenText = Some(messages(s"$key.select-activities.change").toString)
                         )
                     )
                 ))
             ),
             SummaryListRow(
                 key = Key(
-                    content = HtmlContent(messages(s"$key.report-${Activity.toUrl(alt._1)}-alternative-charge.question"))
+                    content = HtmlContent(messages(s"$key.report-${multipleActivitiesSelectedSubKey(act)}alternative-charge.question"))
                 ),
                 value = Value(
-                    content = HtmlContent(messages("common.yes"))
+                    content = HtmlContent(if(ret.alternateCharge.exists(_._1 == act)){messages("common.yes")} else {messages("common.no")})
                 ),
                 actions = Some(Actions(
-                    items = Seq(
-                        ActionItem(
-                            href = s"$serviceUrl/${per.key}/report-${Activity.toUrl(alt._1)}-alternative-charge",
+                        items = Seq(
+                            ActionItem(
+                            href = s"$serviceUrl/${per.key}/report-${multipleActivitiesSelectedSubKey(act)}alternative-charge",
                             content = HtmlContent(messages("common.change")),
-                            visuallyHiddenText = Some(messages(s"$key.report-${Activity.toUrl(alt._1)}-alternative-charge.change").toString)
+                            visuallyHiddenText = Some(messages(s"$key.report-${multipleActivitiesSelectedSubKey(act)}alternative-charge.change").toString)
                         )
                     )
                 ))
-            ),
-            SummaryListRow(
-                key = Key(
-                    content = HtmlContent(messages(s"$key.report-${Activity.toUrl(alt._1)}-loss.question"))
-                ),
-                value = Value(
-                    content = HtmlContent(if(alt._2 == 0){ messages("common.yes")} else { messages("common.no")})
-                ),
-                actions = Some(Actions(
-                    items = Seq(
-                        ActionItem(
-                            href = s"$serviceUrl/${per.key}/report-${Activity.toUrl(alt._1)}-loss",
-                            content = HtmlContent(messages("common.change")),
-                            visuallyHiddenText = Some(messages(s"$key.report-${Activity.toUrl(alt._1)}-loss.change").toString)
+            )) ++ ret.alternateCharge.find(_._1 == act).fold(Seq.empty[SummaryListRow]){ alt =>
+            Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = HtmlContent(messages(s"$key.report-${Activity.toUrl(alt._1)}-loss.question"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(if(alt._2 == 0){ messages("common.yes")} else { messages("common.no")})
+                    ),
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = s"$serviceUrl/${per.key}/report-${Activity.toUrl(alt._1)}-loss",
+                                content = HtmlContent(messages("common.change")),
+                                visuallyHiddenText = Some(messages(s"$key.report-${Activity.toUrl(alt._1)}-loss.change").toString)
+                            )
                         )
-                    )
-                ))
-            ),
-            SummaryListRow(
-                key = Key(
-                    content = HtmlContent(messages(s"$key.report-${Activity.toUrl(alt._1)}-operating-margin.question"))
+                    ))
                 ),
-                value = Value(
-                    content = HtmlContent(s"${alt._2}%")
-                ),
-                actions = Some(Actions(
-                    items = Seq(
-                        ActionItem(
-                            href = s"$serviceUrl/${per.key}/report-${Activity.toUrl(alt._1)}-operating-margin",
-                            content = HtmlContent(messages("common.change")),
-                            visuallyHiddenText = Some(messages(s"$key.report-${Activity.toUrl(alt._1)}-operating-margin.change").toString)
+                SummaryListRow(
+                    key = Key(
+                        content = HtmlContent(messages(s"$key.report-${Activity.toUrl(alt._1)}-operating-margin.question"))
+                    ),
+                    value = Value(
+                        content = HtmlContent(s"${alt._2}%")
+                    ),
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = s"$serviceUrl/${per.key}/report-${Activity.toUrl(alt._1)}-operating-margin",
+                                content = HtmlContent(messages("common.change")),
+                                visuallyHiddenText = Some(messages(s"$key.report-${Activity.toUrl(alt._1)}-operating-margin.change").toString)
+                            )
                         )
-                    )
-                ))
+                    ))
+                )
             )
-        )
+        }
     ))
 }
 

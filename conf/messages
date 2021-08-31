@@ -772,8 +772,10 @@ check-your-answers.ret.relief-deducted.change=Change the amount of relief claime
 check-your-answers.ret.group-company={0}’s Digital Services Tax liability
 check-your-answers.ret.group-company.change=Change {0}’s Digital Services Tax liability
 
-check-your-answers.ret.report-alternative-charge.question=Activity reported in this return
-check-your-answers.ret.report-alternative-charge.change=Change activity reported in this return
+check-your-answers.ret.select-activities.question=Activity reported in this return
+check-your-answers.ret.select-activities.change=Change activity reported in this return
+check-your-answers.ret.report-alternative-charge.question=Alternative charge applied
+check-your-answers.ret.report-alternative-charge.change=Change alternative charge applied
 
 check-your-answers.ret.social-media.title=Social media activity
 check-your-answers.ret.report-social-media-alternative-charge.question=Alternative charge applied
