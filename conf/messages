@@ -576,6 +576,8 @@ change-company=Change company name
 manage-companies.required=Select yes if you need to add another company to your group
 
 # Company Details
+manage-companies-add-company.heading=Add company details
+manage-companies-edit-company.heading=Change company details
 company.heading=Company details
 company.name.heading=Company name
 company.name.hint=This is the name registered with an official company register, such as Companies House.
