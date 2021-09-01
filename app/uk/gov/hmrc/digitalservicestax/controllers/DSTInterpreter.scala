@@ -461,7 +461,14 @@ class DSTInterpreter @Inject()(
     }
 
     val errorTitle: String = if(errors.isNonEmpty) s"${messages("common.error")}: " else ""
-    val plainTextHeading = Jsoup.parse(messages(keyList.mkString("-") + ".heading").toString).body.text
+    val plainTextHeading = Jsoup.parse(
+      messages(
+        keyList
+          .mkString("-")
+          .replaceAll("""\bmanage-companies-edit-\d+-company\b""", "manage-companies-edit-company")
+          + ".heading"
+      ).toString
+    ).body.text
 
     layout(
       pageTitle = (errorTitle + s"$plainTextHeading - ${messages("common.title")} - ${messages("common.title.suffix")}").some
