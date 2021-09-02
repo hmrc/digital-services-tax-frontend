@@ -74,22 +74,41 @@
         )
     }
 
-    val crossBorderRow = SummaryListRow(
-        key = Key(
-            content = HtmlContent(messages(s"$key.report-cross-border-transaction-relief.question"))
-        ),
-        value = Value(
-            content = HtmlContent(if(ret.crossBorderReliefAmount != Money(0)){ messages("common.yes")} else { messages("common.no")})
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"$serviceUrl/${per.key}/report-cross-border-transaction-relief",
-                    content = HtmlContent(messages("common.change")),
-                    visuallyHiddenText = Some(messages(s"$key.report-cross-border-transaction-relief.change").toString)
+    val crossBorderRow =Seq(
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.report-cross-border-transaction-relief.question"))
+            ),
+            value = Value(
+                content = HtmlContent(if(ret.crossBorderReliefAmount != Money(0)){ messages("common.yes")} else { messages("common.no")})
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/${per.key}/report-cross-border-transaction-relief",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.report-cross-border-transaction-relief.change").toString)
+                    )
                 )
-            )
-        ))
+            ))
+        ),
+        SummaryListRow(
+            key = Key(
+                content = HtmlContent(messages(s"$key.relief-deducted.question"))
+            ),
+            value = Value(
+                content = HtmlContent(s"£${ret.crossBorderReliefAmount}")
+            ),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = s"$serviceUrl/${per.key}/relief-deducted",
+                        content = HtmlContent(messages("common.change")),
+                        visuallyHiddenText = Some(messages(s"$key.relief-deducted.change").toString)
+                    )
+                )
+            ))
+        )
     )
 
     val companiesAmountRows = ret.companiesAmount.zipWithIndex.map { case (co, i) =>
@@ -98,7 +117,7 @@
                 content = HtmlContent(messages(s"$key.group-company", co._1.name))
             ),
             value = Value(
-                content = HtmlContent(s"£ ${co._2}")
+                content = HtmlContent(s"£${co._2}")
             ),
             actions = Some(Actions(
                 items = Seq(
@@ -112,7 +131,7 @@
         )
     }.toSeq
 
-    (totalLiabilityRow +: allowanceAmountRow :+ crossBorderRow) ++ companiesAmountRows
+    (totalLiabilityRow +: allowanceAmountRow) ++ crossBorderRow ++ companiesAmountRows
 }
 
 @bankDetailsRows = @{
