@@ -683,7 +683,7 @@ report-cross-border-transaction-relief.required=Select yes if you are claiming a
 
 #relief deducted
 relief-deducted.heading=How much cross-border transactions relief have you deducted from revenues in this return?
-relief-deducted.required=Enter the amount of cross-border transactions relief you have deducted from revenues in this return
+relief-deducted.required=Enter the amount of cross-border transactions relief you have deducted from revenues in this return in pounds or pounds and pence
 relief-deducted.not-a-number=The amount of cross-border transactions relief you deducted from revenues must be an amount of \
   money, like 1,234.56 or 1,560.00
 relief-deducted.length.exceeded=The amount of cross-border transactions relief you deducted from revenues must be 15 numbers or fewer
@@ -715,7 +715,7 @@ allowance-deducted.max-money=The amount of the £25m annual allowance you have d
 #Group Liability
 group-liability.heading=What is the {0}’s total UK Digital Services Tax liability for {1} to {2}?
 group-liability.hint=This is the total amount of liability after applying any deductions and allowances.
-group-liability.required=Enter the {0}’s total Digital Services Tax liability for {1} to {2}
+group-liability.required=Enter the {0}’s total Digital Services Tax liability for {1} to {2} in pounds or pounds and pence
 group-liability.not-a-number=The {0}’s total liability must be an amount of money, like 1,234.56 or 1,560.00
 group-liability.length.exceeded=The {0}’s total liability must be 15 numbers or fewer
 group-liability.invalid=The {0}’s total liability must be 15 numbers or fewer
