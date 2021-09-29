@@ -288,8 +288,7 @@ check-your-answers.reg.contact-details.change.email=Change email address
 
 check-your-answers.reg.liability-date.title=Accounting period details
 check-your-answers.reg.liability-start-date.question=Liability start date
-check-your-answers.reg.check-liability-date.change=Change the date the company become liable for Digital Services Tax
-check-your-answers.reg.liability-start-date.change=Change the liability start date
+check-your-answers.reg.liability-start-date.change=Change the date the company became liable for Digital Services Tax
 
 check-your-answers.reg.accounting-end-date.question=First accounting period end date
 check-your-answers.reg.accounting-end-date.change=Change the first accounting period end date
@@ -502,9 +501,6 @@ contact-details.email.length.exceeded=Email address must be 132 characters or fe
 email.required=Please enter an email address
 email.invalid=Please enter a valid email address
 email.length.exceeded=Email address must be 132 characters or fewer
-
-#Check liability date
-check-liability-date.required=Select yes if the {0} was liable for Digital Services Tax on 1 April 2020
 
 #liability start date
 not-a-date=Enter a real date
