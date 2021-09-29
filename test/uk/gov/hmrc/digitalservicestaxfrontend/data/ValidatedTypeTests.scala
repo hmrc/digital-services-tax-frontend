@@ -16,18 +16,17 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.data
 
-import java.time.LocalDate
-
 import cats.implicits._
 import cats.kernel.Monoid
 import org.scalacheck.Gen
 import org.scalactic.anyvals.PosInt
 import org.scalatest.{FlatSpec, Matchers}
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.frontend._
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
+
+import java.time.LocalDate
 
 class ValidatedTypeTests extends FlatSpec with Matchers with ConfiguredPropertyChecks {
 

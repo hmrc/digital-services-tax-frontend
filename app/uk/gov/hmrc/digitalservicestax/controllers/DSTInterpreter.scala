@@ -178,16 +178,14 @@ class DSTInterpreter @Inject()(
   }
 
 
-  implicit def phoneField(
-    implicit request: Request[AnyContent]
-  )=
+  implicit def phoneField =
     validatedString(
       PhoneNumber,
       24
     )
 
 
-  implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A], request: Request[AnyContent]): WebAsk[Html, Set[A]] =
+  implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, Set[A]] =
     new WebAsk[Html, Set[A]] {
 
       def decode(out: Input): Either[ErrorTree,Set[A]] = {
@@ -221,7 +219,7 @@ class DSTInterpreter @Inject()(
           existingValues,
           errors,
           messages
-        )(request).some
+        ).some
       }
 
     }

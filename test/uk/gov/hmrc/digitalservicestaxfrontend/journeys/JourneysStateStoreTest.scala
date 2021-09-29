@@ -17,11 +17,10 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
 import com.outworkers.util.domain.ShortString
-import uk.gov.hmrc.digitalservicestax.repo.{JourneyState, JourneyStateStoreImpl}
-import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import com.outworkers.util.samplers._
 import play.api.libs.json.{JsObject, JsString, Json}
-import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
+import uk.gov.hmrc.digitalservicestax.repo.{JourneyState, JourneyStateStoreImpl}
+import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

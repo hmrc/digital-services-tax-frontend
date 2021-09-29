@@ -18,7 +18,6 @@ package uk.gov.hmrc.digitalservicestaxfrontend.connectors
 
 import java.time.format.DateTimeFormatter
 
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.http.Status
 import play.api.mvc.{AnyContent, Results}
 import play.api.test.FakeRequest
@@ -50,7 +49,7 @@ class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyCh
   }
 
   "should trigger reaver method to perform a delete" in {
-    whenReady(persistence.reaver) { res =>
+    whenReady(persistence.reaver) { _ =>
       info("Reaver method invoked")
     }
   }

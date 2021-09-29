@@ -94,8 +94,6 @@ class ReturnsController @Inject()(
     implicit request: AuthorisedRequest[AnyContent] =>
       implicit val msg: UniformMessages[Html] = messages(request)
 
-      //TODO Cache radio button selection
-
        implicit val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
          MongoPersistence[AuthorisedRequest[AnyContent]](
            mongo,

@@ -47,8 +47,6 @@ import scala.concurrent.Future
 
 class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with ConfiguredPropertyChecks {
 
-  lazy val authConnector: PlayAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig)
-
   // Run wiremock server on local machine with specified port.
   val inet = new URI(authConnector.serviceUrl)
   val wireMockServer = new WireMockServer(wireMockConfig().port(inet.getPort))

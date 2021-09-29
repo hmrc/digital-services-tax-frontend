@@ -18,15 +18,8 @@
 @this(
     govukFieldSet: GovukFieldset
 )
-@(key: String, content: Html, isCompoundField: Boolean, hasHint: Boolean, hasErrors: Boolean, hasIntro: Boolean)(implicit messages: UniformMessages[Html])
+@(key: String, content: Html, hasErrors: Boolean)(implicit messages: UniformMessages[Html])
 
-@describedByClass = @{
-    val ariaHint = if(hasHint) Some(s"$key-hint") else None
-    val ariaErrors = if(hasErrors) Some(s"$key-error") else None
-    val ariaIntro = if(hasIntro) Some(s"$key-intro") else None
-    val ariaContent = if(content.toString().contains(s"id='${key}--sfer-content'")) Some(s"$key--sfer-content") else None
-    List(ariaHint, ariaErrors, ariaIntro, ariaContent).collect{ case Some(s) => s }.mkString(" ")
-}
 @isCompoundField= @{
     List(
         "contact-details",
@@ -46,7 +39,7 @@
 }
     @if(isCompoundField){
         @govukFieldSet(Fieldset(
-            legend = messages.get(s"$key.heading").fold(Option.empty[Legend]){ leg =>
+            legend = messages.get(s"$key.heading").fold(Option.empty[Legend]){ _ =>
                 Some(
                     Legend(
                         content = headHintAndLegend,

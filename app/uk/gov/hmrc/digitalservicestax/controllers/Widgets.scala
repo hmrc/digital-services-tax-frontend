@@ -29,8 +29,8 @@ trait Widgets {
 
   implicit val appConfig: AppConfig
 
-  implicit val blah3: WebAsk[Html, Nothing] = new WebAsk[Html, Nothing] {
-    def decode(out: Input): Either[ErrorTree,Nothing] =
+  implicit val impossibleAsk: WebAsk[Html, Nothing] = new WebAsk[Html, Nothing] {
+    def decode(out: Input): Either[ErrorTree, Nothing] =
       Left(ErrorMsg("impossible-state").toTree)
 
     def encode(in: Nothing): Input =

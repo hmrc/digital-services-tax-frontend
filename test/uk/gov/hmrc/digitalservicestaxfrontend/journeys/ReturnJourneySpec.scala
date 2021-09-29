@@ -43,7 +43,6 @@ class ReturnJourneySpec extends FlatSpec with Matchers {
   implicit val sampleListQty = SampleListQty[GroupCompany](1)
 
   "If the registration is not for a group we" should "not see manage-companies questions" in {
-    implicit val sampleGroupCompanyListAsk = instances(List.empty[GroupCompany])
     val ret:Return = LogicTableInterpreter.interpret(ReturnJourney.returnJourney(
       samplePeriod,
       sampleReg

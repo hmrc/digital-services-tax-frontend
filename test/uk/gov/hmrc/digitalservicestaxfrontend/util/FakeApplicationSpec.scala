@@ -18,7 +18,7 @@ package uk.gov.hmrc.digitalservicestaxfrontend.util
 
 import akka.actor.ActorSystem
 import com.softwaremill.macwire.wire
-import org.scalatest.TryValues
+import org.scalatest.{Matchers, TryValues}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{BaseOneAppPerSuite, FakeApplicationFactory, PlaySpec}
 import play.api.i18n.MessagesApi
@@ -29,13 +29,17 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.{Application, ApplicationLoader}
 import play.modules.reactivemongo.DefaultReactiveMongoApi
 import reactivemongo.api.MongoConnection
+import uk.gov.hmrc.auth.core.PlayAuthConnector
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.test.TestConnector
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, PayYourDst}
+import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.mongo.MongoSpecSupport
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -55,11 +59,15 @@ trait FakeApplicationSpec extends PlaySpec
   lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
   lazy val httpAuditing: HttpAuditing = app.injector.instanceOf[HttpAuditing]
   lazy val httpClient: HttpClient = new DefaultHttpClient(configuration, httpAuditing, wsClient, actorSystem)
+  lazy val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
+  lazy val authConnector: PlayAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig)
+  lazy val layoutInstance: Layout = app.injector.instanceOf[Layout]
+  lazy val payYourDst: PayYourDst = app.injector.instanceOf[PayYourDst]
 
   lazy val appConfig: AppConfig = wire[AppConfig]
   val servicesConfig: ServicesConfig = wire[ServicesConfig]
 
-  val testConnector: TestConnector = new TestConnector(httpClient, environment, configuration, servicesConfig)
+  val testConnector: TestConnector = new TestConnector(httpClient, servicesConfig)
 
   override def fakeApplication(): Application = {
     GuiceApplicationBuilder(environment = environment).configure(
