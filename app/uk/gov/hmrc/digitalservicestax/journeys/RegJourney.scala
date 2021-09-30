@@ -161,28 +161,22 @@ object RegJourney {
            }
           contactDetails <- ask[ContactDetails]("contact-details")
           groupMessage = if(isGroup) "group" else "company"
-          liabilityDate <- ask[Boolean] (
-            "check-liability-date",
-            customContent = message("check-liability-date.required", groupMessage)
-          ) flatMap {
-              case true => pure(LocalDate.of(2020, 4, 1)) // this is the policy start and will not change
-              case false =>
-                ask[LocalDate]("liability-start-date",
-                  validation =
-                    Rule.min(LocalDate.of(2020, 4, 1), "minimum-date") followedBy
-                    Rule.max(LocalDate.now.plusYears(1), "maximum-date"),
-                  customContent =
-                    message("liability-start-date.maximum-date", groupMessage, formatDate(LocalDate.now.plusYears(1))) ++
-                    message("liability-start-date.minimum-date", groupMessage) ++
-                    message("liability-start-date.day-and-month-and-year.empty", groupMessage) ++
-                    message("liability-start-date.day.empty", groupMessage) ++
-                    message("liability-start-date.month.empty", groupMessage) ++
-                    message("liability-start-date.year.empty", groupMessage) ++
-                    message("liability-start-date.day-and-month.empty", groupMessage) ++
-                    message("liability-start-date.day-and-year.empty", groupMessage) ++
-                    message("liability-start-date.month-and-year.empty", groupMessage)
-                )
-          }
+          liabilityDate <- ask[LocalDate](
+            "liability-start-date",
+            validation =
+              Rule.min(LocalDate.of(2020, 4, 1), "minimum-date") followedBy
+                Rule.max(LocalDate.now.plusYears(1), "maximum-date"),
+            customContent =
+              message("liability-start-date.maximum-date", groupMessage, formatDate(LocalDate.now.plusYears(1))) ++
+              message("liability-start-date.minimum-date", groupMessage) ++
+              message("liability-start-date.day-and-month-and-year.empty", groupMessage) ++
+              message("liability-start-date.day.empty", groupMessage) ++
+              message("liability-start-date.month.empty", groupMessage) ++
+              message("liability-start-date.year.empty", groupMessage) ++
+              message("liability-start-date.day-and-month.empty", groupMessage) ++
+              message("liability-start-date.day-and-year.empty", groupMessage) ++
+              message("liability-start-date.month-and-year.empty", groupMessage)
+          )
           periodEndDate <- ask[LocalDate] (
             "accounting-period-end-date",
             validation =

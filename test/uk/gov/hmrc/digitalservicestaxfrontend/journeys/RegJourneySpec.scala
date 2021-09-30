@@ -17,36 +17,37 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
 import java.time.LocalDate
-
 import ltbs.uniform.interpreters.logictable._
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.digitalservicestax.data._
 import TestSampleData._
+import shapeless.tag.@@
+import uk.gov.hmrc.digitalservicestax.data
 import uk.gov.hmrc.digitalservicestax.journeys.RegJourney
 import uk.gov.hmrc.digitalservicestaxfrontend.util.TestDstService
 
 class RegJourneySpec extends FlatSpec with Matchers {
 
-  implicit val sampleUtrAsk = instances(UTR("1234567891"))
-  implicit val samplePostcodeAsk = instances(Postcode("BN1 1NB"))
-  implicit val sampleDateAsk = instances(LocalDate.of(2021, 3, 31))
-  implicit val sampleContactDetailsAsk = instances(sampleContact)
-  implicit val sampleInternationalAddressAsk = instances(internationalAddress)
-  implicit val sampleUkAddressAsk = instances(sampleAddress)
-  implicit val sampleBooleanAsk = instances(true)
+  implicit val sampleUtrAsk: SampleData[String @@ data.UTR.Tag] = instances(UTR("1234567891"))
+  implicit val samplePostcodeAsk: SampleData[String @@ data.Postcode.Tag] = instances(Postcode("BN1 1NB"))
+  implicit val sampleDateAsk: SampleData[LocalDate] = instances(LocalDate.of(2021, 3, 31))
+  implicit val sampleContactDetailsAsk: SampleData[ContactDetails] = instances(sampleContact)
+  implicit val sampleInternationalAddressAsk: SampleData[ForeignAddress] = instances(internationalAddress)
+  implicit val sampleUkAddressAsk: SampleData[UkAddress] = instances(sampleAddress)
+  implicit val sampleBooleanAsk: SampleData[Boolean] = instances(true)
 
-  implicit val sampleCompanyName = instancesF {
+  implicit val sampleCompanyName: SampleData[String @@ data.CompanyName.Tag] = instancesF {
     case "company-name" => List(CompanyName("Supplied company name"))
     case _ => List(CompanyName("Foo Ltd"))
   }
 
   "when the global revenue is under £500m we" should "kick the user out" in {
-    implicit val sampleBooleanAsk = instances(false)
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instances(false)
     assert(LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.isEmpty)
   }
 
   "when the UK revenue is under £25m we" should "kick the user out" in {
-    implicit val sampleBooleanAsk = instancesF {
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "uk-revenues" => List(false)
       case _ => List(true)
     }
@@ -59,7 +60,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
   }
 
   "when there is no Company from sign in and the user does not supply a UTR we" should "get a Registration with the supplied Company name" in {
-    implicit val sampleBooleanAsk = instancesF {
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "check-unique-taxpayer-reference" => List(false)
       case _ => List(true)
     }
@@ -74,7 +75,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
   }
 
   "when there is no Company from sign in & no supplied UTR & an InternationalAddress is specified we" should "get a Registration with an InternatinalAddress" in {
-    implicit val sampleBooleanAsk = instancesF {
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "check-unique-taxpayer-reference" => List(false)
       case "check-company-registered-office-address" => List(false)
       case _ => List(true)
@@ -89,7 +90,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
   }
 
   "when there is no Company from sign in & no supplied UTR & a UkAddress is specified we" should "get a Registration with a UkAddress" in {
-    implicit val sampleBooleanAsk = instancesF {
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "check-unique-taxpayer-reference" => List(true)
       case _ => List(true)
     }
@@ -114,7 +115,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
   }
 
   "when there is a Company from sign in, saying this is the wrong company" should "kick you out of the journey " in {
-    implicit val sampleBooleanAsk = instancesF {
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "confirm-company-details" => List(false)
       case _ => List(true)
     }
@@ -134,7 +135,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
   }
 
   "when there is no Company from sign in, and the one found by UTR is rejected by the user we" should "be kicked out" in {
-    implicit val sampleBooleanAsk = instancesF {
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "confirm-company-details" => List(false)
       case _ => List(true)
     }
@@ -147,7 +148,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
   }
 
   "the Registration" should "have an alternativeContact when user elected to provide one" in {
-    implicit val sampleBooleanAsk = instancesF {
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "company-contact-address" => List(false)
       case _ => List(true)
     }
@@ -167,7 +168,7 @@ class RegJourneySpec extends FlatSpec with Matchers {
     reg.alternativeContact should be ('empty)
   }
 
-  "the Registation" should "have an ultimateParent when the user elected to provide one" in {
+  "the Registration" should "have an ultimateParent when the user elected to provide one" in {
     val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
       testService
     )).value.run.asOutcome()
@@ -175,8 +176,8 @@ class RegJourneySpec extends FlatSpec with Matchers {
     reg.ultimateParent should be ('defined)
   }
 
-  "the Registation" should "not have an ultimateParent when the user elected not to provide one" in {
-    implicit val sampleBooleanAsk = instancesF {
+  "the Registration" should "not have an ultimateParent when the user elected not to provide one" in {
+    implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "check-if-group" => List(false)
       case _ => List(true)
     }
@@ -186,14 +187,6 @@ class RegJourneySpec extends FlatSpec with Matchers {
     )).value.run.asOutcome()
 
     reg.ultimateParent should be ('empty)
-  }
-
-  "when the user chooses not to provide a liability start it " should "be set to 2020-04-06 " in {
-    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      testService
-    )).value.run.asOutcome()
-
-    reg.dateLiable shouldBe LocalDate.of(2020,4, 1)
   }
 
 }
