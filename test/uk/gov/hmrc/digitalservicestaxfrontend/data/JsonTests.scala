@@ -16,21 +16,20 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.data
 
-import java.time.LocalDate
 import com.outworkers.util.samplers._
-import enumeratum.EnumFormats
 import enumeratum.scalacheck._
+import ltbs.uniform.interpreters.playframework.DB
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.{Assertion, FlatSpec, Matchers, OptionValues}
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.libs.json._
+import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{Activity, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, PhoneNumber, Postcode, UTR}
-import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
-import ltbs.uniform.interpreters.playframework.DB
-import uk.gov.hmrc.auth.core.{Enrolment, Enrolments}
 import uk.gov.hmrc.digitalservicestax.repo.JourneyState
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
+import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
+
+import java.time.LocalDate
 
 class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
 

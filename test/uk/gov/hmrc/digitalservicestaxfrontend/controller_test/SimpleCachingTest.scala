@@ -16,18 +16,14 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.controller_test
 
-import java.util.concurrent.atomic.AtomicInteger
-
-import com.outworkers.util.samplers._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.prop.Configuration
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import uk.gov.hmrc.digitalservicestax.controllers.SimpleCaching
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
+import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

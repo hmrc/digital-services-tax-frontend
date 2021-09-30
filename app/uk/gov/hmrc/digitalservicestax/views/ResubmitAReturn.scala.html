@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.digitalservicestax.views.html.helpers._
 @import uk.gov.hmrc.digitalservicestax.frontend.formatDate
 @import uk.gov.hmrc.digitalservicestax.views.html.components.Button
 
@@ -64,7 +63,7 @@
                 classes = "govuk-body",
                 content = HtmlContent(s"<p class='govuk-body'>${messages("resubmit-a-return.amend-a-return").toString}</p>")
             )),
-            errorMessage = form.errors.headOption.map { error =>
+            errorMessage = form.errors.headOption.map { _ =>
                 ErrorMessage(
                     content = HtmlContent(messages(s"$key.required"))
                 )

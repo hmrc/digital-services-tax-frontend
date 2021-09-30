@@ -20,8 +20,6 @@ import java.time.LocalDate
 
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.digitalservicestax.frontend._
-import TestInstances._
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 class DateFormatTests extends FlatSpec with ConfiguredPropertyChecks with Matchers {
 

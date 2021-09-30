@@ -65,7 +65,7 @@
 @hintAndIntro=@{
     import collection.immutable.Seq
 
-    val details = messages.get(s"$keyWithDots.details").map { details =>
+    val details = messages.get(s"$keyWithDots.details").map { _ =>
         govukDetails(Details(
             summary = HtmlContent(messages(s"$keyWithDots.details")),
             content = HtmlContent(messages(s"$keyWithDots.details.text"))
@@ -104,7 +104,7 @@
     @govukRadios(Radios(
         fieldset =
                 Some(Fieldset(
-                        legend = messages.get(s"$keyWithDots.heading").fold(Option.empty[Legend]){ leg =>
+                        legend = messages.get(s"$keyWithDots.heading").fold(Option.empty[Legend]){ _ =>
                             Some(
                                 Legend(
                                     content = headHintAndLegend,

@@ -19,7 +19,6 @@ package controllers
 
 import data._
 import connectors._
-import akka.http.scaladsl.model.headers.LinkParams.title
 import cats.implicits._
 import config.AppConfig
 
@@ -47,8 +46,7 @@ class JourneyController @Inject()(
   servicesConfig: ServicesConfig,
   layout: Layout,
   landing: Landing,
-  val mongo: play.modules.reactivemongo.ReactiveMongoApi,
-  defaultActionBuilder: DefaultActionBuilder
+  val mongo: play.modules.reactivemongo.ReactiveMongoApi
 )(
   implicit ec: ExecutionContext,
   val messagesApi: MessagesApi,
@@ -82,7 +80,7 @@ class JourneyController @Inject()(
             reg, outstandingPeriods.toList.sortBy(_.start), amendedPeriods.toList.sortBy(_.start))))
           }
 
-      case Some(reg) =>
+      case Some(_) =>
         Future.successful(
           Ok(layout(
             pageTitle =

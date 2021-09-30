@@ -20,10 +20,9 @@
 )
 
 
-@(key: List[String], options: Seq[String], existing: Set[String], errors: ErrorTree, messages: UniformMessages[Html], conditional: PartialFunction[String,Html] = PartialFunction.empty )(implicit request: Request[AnyContent])
+@(key: List[String], options: Seq[String], existing: Set[String], errors: ErrorTree, messages: UniformMessages[Html])
 
 @keyNoDots=@{key.mkString("-")}
-@inlineCheckboxKeys=@{(key.mkString(".") == "loan-amount.estimate")}
 
 @standard_field(key, errors, messages, false) {
 

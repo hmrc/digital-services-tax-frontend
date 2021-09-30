@@ -111,7 +111,7 @@ case class MongoPersistence[A <: Request[AnyContent]] (
 
   def apply(request: A)(f: DB => Future[(DB, Result)]): Future[Result] = {
     collection.flatMap(_.find(selector(request)).one[Wrapper]).flatMap {
-      case Some(Wrapper(_, data, _, d)) if {d isBefore killDate} & !useMongoTTL =>
+      case Some(Wrapper(_, _, _, d)) if {d isBefore killDate} & !useMongoTTL =>
         reaver.flatMap{_ => f(DB.empty)}
       case Some(Wrapper(_, data, _, _)) =>
         f(data)

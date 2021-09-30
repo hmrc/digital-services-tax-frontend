@@ -26,22 +26,21 @@ import ltbs.uniform.interpreters.playframework._
 import cats.syntax.semigroup._
 import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut
 
-import scala.concurrent.ExecutionContext
 import play.twirl.api.HtmlFormat
 
 class AuthenticationController @Inject()(mcc: MessagesControllerComponents, timeOutView: TimeOut)
-  (implicit appConfig: AppConfig, ec: ExecutionContext)
+  (implicit appConfig: AppConfig)
   extends FrontendController(mcc) with I18nSupport {
 
-  def signIn: Action[AnyContent] = Action { implicit request =>
+  def signIn: Action[AnyContent] = Action {
     Redirect(appConfig.ggLoginUrl, Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName)))
   }
 
-  def signOut: Action[AnyContent] = Action { implicit request =>
+  def signOut: Action[AnyContent] = Action {
     Redirect(appConfig.signOutDstUrl).withNewSession
   }
 
-  def timeIn(referrer: String): Action[AnyContent] = Action { implicit request =>
+  def timeIn(referrer: String): Action[AnyContent] = Action {
     Redirect(appConfig.ggLoginUrl, Map("continue" -> Seq(referrer), "origin" -> Seq(appConfig.appName)))
   }
 

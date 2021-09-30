@@ -17,7 +17,6 @@
 package uk.gov.hmrc.digitalservicestax.test
 
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.http.HttpClient
@@ -28,8 +27,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class TestConnector @Inject()(
   http: HttpClient,
-  environment: Environment,
-  configuration: Configuration,
   servicesConfig: ServicesConfig
 ) {
 

@@ -56,7 +56,7 @@ class AuthorisedAction @Inject()(
 
     val retrieval =  allEnrolments and credentialRole and internalId and affinityGroup
 
-    authorised(AuthProviders(GovernmentGateway, Verify) and Organisation and User).retrieve(retrieval) { case enrolments ~ role ~ id ~ affinity  =>
+    authorised(AuthProviders(GovernmentGateway, Verify) and Organisation and User).retrieve(retrieval) { case enrolments ~ _ ~ id ~ _  =>
 
       val internalIdString = id.getOrElse(throw new RuntimeException("No internal ID for user"))
       val internalId = InternalId.of(internalIdString).getOrElse(

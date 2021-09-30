@@ -12,7 +12,6 @@ window.HMRCFrontend.initAll();
         });
 
         var wrapper = document.querySelector('.country-code-wrapper');
-        // TODO - not entirely sure this is desired behaviour so not implementing - nb this file is not included in govuk_wrapper
         function resetSelectIfEmpty(e) {
             if (e.target.id === 'countryCode') {
                 var val = e.target.value.trim();

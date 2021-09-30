@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import cats.implicits._
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
 @import ltbs.uniform.{Input => _, _}
 
@@ -35,7 +34,7 @@
 
   @for(field <- fieldList) {
     @defining(
-        addressKey match {
+        (addressKey match {
             case "UkAddress" =>
                 field match {
                     case "line3" | "line4" => "govuk-!-width-two-thirds"
@@ -57,8 +56,7 @@
         case "postalCode" => "postal-code"
         case _ => ""
       },
-      errors.valueAtPath(List(field))
-
+      errors.valueAtPath(List(field)))
     ) { case (formControlClass, autoComplete, errorOpt) =>
 		@if(field == "countryCode") {
 

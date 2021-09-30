@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import scala.concurrent.duration.Duration
 
 @Singleton
-class AppConfig @Inject()(val config: Configuration, servicesConfig: ServicesConfig, environment: Environment) {
+class AppConfig @Inject()(val config: Configuration, servicesConfig: ServicesConfig) {
 
   private def loadConfig(key: String) = config.get[String](key)
 

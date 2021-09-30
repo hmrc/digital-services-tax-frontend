@@ -71,7 +71,7 @@
     import collection.immutable.Seq
 
     val hint = messages.get(s"${key.mkString(".")}.hint")
-    val details = messages.get(s"$keyWithDots.details").map { details =>
+    val details = messages.get(s"$keyWithDots.details").map { _ =>
         govukDetails(Details(
             summary = HtmlContent(messages(s"$keyWithDots.details")),
             content = HtmlContent(messages(s"$keyWithDots.details.text"))

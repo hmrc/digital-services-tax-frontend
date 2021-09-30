@@ -23,7 +23,6 @@
 @(keyList: List[String], errors: ErrorTree, messages: UniformMessages[Html], showErrors: Boolean = true, showDetails: Boolean = true)(inner: Html)
 
 @key=@{keyList.mkString(".")}
-@errorKey=@{s"${keyList.mkString(".")}-error"}
 
 @messages.get(s"$key.heading.large").map { largeHead =>
   @if(keyList.length == 1) {
@@ -46,15 +45,15 @@
     }
 }
 
-@messages.get(s"$key.heading.large.label").map { largeLabel =>
+@messages.get(s"$key.heading.large.label").map { _ =>
     <label class="label heading-m margin-bottom-20" for="@{keyList.mkString("_")}-input">@messages.decompose(s"$key.heading.large.label")</label>
 }
 
-@messages.get(s"$key.intro").map { hint =>
+@messages.get(s"$key.intro").map { _ =>
   <span id="@key-hint" class="hint">@messages.decompose(s"$key.intro")</span>
 }
 @if(showDetails){
-    @messages.get(s"$key.details").map { details =>
+    @messages.get(s"$key.details").map { _ =>
         @govukDetails(Details(
             summary = HtmlContent(messages(s"$key.details")),
             content = HtmlContent(messages(s"$key.details.text"))

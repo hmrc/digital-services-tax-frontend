@@ -48,7 +48,6 @@ package object journeys {
     }
   }
 
-  // TODO consider lifting to uniform
   implicit class RichErrorTree (in: ErrorTree) {
     def humanReadable: String = in.map {
       case (a, b) =>

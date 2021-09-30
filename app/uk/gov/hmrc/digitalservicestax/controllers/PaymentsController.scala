@@ -75,7 +75,7 @@ class PaymentsController @Inject()(
               Some(s"${msg("common.title.short")} - ${msg("common.title")}")
           )(payYourDst(reg.registrationNumber, periods.toList.sortBy(_.start))(msg)))
         }
-      case Some(reg) =>
+      case Some(_) =>
         Future.successful(
           Ok(layout(
             pageTitle =
