@@ -13,7 +13,7 @@ object AppDependencies {
     "com.beachape"            %% "enumeratum-play-json"         % "1.7.0",
     "com.luketebbs.uniform"   %% "interpreter-play28"           % uniformVersion,
     "uk.gov.hmrc"             %% "mongo-caching"                % "7.0.0-play-28",
-    "org.reactivemongo"       %% "play2-reactivemongo"          % "0.18.6-play26", // TODO fix /home/luke/hmrc/digital-services-tax-frontend/app/uk/gov/hmrc/digitalservicestax/connectors/MongoPersistence.scala:85:21 for v0.20.10 upgrade
+    "org.reactivemongo"       %% "play2-reactivemongo"          % "0.18.6-play26",
     "commons-validator"       % "commons-validator"             % "1.6",
     "uk.gov.hmrc"             %% "bootstrap-frontend-play-28"   % "5.10.0",
     "fr.marcwrobel"           % "jbanking"                      % "3.1.1",
