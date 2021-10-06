@@ -92,12 +92,12 @@ object RegJourney {
                       case None =>
                         for {
                           companyName <- ask[CompanyName](
-                            "not-found-company-name",
+                            "company-name",
                             validation = cond[CompanyName](nameCheck(_), "invalid")
                           )
                           companyAddress <- ask[UkAddress](
-                            "not-found-company-registered-office-uk-address",
-                            customContent = message("not-found-company-registered-office-uk-address.listing.heading", companyName)
+                            "company-registered-office-uk-address",
+                            customContent = message("company-registered-office-uk-address.listing.heading", companyName)
                           ).map(identity)
                         } yield CompanyRegWrapper(Company(companyName, companyAddress), useSafeId = true)
                       case Some(crw) =>
