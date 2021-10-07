@@ -27,9 +27,6 @@ class AppConfig @Inject()(val config: Configuration, servicesConfig: ServicesCon
 
   private def loadConfig(key: String) = config.get[String](key)
 
-  private val assetsUrl: String = loadConfig("assets.url")
-  lazy val assetsPrefix: String = assetsUrl + loadConfig("assets.version")
-
   lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
   lazy val analyticsHost: String  = loadConfig(s"google-analytics.host")
 

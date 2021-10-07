@@ -21,10 +21,6 @@ import scala.concurrent.duration._
 
 class ConfigTest extends FakeApplicationSpec {
 
-  "should load a non empty assets prefix" in {
-    appConfig.assetsPrefix.nonEmpty mustEqual true
-  }
-
   "should load an app name from the configuration" in {
     appConfig.appName.nonEmpty mustEqual true
   }
