@@ -36,7 +36,7 @@ class AppConfig @Inject()(val config: Configuration, servicesConfig: ServicesCon
   private lazy val companyAuthSignOutPath: String = servicesConfig.getConfString("company-auth.sign-out-path", "")
   lazy val ggLoginUrl: String                     = s"$companyAuthFrontend$companyAuthSignInPath"
   
-  private val contactHost: String = loadConfig("contact-frontend.host")
+  lazy val contactHost: String = loadConfig("contact-frontend.host")
   lazy val serviceName: String    = loadConfig("serviceName")
 
   lazy val reportAProblemPartialUrl: String = s"$contactHost/contact/problem_reports_ajax?service=$serviceName"
