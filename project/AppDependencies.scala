@@ -6,16 +6,17 @@ import sbt._
 object AppDependencies {
 
   val uniformVersion = "5.0.0-RC1"
+  val bootstrapVersion = "5.14.0"
 
   val compile = Seq(
-    "uk.gov.hmrc"             %% "play-frontend-hmrc"           % "0.90.0-play-28",
+    "uk.gov.hmrc"             %% "play-frontend-hmrc"           % "1.19.0-play-28",
     "com.chuusai"             %% "shapeless"                    % "2.3.3",
     "com.beachape"            %% "enumeratum-play-json"         % "1.7.0",
     "com.luketebbs.uniform"   %% "interpreter-play28"           % uniformVersion,
     "uk.gov.hmrc"             %% "mongo-caching"                % "7.0.0-play-28",
     "org.reactivemongo"       %% "play2-reactivemongo"          % "0.18.6-play26",
     "commons-validator"       % "commons-validator"             % "1.6",
-    "uk.gov.hmrc"             %% "bootstrap-frontend-play-28"   % "5.10.0",
+    "uk.gov.hmrc"             %% "bootstrap-frontend-play-28"   % bootstrapVersion,
     "fr.marcwrobel"           % "jbanking"                      % "3.1.1",
     "org.jsoup"               % "jsoup"                         % "1.14.2"
   )
