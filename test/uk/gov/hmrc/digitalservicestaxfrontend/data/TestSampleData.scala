@@ -24,6 +24,8 @@ import uk.gov.hmrc.digitalservicestax.data.Activity.{OnlineMarketplace, SearchEn
 
 object TestSampleData {
 
+
+
   val sampleAddress = UkAddress (
     AddressLine("12 The Street"),
     AddressLine("False Crescent").some,
