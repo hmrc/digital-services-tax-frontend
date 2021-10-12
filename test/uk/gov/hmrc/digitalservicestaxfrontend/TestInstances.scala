@@ -298,20 +298,20 @@ object TestInstances {
 
   implicit def arbForeignAddress: Arbitrary[ForeignAddress] = Arbitrary {
     (
-      arbitrary[AddressLine],
-      arbitrary[Option[AddressLine]],
-      arbitrary[Option[AddressLine]],
-      arbitrary[Option[AddressLine]],
+      arbitrary[AddressLine].retryUntil(x => x == x.trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
       arbitrary[CountryCode]
     ).mapN(ForeignAddress.apply)
   }
 
   implicit def arbUkAddress: Arbitrary[UkAddress] = Arbitrary {
     (
-      arbitrary[AddressLine],
-      arbitrary[Option[AddressLine]],
-      arbitrary[Option[AddressLine]],
-      arbitrary[Option[AddressLine]],
+      arbitrary[AddressLine].retryUntil(x => x == x.trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
       arbitrary[Postcode]
     ).mapN(UkAddress.apply)
   }

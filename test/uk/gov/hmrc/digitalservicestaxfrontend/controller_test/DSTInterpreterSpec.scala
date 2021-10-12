@@ -20,36 +20,53 @@ import cats.data.NonEmptyList
 import ltbs.uniform._
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import cats.implicits._
+import ltbs.uniform.common.web.WebAsk
+import org.scalatest.Assertion
+import play.api.test.Helpers._
 import play.twirl.api.Html
+import uk.gov.hmrc.digitalservicestax.data.Activity
+import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances
 
+import java.time.LocalDate
 import scala.collection.immutable.ListMap
 import scala.collection.mutable.WrappedArray
 
 class DSTInterpreterSpec extends FakeApplicationSpec {
 
-  "DSTInterpreter twirlBoolField" must {
-    "decode & encode boolean" in {
-      val bool = true
-      val foo: Input = interpreter.twirlBoolField.encode(bool)
-      val bar: Either[ErrorTree, Boolean] = interpreter.twirlBoolField.decode(foo)
-      val fakeInput: Input = Map(Nil -> List("bar"))
-      val foobar = interpreter.twirlBoolField.decode(fakeInput)
-      println(foobar)
-      bar mustBe Right(bool)
-
-
+  "DSTInterpreter codecs" must {
+    "decode & encode input" in {
+      testCodecRoundtrip(true, interpreter.twirlBoolField)
+      testCodecRoundtrip(false, interpreter.twirlBoolField)
+      testCodecRoundtrip("blah", interpreter.twirlStringFields())
+      testCodecRoundtrip(LocalDate.now, interpreter.twirlDateField)
+      testCodecRoundtrip(TestInstances.arbForeignAddress.arbitrary.sample.get, interpreter.twirlForeignAddressField)
+      testCodecRoundtrip(TestInstances.arbUkAddress.arbitrary.sample.get, interpreter.twirlUKAddressField)
+      testCodecRoundtrip[Activity](Activity.SocialMedia, interpreter.enumeratumField)
     }
-//    "render radios" in {
-//      val Some(html) = interpreter.twirlBoolField.render(
-//        Nil,
-//        Nil,
-//        None,
-//        Nil,
-//        Input.empty,
-//        ErrorTree.empty,
-//        UniformMessages.echo.map(Html.apply)
-//      )
-//
-//    }
+    "handle invalid boolean input" in {
+      val fakeInput: Input = Map(Nil -> List("bar"))
+      val Left(foobar) = interpreter.twirlBoolField.decode(fakeInput)
+      val NonEmptyList(err, _) = foobar.values.toList.head
+      err.msg mustBe "invalid"
+    }
+    "render radios for booleans" in {
+      val Some(html) = interpreter.twirlBoolField.render(
+        Nil,
+        List("foo"),
+        None,
+        Nil,
+        Input.empty,
+        ErrorTree.empty,
+        UniformMessages.echo.map(Html.apply)
+      )
+      contentAsString(html) must include("""type="radio" value="FALSE"""")
+      contentAsString(html) must include("""type="radio" value="TRUE"""")
+    }
+  }
+
+  def testCodecRoundtrip[A](raw: A, ask: WebAsk[Html, A]): Assertion = {
+    val a = ask.encode(raw)
+    val b = ask.decode(a)
+    b mustBe Right(raw)
   }
 }
