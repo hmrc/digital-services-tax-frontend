@@ -18,51 +18,162 @@ package uk.gov.hmrc.digitalservicestaxfrontend.controller_test
 
 import cats.data.NonEmptyList
 import ltbs.uniform._
-import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
-import cats.implicits._
-import ltbs.uniform.common.web.WebAsk
+import ltbs.uniform.common.web.{Breadcrumbs, WebAsk, WebAskList, WebTell}
 import org.scalatest.Assertion
 import play.api.test.Helpers._
 import play.twirl.api.Html
-import uk.gov.hmrc.digitalservicestax.data.Activity
-import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances
+import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import uk.gov.hmrc.digitalservicestaxfrontend.{ConfiguredPropertyChecks, TestInstances}
+import uk.gov.hmrc.govukfrontend.views.Implicits.RichHtml
 
 import java.time.LocalDate
-import scala.collection.immutable.ListMap
-import scala.collection.mutable.WrappedArray
 
-class DSTInterpreterSpec extends FakeApplicationSpec {
+class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChecks {
+
+  import TestInstances._
+  "DSTInterpreter codec " must {
+    "have round trip parity " in {
+      forAll {(ld: LocalDate, fa: ForeignAddress, uka: UkAddress, a: Activity, s: String, b: Boolean) =>
+        testCodecRoundtrip(ld, interpreter.twirlDateField)
+        testCodecRoundtrip(fa, interpreter.twirlForeignAddressField)
+        testCodecRoundtrip(uka, interpreter.twirlUKAddressField)
+        testCodecRoundtrip[Activity](a, interpreter.enumeratumField)
+        testCodecRoundtrip(s, interpreter.twirlStringFields())
+        testCodecRoundtrip(b, interpreter.twirlBoolField)
+      }
+      forAll {(cc: CountryCode, as: Set[Activity], u: Unit, i: Int, oUtr: Option[UTR], an: AccountName) =>
+        testCodecRoundtrip(cc, interpreter.twirlCountryCodeField)
+        testCodecRoundtrip(u, interpreter.blah)
+        testCodecRoundtrip[Set[Activity]](as, interpreter.enumeratumSetField)
+        testCodecRoundtrip(i, interpreter.intField)
+        testCodecRoundtrip(oUtr, interpreter.optUtrField)
+        testCodecRoundtrip(an, interpreter.accountNameField)
+
+      }
+      forAll { (anf: AccountNumber, bd: BigDecimal, bsri: Option[BuildingSocietyRollNumber], iban: IBAN, sc: SortCode, m: Money) =>
+        testCodecRoundtrip(anf, interpreter.accountNumberField)
+        testCodecRoundtrip(bd, interpreter.bigdecimalField)
+        testCodecRoundtrip(bsri, interpreter.BuildingSocietyRollNumberField)
+        testCodecRoundtrip(iban, interpreter.ibanField)
+        testCodecRoundtrip(sc, interpreter.sortCodeField)
+        testCodecRoundtrip(m, interpreter.moneyField)
+      }
+      forAll { (p: Percent, f: Float, l: Long, nes: NonEmptyString) =>
+        testCodecRoundtrip(p, interpreter.percentField)
+        testCodecRoundtrip(f, interpreter.floatField)
+        testCodecRoundtrip(l, interpreter.longField)
+        testCodecRoundtrip(nes, interpreter.nesField)
+      }
+    }
+
+  }
+
+  "DSTInterpreter render" must {
+    "return Html" in {
+      forAll { (_: LocalDate) => // n.b. forAll needs one arg but finds the other implicit Gen
+        testRender(interpreter.twirlDateField)
+        testRender(interpreter.blah)
+        testRender(interpreter.twirlForeignAddressField)
+        testRender(interpreter.twirlUKAddressField)
+        testRender[Activity](interpreter.enumeratumField, containsRadio)
+        testRender(interpreter.twirlStringFields())
+        testRender(interpreter.twirlBoolField, containsRadio)
+        testRender[Set[Activity]](interpreter.enumeratumSetField, html => contentAsString(html) must include("""type="checkbox""""))
+        testRender(interpreter.twirlCountryCodeField)
+        testRender(interpreter.intField)
+        testRender(interpreter.optUtrField)
+        testRender(interpreter.accountNameField)
+        testRender(interpreter.accountNumberField)
+        testRender(interpreter.bigdecimalField)
+        testRender(interpreter.BuildingSocietyRollNumberField)
+        testRender(interpreter.ibanField)
+        testRender(interpreter.sortCodeField)
+        testRender(interpreter.moneyField)
+        testRender(interpreter.percentField)
+        testRender(interpreter.floatField)
+        testRender(interpreter.longField)
+        testRender(interpreter.nesField)
+      }
+    }
+  }
 
   "DSTInterpreter codecs" must {
-    "decode & encode input" in {
-      testCodecRoundtrip(true, interpreter.twirlBoolField)
-      testCodecRoundtrip(false, interpreter.twirlBoolField)
-      testCodecRoundtrip("blah", interpreter.twirlStringFields())
-      testCodecRoundtrip(LocalDate.now, interpreter.twirlDateField)
-      testCodecRoundtrip(TestInstances.arbForeignAddress.arbitrary.sample.get, interpreter.twirlForeignAddressField)
-      testCodecRoundtrip(TestInstances.arbUkAddress.arbitrary.sample.get, interpreter.twirlUKAddressField)
-      testCodecRoundtrip[Activity](Activity.SocialMedia, interpreter.enumeratumField)
+    "handle invalid input" in {
+      forAll { (_: Boolean) =>
+        testErrors(interpreter.twirlBoolField)
+        testErrors[Activity](interpreter.enumeratumField)
+        testErrors[Set[Activity]](interpreter.enumeratumSetField)
+        testErrors(interpreter.twirlDateField, "day-and-month-and-year.empty")
+        testErrors(interpreter.twirlDateField, "not-a-date", Map(List("year") -> List("2017"), List("month") -> List("2"), List("day") -> List("30")))
+        testErrors(interpreter.nesField,"invalid", Map(Nil -> List("")))
+        testErrors(interpreter.BuildingSocietyRollNumberField, "length.exceeded", Map(Nil -> List("asdfasdfasdfasdfasdf")))
+        testErrors(interpreter.BuildingSocietyRollNumberField, "invalid", Map(Nil -> List("!!!")))
+        testErrors(interpreter.bigdecimalField, "not-a-number")
+      }
     }
-    "handle invalid boolean input" in {
-      val fakeInput: Input = Map(Nil -> List("bar"))
-      val Left(foobar) = interpreter.twirlBoolField.decode(fakeInput)
-      val NonEmptyList(err, _) = foobar.values.toList.head
-      err.msg mustBe "invalid"
-    }
-    "render radios for booleans" in {
-      val Some(html) = interpreter.twirlBoolField.render(
+  }
+
+  "DSTInterpreter " must {
+    "return Html for renderAnd with valid members" in {
+      val foo = (interpreter.renderAnd(
         Nil,
         List("foo"),
         None,
         Nil,
         Input.empty,
         ErrorTree.empty,
-        UniformMessages.echo.map(Html.apply)
+        UniformMessages.echo.map(Html.apply),
+        List(("foo", Html("memberA")), ("bar", Html("memberB")))
+      ))
+      foo.nonEmpty mustBe true
+    }
+    "return Html with radios for renderOr with valid alternatives" in {
+      val foo = interpreter.renderOr(
+        Nil,
+        List("foo"),
+        None,
+        Nil,
+        Input.empty,
+        ErrorTree.empty,
+        UniformMessages.echo.map(Html.apply),
+        List(("foo", None), ("bar", None)),
+        None
       )
-      contentAsString(html) must include("""type="radio" value="FALSE"""")
-      contentAsString(html) must include("""type="radio" value="TRUE"""")
+      foo.nonEmpty mustBe true
+      containsRadio(foo)
     }
   }
+
+  def testErrors[A](
+        ask: WebAsk[Html, A],
+        expectedErrMsg: String = "invalid",
+        badInput: Input = Map(Nil -> List("bar")),
+  ): Assertion = {
+    val Left(foo) = ask.decode(badInput)
+    val NonEmptyList(err, _) = foo.values.toList.head
+    err.msg mustBe expectedErrMsg
+  }
+
+  def testRender[A](
+    ask: WebAsk[Html, A],
+    extraAssertion: Html =>  Assertion = _ => 1 mustBe 1
+  ): Assertion = {
+    val foo = ask.render(
+      Nil,
+      List("foo"),
+      None,
+      Nil,
+      Input.empty,
+      ErrorTree.empty,
+      UniformMessages.echo.map(Html.apply)
+    )
+    foo.nonEmpty mustBe true
+    extraAssertion(foo.get)
+  }
+
+  def containsRadio(html: Html): Assertion =
+    contentAsString(html) must include("""type="radio"""")
 
   def testCodecRoundtrip[A](raw: A, ask: WebAsk[Html, A]): Assertion = {
     val a = ask.encode(raw)
