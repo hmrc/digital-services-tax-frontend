@@ -35,7 +35,7 @@ trait Widgets {
 
     def encode(in: Nothing): Input =
       sys.error("attempting to encode nothing")
-    
+
     def render(
       pageKey: List[String],
       fieldKey: List[String],

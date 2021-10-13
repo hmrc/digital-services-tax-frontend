@@ -26,6 +26,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import shapeless.tag.@@
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.digitalservicestax.data.{Period, RegexValidatedString, _}
+import uk.gov.hmrc.digitalservicestax.frontend.Kickout
 import wolfendale.scalacheck.regexp.RegexpGen
 
 import scala.collection.immutable.ListMap
@@ -147,6 +148,9 @@ object TestInstances {
     Gen.oneOf(ibanList).map(IBAN.apply)
   }
 
+  implicit val arbKickout: Arbitrary[Kickout] = Arbitrary {
+    nonEmptyString.map(Kickout.apply)
+  }
   implicit val arbAccountName: Arbitrary[AccountName] = Arbitrary {
     RegexpGen.from(AccountName.regex).map(AccountName.apply)
   }

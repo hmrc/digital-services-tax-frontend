@@ -23,6 +23,7 @@ import org.scalatest.Assertion
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.digitalservicestax.frontend.Kickout
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import uk.gov.hmrc.digitalservicestaxfrontend.{ConfiguredPropertyChecks, TestInstances}
 import uk.gov.hmrc.govukfrontend.views.Implicits.RichHtml
@@ -143,6 +144,14 @@ class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChec
       foo.nonEmpty mustBe true
       containsRadio(foo)
     }
+    "return Html when 'telling'" in {
+      forAll { (c: Company, b: Boolean, k: Kickout, a: Address) =>
+        testRenderTell(interpreter.companyTell, c)
+        testRenderTell(interpreter.booleanTell, b)
+        testRenderTell(interpreter.kickoutTell, k)
+        testRenderTell(interpreter.addressTell, a)
+      }
+    }
   }
 
   def testErrors[A](
@@ -153,6 +162,18 @@ class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChec
     val Left(foo) = ask.decode(badInput)
     val NonEmptyList(err, _) = foo.values.toList.head
     err.msg mustBe expectedErrMsg
+  }
+
+  def testRenderTell[A](
+    tell: WebTell[Html, A],
+    in: A,
+    key: String = "foo",
+    extraAssertion: Html =>  Assertion = _ => 1 mustBe 1,
+    msg: UniformMessages[Html] = UniformMessages.echo.map(Html.apply)
+  ): Assertion = {
+    val foo = tell.render(in, key, msg)
+    foo.nonEmpty mustBe true
+    extraAssertion(foo.get)
   }
 
   def testRender[A](
