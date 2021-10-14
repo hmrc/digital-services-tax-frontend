@@ -22,9 +22,9 @@ import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
 import play.modules.reactivemongo.ReactiveMongoApi
-import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, MongoPersistence}
+import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoPersistence}
 import uk.gov.hmrc.digitalservicestax.controllers.{ReturnsController, routes}
-import uk.gov.hmrc.digitalservicestax.data.Period
+import uk.gov.hmrc.digitalservicestax.data.{CompanyRegWrapper, Period, Postcode, Registration, Return, UTR}
 import uk.gov.hmrc.digitalservicestax.data.TestSampleData.{samplePeriod, sampleReg, sampleReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.ResubmitAReturn
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest

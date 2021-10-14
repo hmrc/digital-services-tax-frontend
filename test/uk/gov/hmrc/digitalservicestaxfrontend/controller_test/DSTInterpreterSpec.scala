@@ -72,36 +72,42 @@ class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChec
 
   "DSTInterpreter render" must {
     "return Html" in {
-      forAll { (_: LocalDate) => // n.b. forAll needs one arg but finds the other implicit Gen
-        testRender(interpreter.twirlDateField)
-        testRender(interpreter.blah)
-        testRender(interpreter.twirlForeignAddressField)
-        testRender(interpreter.twirlUKAddressField)
-        testRender[Activity](interpreter.enumeratumField, containsRadio)
-        testRender(interpreter.twirlStringFields())
-        testRender(interpreter.twirlBoolField, containsRadio)
-        testRender[Set[Activity]](interpreter.enumeratumSetField, html => contentAsString(html) must include("""type="checkbox""""))
-        testRender(interpreter.twirlCountryCodeField)
-        testRender(interpreter.intField)
-        testRender(interpreter.optUtrField)
-        testRender(interpreter.accountNameField)
-        testRender(interpreter.accountNumberField)
-        testRender(interpreter.bigdecimalField)
-        testRender(interpreter.BuildingSocietyRollNumberField)
-        testRender(interpreter.ibanField)
-        testRender(interpreter.sortCodeField)
-        testRender(interpreter.moneyField)
-        testRender(interpreter.percentField)
-        testRender(interpreter.floatField)
-        testRender(interpreter.longField)
-        testRender(interpreter.nesField)
+      forAll { (ld: LocalDate, fa: ForeignAddress, uka: UkAddress, a: Activity, s: String, b: Boolean) =>
+        testRender(ld, interpreter.twirlDateField)
+        testRender(fa, interpreter.twirlForeignAddressField)
+        testRender(uka, interpreter.twirlUKAddressField)
+        testRender[Activity](a, interpreter.enumeratumField, containsRadio)
+        testRender(s, interpreter.twirlStringFields())
+        testRender(b, interpreter.twirlBoolField, containsRadio)
+        testRender(b, interpreter.twirlBoolField, containsRadio, List("about-you"))
+      }
+      forAll { (cc: CountryCode, as: Set[Activity], u: Unit, i: Int, oUtr: Option[UTR], an: AccountName) =>
+        testRender(cc, interpreter.twirlCountryCodeField)
+        testRender[Set[Activity]](as, interpreter.enumeratumSetField, html => contentAsString(html) must include("""type="checkbox""""))
+        testRender(u, interpreter.blah)
+        testRender(i, interpreter.intField)
+        testRender(oUtr, interpreter.optUtrField)
+        testRender(an, interpreter.accountNameField)
+      }
+      forAll { (anf: AccountNumber, bd: BigDecimal, bsri: Option[BuildingSocietyRollNumber], iban: IBAN, sc: SortCode, m: Money) =>
+        testRender(anf, interpreter.accountNumberField)
+        testRender(bd, interpreter.bigdecimalField)
+        testRender(bsri, interpreter.BuildingSocietyRollNumberField)
+        testRender(iban, interpreter.ibanField)
+        testRender(sc, interpreter.sortCodeField)
+        testRender(m, interpreter.moneyField)
+      }
+      forAll { (p: Percent, f: Float, l: Long, nes: NonEmptyString) =>
+        testRender(p, interpreter.percentField)
+        testRender(f, interpreter.floatField)
+        testRender(l, interpreter.longField)
+        testRender(nes, interpreter.nesField)
       }
     }
   }
 
   "DSTInterpreter codecs" must {
     "handle invalid input" in {
-      forAll { (_: Boolean) =>
         testErrors(interpreter.twirlBoolField)
         testErrors[Activity](interpreter.enumeratumField)
         testErrors[Set[Activity]](interpreter.enumeratumSetField)
@@ -111,7 +117,6 @@ class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChec
         testErrors(interpreter.BuildingSocietyRollNumberField, "length.exceeded", Map(Nil -> List("asdfasdfasdfasdfasdf")))
         testErrors(interpreter.BuildingSocietyRollNumberField, "invalid", Map(Nil -> List("!!!")))
         testErrors(interpreter.bigdecimalField, "not-a-number")
-      }
     }
   }
 
@@ -177,15 +182,17 @@ class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChec
   }
 
   def testRender[A](
+    raw: A,
     ask: WebAsk[Html, A],
-    extraAssertion: Html =>  Assertion = _ => 1 mustBe 1
+    extraAssertion: Html =>  Assertion = _ => 1 mustBe 1,
+    pageKey: List[String] = Nil
   ): Assertion = {
     val foo = ask.render(
-      Nil,
+      pageKey,
       List("foo"),
       None,
       Nil,
-      Input.empty,
+      ask.encode(raw),
       ErrorTree.empty,
       UniformMessages.echo.map(Html.apply)
     )

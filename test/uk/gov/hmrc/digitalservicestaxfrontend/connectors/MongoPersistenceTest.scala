@@ -17,13 +17,12 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.connectors
 
 import java.time.format.DateTimeFormatter
-
 import play.api.http.Status
 import play.api.mvc.{AnyContent, Results}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence
-import uk.gov.hmrc.digitalservicestax.data.InternalId
+import uk.gov.hmrc.digitalservicestax.data.{InternalId, Return}
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
@@ -31,7 +30,7 @@ import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyChecks {
 
@@ -54,7 +53,7 @@ class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyCh
     }
   }
 
-  "should generate a kill date and store it in Mongo for an authorised Request" ignore {
+  "should generate a kill date and store it in Mongo for an authorised Request" in {
     forAll { (user: InternalId, enrolments: Enrolments) =>
       val req = AuthorisedRequest[AnyContent](user, enrolments, FakeRequest())
 
@@ -68,5 +67,17 @@ class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyCh
     }
   }
 
+  "should cache and retrieve a Return" in {
+    forAll {(user: InternalId, enrolments: Enrolments, ret: Return, purgeState: Boolean) =>
+      implicit val req: AuthorisedRequest[AnyContent] = AuthorisedRequest[AnyContent](user, enrolments, FakeRequest())
+      for {
+        _ <- persistence.cacheReturn(ret, purgeState)
+        retrieved <- persistence.retrieveCachedReturn
+      } yield {
+        retrieved.nonEmpty mustBe true
+        retrieved.map(_ mustBe ret)
+      }
+    }
+  }
 
 }

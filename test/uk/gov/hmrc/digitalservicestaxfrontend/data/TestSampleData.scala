@@ -128,4 +128,47 @@ object TestSampleData {
     Some(sampleRepaymentDetails)
   )
 
+  val j = """{
+            |	"obligations": [
+            |		{
+            |			"identification": {
+            |				"incomeSourceType": "ITSA",
+            |				"referenceNumber": "AB123456A",
+            |				"referenceType": "NINO"
+            |			},
+            |			"obligationDetails": [
+            |				{
+            |					"status": "O",
+            |					"inboundCorrespondenceFromDate": "2018-02-28",
+            |					"inboundCorrespondenceToDate": "2019-02-28",
+            |					"inboundCorrespondenceDateReceived": "2020-01-24",
+            |					"inboundCorrespondenceDueDate": "2020-02-28",
+            |					"periodKey": "#001"
+            |				},
+            |				{
+            |					"status": "O",
+            |					"inboundCorrespondenceFromDate": "2019-02-28",
+            |					"inboundCorrespondenceToDate": "2020-02-28",
+            |					"inboundCorrespondenceDateReceived": "2021-01-24",
+            |					"inboundCorrespondenceDueDate": "2021-02-28",
+            |					"periodKey": "#002"
+            |				},
+            |				{
+            |					"status": "O",
+            |					"inboundCorrespondenceFromDate": "2020-02-28",
+            |					"inboundCorrespondenceToDate": "2021-02-28",
+            |					"inboundCorrespondenceDueDate": "2022-02-28",
+            |					"periodKey": "#003"
+            |				},
+            |				{
+            |					"status": "O",
+            |					"inboundCorrespondenceFromDate": "2021-02-28",
+            |					"inboundCorrespondenceToDate": "2022-01-28",
+            |					"inboundCorrespondenceDueDate": "2023-01-28",
+            |					"periodKey": "#004"
+            |				}
+            |			]
+            |		}
+            |	]
+            |}""".stripMargin
 }

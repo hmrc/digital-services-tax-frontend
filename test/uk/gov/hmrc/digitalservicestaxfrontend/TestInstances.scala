@@ -301,6 +301,16 @@ object TestInstances {
     ).mapN(Period.apply))
   }
 
+  implicit def listOfPeriodLocalDateTuple: Arbitrary[List[(Period, Option[LocalDate])]] = {
+    val foo = for {
+      p <- periodArb.arbitrary
+      d <- Gen.option(arbDate.arbitrary)
+      n <- Gen.chooseNum(1, 50)
+      l <- Gen.listOfN(n, (p, d))
+    } yield l
+    Arbitrary { foo }
+  }
+
   def neString(maxLen: Int = 255) = (
     (
       Gen.alphaNumChar,
@@ -310,7 +320,7 @@ object TestInstances {
     )
 
   implicit def arbNEString: Arbitrary[NonEmptyString] = Arbitrary { neString() }
-  implicit def arbPostcode: Arbitrary[Postcode] = Arbitrary(Postcode.gen)
+  implicit def arbPostcode: Arbitrary[Postcode] = Arbitrary(Postcode.gen.retryUntil(x => x.toString == x.toString.replaceAll(" ","")))
   implicit def arbDSTNumber: Arbitrary[DSTRegNumber] = Arbitrary(DSTRegNumber.gen)
   implicit def arbFormBundleNumber: Arbitrary[FormBundleNumber] = Arbitrary(FormBundleNumber.gen)
   implicit def arbCountryCode: Arbitrary[CountryCode] = Arbitrary(CountryCode.gen)

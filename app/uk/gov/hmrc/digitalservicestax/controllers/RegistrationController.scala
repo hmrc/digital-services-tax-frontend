@@ -37,7 +37,7 @@ import views.html.end._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import data._
-import connectors.{DSTConnector, MongoPersistence}
+import connectors.{DSTConnector, DSTService, MongoPersistence}
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 
 import scala.concurrent.duration._
@@ -73,7 +73,7 @@ class RegistrationController @Inject()(
       appConfig.mongoJourneyStoreExpireAfter
     )(_.internalId)
 
-  def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
+  def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 
   private implicit val cyaRegTell = new WebTell[Html, CYA[Registration]] {
     override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Option[Html] =

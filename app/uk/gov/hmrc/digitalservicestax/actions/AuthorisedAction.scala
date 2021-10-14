@@ -24,7 +24,7 @@ import ltbs.uniform.UniformMessages
 import play.api.Logger
 import play.api.i18n.MessagesApi
 import play.api.mvc.Results.{Ok, Redirect}
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.AuthProvider.{GovernmentGateway, Verify}

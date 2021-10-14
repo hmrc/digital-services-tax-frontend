@@ -24,7 +24,7 @@ import org.scalatest.{Assertion, FlatSpec, Matchers, OptionValues}
 import play.api.libs.json._
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
-import uk.gov.hmrc.digitalservicestax.data.{Activity, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, PhoneNumber, Postcode, UTR}
+import uk.gov.hmrc.digitalservicestax.data.{Activity, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, Period, PhoneNumber, Postcode, TestSampleData, UTR}
 import uk.gov.hmrc.digitalservicestax.repo.JourneyState
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
@@ -75,7 +75,6 @@ class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks wit
     testJsonRoundtrip[PhoneNumber]
   }
 
-
   it should "serialize and de-serialise a NonEmptyString instance" in {
     testJsonRoundtrip[NonEmptyString]
   }
@@ -88,6 +87,15 @@ class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks wit
         (JsPath \ "value") -> JsonValidationError(Seq(s"Expected non empty string, got $sample"))
       )
     }
+  }
+
+  it should "serialize and de-seralize a List[(Period, Option[LocalDate])]" in {
+    // n.b. the Json sent to DES API to getPeriods use asymetric json, hence no round trip
+    forAll { a: List[(Period, Option[LocalDate])] =>
+      Json.toJson(a)
+    }
+    val fromJson = Json.parse(TestSampleData.j)
+    Json.fromJson(fromJson)(readPeriods).isSuccess shouldEqual true
   }
 
   it should "serialize and de-serialise an Email instance" in {
