@@ -30,7 +30,7 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.views
 import uk.gov.hmrc.digitalservicestax.views.html.{Layout, PayYourDst}
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedAction}
+import uk.gov.hmrc.digitalservicestaxfrontend.actions.Auth
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider

@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedAction, AuthorisedRequest}
+import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -39,9 +39,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import data._
 import connectors.{DSTConnector, DSTService, MongoPersistence}
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
-
-import scala.concurrent.duration._
-import scala.concurrent.duration.MINUTES
 
 class RegistrationController @Inject()(
   authorisedAction: Auth,
