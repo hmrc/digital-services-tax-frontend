@@ -31,7 +31,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, MongoPersistence}
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.{AuthorisedAction, AuthorisedRequest}
+import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -47,7 +47,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 class ReturnsController @Inject()(
-  authorisedAction: AuthorisedAction,
+  authorisedAction: Auth,
   http: HttpClient,
   servicesConfig: ServicesConfig,
   mongo: ReactiveMongoApi,
@@ -67,7 +67,7 @@ class ReturnsController @Inject()(
 {
 
   import interpreter._
-  private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
+  def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
     override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Option[Html] =

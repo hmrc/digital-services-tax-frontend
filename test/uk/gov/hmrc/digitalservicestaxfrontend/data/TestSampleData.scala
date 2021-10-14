@@ -17,14 +17,13 @@
 package uk.gov.hmrc.digitalservicestax.data
 
 import java.time.LocalDate
-
 import cats.implicits._
 import uk.gov.hmrc.digitalservicestax.data.Activity.{OnlineMarketplace, SearchEngine, SocialMedia}
 
+import scala.collection.immutable.ListMap
+
 
 object TestSampleData {
-
-
 
   val sampleAddress = UkAddress (
     AddressLine("12 The Street"),
@@ -108,7 +107,25 @@ object TestSampleData {
     LocalDate.now,
     LocalDate.now,
     LocalDate.now,
-    Period.Key("FOOO")
+    Period.Key("0001")
+  )
+
+  val sampleAlternativeCharge: Map[Activity, Percent] = Map(
+    SocialMedia -> samplePercent
+  )
+
+  val sampleCompaniesAmount: ListMap[GroupCompany, Money] = ListMap(
+    sampleGroupCompany -> sampleMoney
+  )
+
+  val sampleReturn: Return = Return(
+    sampleActivitySet,
+    sampleAlternativeCharge,
+    sampleMoney,
+    Some(sampleMoney),
+    sampleCompaniesAmount,
+    sampleMoney,
+    Some(sampleRepaymentDetails)
   )
 
 }

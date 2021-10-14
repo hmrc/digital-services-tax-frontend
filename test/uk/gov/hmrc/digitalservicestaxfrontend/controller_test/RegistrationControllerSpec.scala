@@ -88,7 +88,7 @@ class RegistrationControllerSpec extends FakeApplicationSpec {
     interpreter,
     authConnector,
     messagesApi,
-    checkYourAnswersInstance,
+    checkYourAnswersRegInstance,
     confirmationRegInstance,
     layoutInstance
     )(

@@ -415,7 +415,7 @@ object TestInstances {
   )
 
   implicit def arbCredRole: Arbitrary[CredentialRole] = Arbitrary {
-    Gen.oneOf(List(User, Admin, Assistant))
+    Gen.oneOf(List(User, Assistant))
   }
 
   implicit def arbAffinityGroup: Arbitrary[AffinityGroup] = Arbitrary {

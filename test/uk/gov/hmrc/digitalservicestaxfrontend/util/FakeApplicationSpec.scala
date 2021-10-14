@@ -34,8 +34,8 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.DSTInterpreter
 import uk.gov.hmrc.digitalservicestax.test.TestConnector
-import uk.gov.hmrc.digitalservicestax.views.html.cya.CheckYourAnswersReg
-import uk.gov.hmrc.digitalservicestax.views.html.end.ConfirmationReg
+import uk.gov.hmrc.digitalservicestax.views.html.cya.{CheckYourAnswersReg, CheckYourAnswersRet}
+import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, ConfirmationReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout, PayYourDst}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.digitalservicestaxfrontend.controller_test.FakeAuthorisedAction
@@ -69,8 +69,10 @@ trait FakeApplicationSpec extends PlaySpec
   lazy val authConnector: PlayAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig)
   lazy val layoutInstance: Layout = app.injector.instanceOf[Layout]
   lazy val landingInstance: Landing = app.injector.instanceOf[Landing]
-  lazy val checkYourAnswersInstance: CheckYourAnswersReg = app.injector.instanceOf[CheckYourAnswersReg]
+  lazy val checkYourAnswersRegInstance: CheckYourAnswersReg = app.injector.instanceOf[CheckYourAnswersReg]
+  lazy val checkYourAnswersRetInstance: CheckYourAnswersRet = app.injector.instanceOf[CheckYourAnswersRet]
   lazy val confirmationRegInstance: ConfirmationReg  = app.injector.instanceOf[ConfirmationReg]
+  lazy val confirmationRetInstance: ConfirmationReturn  = app.injector.instanceOf[ConfirmationReturn]
   lazy val payYourDst: PayYourDst = app.injector.instanceOf[PayYourDst]
   lazy val interpreter = app.injector.instanceOf[DSTInterpreter]
 
