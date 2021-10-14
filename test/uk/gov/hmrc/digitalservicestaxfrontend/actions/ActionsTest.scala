@@ -17,7 +17,6 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.actions
 
 import java.net.URI
-
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlPathEqualTo}
@@ -37,7 +36,8 @@ import uk.gov.hmrc.digitalservicestax.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views.html.{ErrorTemplate, Layout}
-import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
+import uk.gov.hmrc.digitalservicestaxfrontend.{ConfiguredPropertyChecks, TestInstances}
+import TestInstances._
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
