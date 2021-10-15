@@ -40,6 +40,8 @@ import data._
 import connectors.{DSTConnector, DSTService, MongoPersistence}
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 
+import scala.concurrent.duration._
+
 class RegistrationController @Inject()(
   authorisedAction: Auth,
   http: HttpClient,
@@ -61,7 +63,9 @@ class RegistrationController @Inject()(
 
   import interpreter._
 
-  implicit val futureAdapter = FutureAdapter[Html].alwaysRerun
+  val futureAdapter = FutureAdapter.rerunOnStateChange[Html](15 minutes)
+  implicit lazy val lookupCompanyCodec: Codec[Option[CompanyRegWrapper]] = implicitly[WebAsk[Html, Option[CompanyRegWrapper]]]//InferCodec[Option[CompanyRegWrapper]]
+  import futureAdapter._
 
   implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
     MongoPersistence[AuthorisedRequest[AnyContent]](

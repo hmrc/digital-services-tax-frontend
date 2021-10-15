@@ -47,7 +47,7 @@ object RegJourney {
     for {
       _ <- end("global-revenues-not-eligible", Kickout("global-revenues-not-eligible")) unless ask[Boolean]("global-revenues")
       _ <- end("uk-revenues-not-eligible", Kickout("uk-revenues-not-eligible")) unless ask[Boolean]("uk-revenues")
-      companyRegWrapper <- convert(backendService.lookupCompany()) flatMap { // gets a CompanyRegWrapper but converts to a company
+      companyRegWrapper <- convertWithKey("lookup-company")(backendService.lookupCompany()) flatMap { // gets a CompanyRegWrapper but converts to a company
 
         // found a matching company
         case Some(companyRW) =>
@@ -119,8 +119,8 @@ object RegJourney {
       registration <- {
         for {
           companyRegWrapper <- pure(companyRegWrapper)
-          contactAddress <- (
-            ask[Boolean]("check-contact-address") flatMap {
+          contactAddress <- subJourney("contact-address") {
+            (ask[Boolean]("check-contact-address") flatMap {
               case true =>
                 ask[UkAddress](
                   "contact-uk-address"
@@ -129,8 +129,7 @@ object RegJourney {
                 ask[ForeignAddress](
                   "contact-international-address"
                 ).map(identity)
-            }
-            ) unless interact[Boolean]("company-contact-address", companyRegWrapper.company.address)
+            }) unless interact[Boolean]("company-contact-address", companyRegWrapper.company.address)}
           isGroup <- ask[Boolean]("check-if-group")
           ultimateParent <- if(isGroup){
             for {

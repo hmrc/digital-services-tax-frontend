@@ -5,7 +5,7 @@ import sbt._
 
 object AppDependencies {
 
-  val uniformVersion = "5.0.0-RC1"
+  val uniformVersion = "5.0.0-RC2"
   val bootstrapVersion = "5.14.0"
 
   val compile = Seq(
