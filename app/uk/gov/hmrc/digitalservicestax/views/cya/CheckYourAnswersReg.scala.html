@@ -46,7 +46,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/${if(in.companyReg.useSafeId){"company-name"} else {"confirm-company-details"}}?leap-to=check-your-answers",
+                        href = s"$serviceUrl/${if(in.companyReg.useSafeId){"company-name"} else {"confirm-company-details"}}",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.company-name-and-reg-address.change").toString)
                     )
@@ -69,7 +69,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/contact-address?leap-to=check-your-answers",
+                        href = s"$serviceUrl/company-contact-address",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.company-contact-address.change").toString)
                     )
@@ -86,7 +86,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/check-if-group?leap-to=check-your-answers",
+                        href = s"$serviceUrl/check-if-group",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.company-name-and-reg-address.change").toString)
                     )
@@ -111,7 +111,7 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = s"$serviceUrl/ultimate-parent-company-name?leap-to=check-your-answers",
+                            href = s"$serviceUrl/ultimate-parent-company-name",
                             content = HtmlContent(messages("common.change")),
                             visuallyHiddenText = Some(messages(s"$key.ultimate-parent-company-name.change").toString)
                         )
@@ -128,7 +128,7 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = s"$serviceUrl/check-ultimate-parent-company-address?leap-to=check-your-answers",
+                            href = s"$serviceUrl/check-ultimate-parent-company-address",
                             content = HtmlContent(messages("common.change")),
                             visuallyHiddenText = Some(messages(s"$key.ultimate-parent-company-address.change").toString)
                         )
@@ -152,7 +152,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/contact-details?leap-to=check-your-answers",
+                        href = s"$serviceUrl/contact-details#contact-details_forename-input",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.contact-details.change.name").toString)
                     )
@@ -169,7 +169,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/contact-details?leap-to=check-your-answers",
+                        href = s"$serviceUrl/contact-details#contact-details_phoneNumber-input",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.contact-details.change.phone-number").toString)
                     )
@@ -186,7 +186,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/contact-details?leap-to=check-your-answers",
+                        href = s"$serviceUrl/contact-details#contact-details_email-input",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.contact-details.change.email").toString)
                     )
@@ -209,7 +209,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/liability-start-date?leap-to=check-your-answers",
+                        href = s"$serviceUrl/liability-start-date",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.liability-start-date.change").toString)
                     )
@@ -226,7 +226,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/accounting-period-end-date?leap-to=check-your-answers",
+                        href = s"$serviceUrl/accounting-period-end-date",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.accounting-period-end-date.change").toString)
                     )

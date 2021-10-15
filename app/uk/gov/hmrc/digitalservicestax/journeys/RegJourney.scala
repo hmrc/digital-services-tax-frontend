@@ -119,8 +119,8 @@ object RegJourney {
       registration <- {
         for {
           companyRegWrapper <- pure(companyRegWrapper)
-          contactAddress <- subJourney("contact-address") {
-            (ask[Boolean]("check-contact-address") flatMap {
+          contactAddress <- (
+            ask[Boolean]("check-contact-address") flatMap {
               case true =>
                 ask[UkAddress](
                   "contact-uk-address"
@@ -129,7 +129,8 @@ object RegJourney {
                 ask[ForeignAddress](
                   "contact-international-address"
                 ).map(identity)
-            }) unless interact[Boolean]("company-contact-address", companyRegWrapper.company.address)}
+            }
+            ) unless interact[Boolean]("company-contact-address", companyRegWrapper.company.address)
           isGroup <- ask[Boolean]("check-if-group")
           ultimateParent <- if(isGroup){
             for {
