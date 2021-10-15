@@ -5,7 +5,7 @@ import sbt._
 
 object AppDependencies {
 
-  val uniformVersion = "5.0.0-RC1"
+  val uniformVersion = "5.0.0-RC2"
   val bootstrapVersion = "5.14.0"
 
   val compile = Seq(
@@ -35,6 +35,7 @@ object AppDependencies {
     "uk.gov.hmrc"               %% "reactivemongo-test"       % "5.0.0-play-28",
     "org.pegdown"               %  "pegdown"                  % "1.6.0",
     "org.scalatestplus.play"    %% "scalatestplus-play"       % "3.1.3",
+    "org.mockito"               %  "mockito-core"             % "3.3.3",
     "com.softwaremill.macwire"  %% "macros"                   % "2.3.3",
     "com.softwaremill.macwire"  %% "macrosakka"               % "2.3.3",
     "com.softwaremill.macwire"  %% "proxy"                    % "2.3.3",

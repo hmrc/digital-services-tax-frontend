@@ -29,5 +29,7 @@ trait TestDstService extends DSTService[Id] {
   def submitReturn(period: Period, ret: Return): Unit = (())
   def lookupRegistration(): Option[Registration] = sampleReg.some
   def lookupOutstandingReturns(): Set[Period] = Set.empty
+  def lookupAmendableReturns(): Set[Period] = Set.empty
+  def lookupAllReturns(): Set[Period] = Set.empty
   def get = this.transform(ToLogic)
 }

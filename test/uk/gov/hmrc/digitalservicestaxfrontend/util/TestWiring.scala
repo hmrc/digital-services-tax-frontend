@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.util
 
-import java.io.File
-import java.time.Clock
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.{Configuration, Environment}
 
-trait TestWiring {
+import java.io.File
+import java.time.Clock
+
+trait TestWiring extends MockitoSugar {
   val appName: String = configuration.get[String]("appName")
 
   lazy val configuration: Configuration = Configuration.load(environment, Map(

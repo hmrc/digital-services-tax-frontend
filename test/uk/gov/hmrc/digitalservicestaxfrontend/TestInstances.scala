@@ -25,7 +25,8 @@ import org.scalacheck.cats.implicits._
 import org.scalacheck.{Arbitrary, Gen}
 import shapeless.tag.@@
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.digitalservicestax.data.{Period, _}
+import uk.gov.hmrc.digitalservicestax.data.{Period, RegexValidatedString, _}
+import uk.gov.hmrc.digitalservicestax.frontend.Kickout
 import wolfendale.scalacheck.regexp.RegexpGen
 
 import scala.collection.immutable.ListMap
@@ -147,14 +148,47 @@ object TestInstances {
     Gen.oneOf(ibanList).map(IBAN.apply)
   }
 
+  implicit val arbKickout: Arbitrary[Kickout] = Arbitrary {
+    nonEmptyString.map(Kickout.apply)
+  }
+  implicit val arbAccountName: Arbitrary[AccountName] = Arbitrary {
+    RegexpGen.from(AccountName.regex).map(AccountName.apply)
+  }
+
+  implicit val arbAccountNumber: Arbitrary[AccountNumber] = Arbitrary {
+    RegexpGen.from(AccountNumber.regex).map(AccountNumber.apply)
+  }
+
+  implicit val arbBuildingSocietyRollNumber: Arbitrary[BuildingSocietyRollNumber] = Arbitrary {
+    RegexpGen.from(BuildingSocietyRollNumber.regex).map(BuildingSocietyRollNumber.apply).retryUntil(x => x == x.trim)
+  }
+
+  implicit val arbSortCode: Arbitrary[SortCode] = Arbitrary {
+    RegexpGen.from(SortCode.regex).map(SortCode.apply)
+  }
+
   implicit val argRestrictedString: Arbitrary[RestrictiveString] = Arbitrary(
     RestrictiveString.gen
     //    RegexpGen.from("""^[0-9a-zA-Z{À-˿’}\\- &`'^._|]{1,255}$""")
   )
 
+  implicit val arbBool: Arbitrary[Boolean] = Arbitrary {
+    Gen.oneOf(List(true, false))
+  }
+
+  implicit val arbActivity: Arbitrary[Activity] = Arbitrary {
+    Gen.oneOf(List(Activity.SocialMedia, Activity.SearchEngine, Activity.OnlineMarketplace))
+  }
 
   implicit val arbPercent: Arbitrary[Percent] = Arbitrary {
     Gen.chooseNum(0, 100).map(b => Percent(b.toFloat))
+  }
+
+  implicit val arbGroupCompanyList: Arbitrary[List[GroupCompany]] = Arbitrary {
+    for {
+      num <- Gen.chooseNum(1, 5)
+      list <- Gen.listOfN(num, genGroupCo)
+    } yield list
   }
 
   def nonEmptyString: Gen[NonEmptyString] =
@@ -231,7 +265,7 @@ object TestInstances {
       case _ => Gen.const(None)
     }.flatten
 
-  def genActivitySet: Gen[Set[Activity]] = Gen.oneOf(1,2,3).map { x =>
+  implicit def genActivitySet: Gen[Set[Activity]] = Gen.oneOf(1,2,3).map { x =>
     Gen.listOfN(x, arbitrary[Activity])
   }.flatten.retryUntil(x => x.distinct.size == x.size, 100).map(_.toSet)
 
@@ -267,6 +301,16 @@ object TestInstances {
     ).mapN(Period.apply))
   }
 
+  implicit def listOfPeriodLocalDateTuple: Arbitrary[List[(Period, Option[LocalDate])]] = {
+    val foo = for {
+      p <- periodArb.arbitrary
+      d <- Gen.option(arbDate.arbitrary)
+      n <- Gen.chooseNum(1, 50)
+      l <- Gen.listOfN(n, (p, d))
+    } yield l
+    Arbitrary { foo }
+  }
+
   def neString(maxLen: Int = 255) = (
     (
       Gen.alphaNumChar,
@@ -276,7 +320,7 @@ object TestInstances {
     )
 
   implicit def arbNEString: Arbitrary[NonEmptyString] = Arbitrary { neString() }
-  implicit def arbPostcode: Arbitrary[Postcode] = Arbitrary(Postcode.gen)
+  implicit def arbPostcode: Arbitrary[Postcode] = Arbitrary(Postcode.gen.retryUntil(x => x.toString == x.toString.replaceAll(" ","")))
   implicit def arbDSTNumber: Arbitrary[DSTRegNumber] = Arbitrary(DSTRegNumber.gen)
   implicit def arbFormBundleNumber: Arbitrary[FormBundleNumber] = Arbitrary(FormBundleNumber.gen)
   implicit def arbCountryCode: Arbitrary[CountryCode] = Arbitrary(CountryCode.gen)
@@ -298,20 +342,20 @@ object TestInstances {
 
   implicit def arbForeignAddress: Arbitrary[ForeignAddress] = Arbitrary {
     (
-      arbitrary[AddressLine],
-      arbitrary[Option[AddressLine]],
-      arbitrary[Option[AddressLine]],
-      arbitrary[Option[AddressLine]],
+      arbitrary[AddressLine].retryUntil(x => x == x.trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
       arbitrary[CountryCode]
     ).mapN(ForeignAddress.apply)
   }
 
   implicit def arbUkAddress: Arbitrary[UkAddress] = Arbitrary {
     (
-      arbitrary[AddressLine],
-      arbitrary[Option[AddressLine]],
-      arbitrary[Option[AddressLine]],
-      arbitrary[Option[AddressLine]],
+      arbitrary[AddressLine].retryUntil(x => x == x.trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
+      arbitrary[Option[AddressLine]].retryUntil(x => x.getOrElse("") == x.getOrElse("").trim),
       arbitrary[Postcode]
     ).mapN(UkAddress.apply)
   }
@@ -381,7 +425,7 @@ object TestInstances {
   )
 
   implicit def arbCredRole: Arbitrary[CredentialRole] = Arbitrary {
-    Gen.oneOf(List(User, Admin, Assistant))
+    Gen.oneOf(List(User, Assistant))
   }
 
   implicit def arbAffinityGroup: Arbitrary[AffinityGroup] = Arbitrary {

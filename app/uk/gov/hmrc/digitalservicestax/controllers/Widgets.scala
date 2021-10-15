@@ -29,24 +29,6 @@ trait Widgets {
 
   implicit val appConfig: AppConfig
 
-  implicit val impossibleAsk: WebAsk[Html, Nothing] = new WebAsk[Html, Nothing] {
-    def decode(out: Input): Either[ErrorTree, Nothing] =
-      Left(ErrorMsg("impossible-state").toTree)
-
-    def encode(in: Nothing): Input =
-      sys.error("attempting to encode nothing")
-    
-    def render(
-      pageKey: List[String],
-      fieldKey: List[String],
-      tell: Option[Html],
-      breadcrumbs: Breadcrumbs,
-      data: Input,
-      errors: ErrorTree,
-      messages: UniformMessages[Html]
-    ): Option[Html] = tell
-  }
-
   implicit val addressTell = new WebTell[Html, Address] {
     override def render(in: Address, key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(Html(

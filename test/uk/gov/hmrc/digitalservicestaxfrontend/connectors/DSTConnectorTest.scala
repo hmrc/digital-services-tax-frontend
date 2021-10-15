@@ -86,7 +86,7 @@ class DSTConnectorTest extends WiremockSpec with ConfiguredPropertyChecks {
     }
   }
 
-  "should lookup a company successfully by utr and postcode" ignore {
+  "should lookup a company successfully by utr and postcode" in {
     forAll { (utr: UTR, postcode: Postcode, reg: CompanyRegWrapper) =>
 
       val escaped = postcode.replaceAll("\\s+", "")

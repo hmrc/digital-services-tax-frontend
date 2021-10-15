@@ -33,7 +33,7 @@ class AuthenticationController @Inject()(mcc: MessagesControllerComponents, time
   extends FrontendController(mcc) with I18nSupport {
 
   def signIn: Action[AnyContent] = Action {
-    Redirect(appConfig.ggLoginUrl, Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName)))
+    Redirect(url = appConfig.ggLoginUrl, queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName)))
   }
 
   def signOut: Action[AnyContent] = Action {

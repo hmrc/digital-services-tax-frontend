@@ -47,7 +47,7 @@ object RegJourney {
     for {
       _ <- end("global-revenues-not-eligible", Kickout("global-revenues-not-eligible")) unless ask[Boolean]("global-revenues")
       _ <- end("uk-revenues-not-eligible", Kickout("uk-revenues-not-eligible")) unless ask[Boolean]("uk-revenues")
-      companyRegWrapper <- convert(backendService.lookupCompany()) flatMap { // gets a CompanyRegWrapper but converts to a company
+      companyRegWrapper <- convertWithKey("lookup-company")(backendService.lookupCompany()) flatMap { // gets a CompanyRegWrapper but converts to a company
 
         // found a matching company
         case Some(companyRW) =>

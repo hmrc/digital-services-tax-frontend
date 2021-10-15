@@ -17,7 +17,9 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.actions
 
 import cats.syntax.semigroup._
-import javax.inject.Inject
+import com.google.inject.ImplementedBy
+
+import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import play.api.Logger
 import play.api.i18n.MessagesApi
@@ -39,12 +41,18 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@ImplementedBy(classOf[AuthorisedAction])
+trait Auth extends ActionRefiner[Request, AuthorisedRequest]  with ActionBuilder[AuthorisedRequest, AnyContent] with AuthorisedFunctions {
+  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]]
+}
+
+@Singleton
 class AuthorisedAction @Inject()(
   mcc: MessagesControllerComponents,
   layout: Layout,
   val authConnector: AuthConnector
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext, val messagesApi: MessagesApi)
-  extends ActionBuilder[AuthorisedRequest, AnyContent] with ActionRefiner[Request, AuthorisedRequest] with AuthorisedFunctions {
+  extends Auth {
 
   val logger = Logger(getClass)
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {

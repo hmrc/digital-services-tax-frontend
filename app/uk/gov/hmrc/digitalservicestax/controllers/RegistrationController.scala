@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.{AuthorisedAction, AuthorisedRequest}
+import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -37,11 +37,13 @@ import views.html.end._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import data._
-import connectors.{DSTConnector, MongoPersistence}
+import connectors.{DSTConnector, DSTService, MongoPersistence}
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 
+import scala.concurrent.duration._
+
 class RegistrationController @Inject()(
-  authorisedAction: AuthorisedAction,
+  authorisedAction: Auth,
   http: HttpClient,
   servicesConfig: ServicesConfig,
   mongo: ReactiveMongoApi,
@@ -61,12 +63,17 @@ class RegistrationController @Inject()(
 
   import interpreter._
 
-  implicit val futureAdapter = FutureAdapter[Html].alwaysRerun
+  val futureAdapter = FutureAdapter.rerunOnStateChange[Html](15.minutes)
+  import futureAdapter._
 
-  private def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
+  implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
+    MongoPersistence[AuthorisedRequest[AnyContent]](
+      mongo,
+      collectionName = "uf-registrations",
+      appConfig.mongoJourneyStoreExpireAfter
+    )(_.internalId)
 
-  private def hod(id: InternalId)(implicit hc: HeaderCarrier) =
-    connectors.CachedDstService(backend)(id)
+  def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 
   private implicit val cyaRegTell = new WebTell[Html, CYA[Registration]] {
     override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Option[Html] =
@@ -85,12 +92,6 @@ class RegistrationController @Inject()(
 
     implicit val msg: UniformMessages[Html] = messages(request)
 
-    implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
-      MongoPersistence[AuthorisedRequest[AnyContent]](
-        mongo,
-        collectionName = "uf-registrations",
-        appConfig.mongoJourneyStoreExpireAfter
-      )(_.internalId)
 
     backend.lookupRegistration().flatMap {
       case None =>

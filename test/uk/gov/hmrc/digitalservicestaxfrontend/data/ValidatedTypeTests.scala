@@ -117,5 +117,14 @@ class ValidatedTypeTests extends FlatSpec with Matchers with ConfiguredPropertyC
       Activity.toUrl(a) shouldEqual expected
     }
   }
+
+  it should "combine and empty Money correctly" in {
+    import Money.mon
+    forAll { (a: Money, b: Money) =>
+      a.combine(b) - a shouldEqual b
+      a.combine(b) - b shouldEqual a
+      a.combine(b) - b - a shouldEqual mon.empty
+    }
+  }
 }
 

@@ -18,7 +18,6 @@ package uk.gov.hmrc.digitalservicestax.connectors
 
 import ltbs.uniform._
 import interpreters.playframework._
-import common.web.Codec
 import reactivemongo.api.commands.WriteResult
 import uk.gov.hmrc.digitalservicestax.data.Return
 
@@ -124,18 +123,6 @@ case class MongoPersistence[A <: Request[AnyContent]] (
           case e => throw new Exception(s"$e")
         })
     }
-  }
-
-  // N.b. this removes the entire record
-  def getDirect[T](key: String*)(implicit request: A, codec: Codec[T]): Future[Either[ErrorTree, T]] = {
-    val dbF: Future[DB] = collection.flatMap(_.findAndRemove(selector(request)).map(_.result[Wrapper])).map {
-      case Some(Wrapper(_, data, _, _)) => data
-      case None => DB.empty
-    }
-    dbF.map(_.get(key.toList).map {Input.fromUrlEncodedString(_) flatMap codec.decode} match {
-      case None => Left(ltbs.uniform.ErrorMsg("not found").toTree)
-      case Some(x) => x
-    })
   }
 
   def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit request: A): Future[Unit] = {

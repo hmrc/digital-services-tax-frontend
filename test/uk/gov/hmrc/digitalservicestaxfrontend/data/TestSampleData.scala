@@ -17,9 +17,10 @@
 package uk.gov.hmrc.digitalservicestax.data
 
 import java.time.LocalDate
-
 import cats.implicits._
 import uk.gov.hmrc.digitalservicestax.data.Activity.{OnlineMarketplace, SearchEngine, SocialMedia}
+
+import scala.collection.immutable.ListMap
 
 
 object TestSampleData {
@@ -106,7 +107,68 @@ object TestSampleData {
     LocalDate.now,
     LocalDate.now,
     LocalDate.now,
-    Period.Key("FOOO")
+    Period.Key("0001")
   )
 
+  val sampleAlternativeCharge: Map[Activity, Percent] = Map(
+    SocialMedia -> samplePercent
+  )
+
+  val sampleCompaniesAmount: ListMap[GroupCompany, Money] = ListMap(
+    sampleGroupCompany -> sampleMoney
+  )
+
+  val sampleReturn: Return = Return(
+    sampleActivitySet,
+    sampleAlternativeCharge,
+    sampleMoney,
+    Some(sampleMoney),
+    sampleCompaniesAmount,
+    sampleMoney,
+    Some(sampleRepaymentDetails)
+  )
+
+  val j = """{
+            |	"obligations": [
+            |		{
+            |			"identification": {
+            |				"incomeSourceType": "ITSA",
+            |				"referenceNumber": "AB123456A",
+            |				"referenceType": "NINO"
+            |			},
+            |			"obligationDetails": [
+            |				{
+            |					"status": "O",
+            |					"inboundCorrespondenceFromDate": "2018-02-28",
+            |					"inboundCorrespondenceToDate": "2019-02-28",
+            |					"inboundCorrespondenceDateReceived": "2020-01-24",
+            |					"inboundCorrespondenceDueDate": "2020-02-28",
+            |					"periodKey": "#001"
+            |				},
+            |				{
+            |					"status": "O",
+            |					"inboundCorrespondenceFromDate": "2019-02-28",
+            |					"inboundCorrespondenceToDate": "2020-02-28",
+            |					"inboundCorrespondenceDateReceived": "2021-01-24",
+            |					"inboundCorrespondenceDueDate": "2021-02-28",
+            |					"periodKey": "#002"
+            |				},
+            |				{
+            |					"status": "O",
+            |					"inboundCorrespondenceFromDate": "2020-02-28",
+            |					"inboundCorrespondenceToDate": "2021-02-28",
+            |					"inboundCorrespondenceDueDate": "2022-02-28",
+            |					"periodKey": "#003"
+            |				},
+            |				{
+            |					"status": "O",
+            |					"inboundCorrespondenceFromDate": "2021-02-28",
+            |					"inboundCorrespondenceToDate": "2022-01-28",
+            |					"inboundCorrespondenceDueDate": "2023-01-28",
+            |					"periodKey": "#004"
+            |				}
+            |			]
+            |		}
+            |	]
+            |}""".stripMargin
 }
