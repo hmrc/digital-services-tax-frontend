@@ -524,6 +524,7 @@ class DSTInterpreter @Inject()(
 
   implicit def nesField                       = validatedVariant(NonEmptyString)
   implicit def utrField                       = validatedString(UTR)
+  implicit def safeIdField                    = validatedString(SafeId)
   implicit def emailField                     = validatedString(Email, 132)
   //  implicit def phoneField       = validatedString(PhoneNumber, 24)(twirlStringFields(
   //    customRender = views.html.uniform.phonenumber.apply _

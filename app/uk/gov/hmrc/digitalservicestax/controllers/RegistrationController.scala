@@ -63,8 +63,7 @@ class RegistrationController @Inject()(
 
   import interpreter._
 
-  val futureAdapter = FutureAdapter.rerunOnStateChange[Html](15 minutes)
-  implicit lazy val lookupCompanyCodec: Codec[Option[CompanyRegWrapper]] = implicitly[WebAsk[Html, Option[CompanyRegWrapper]]]//InferCodec[Option[CompanyRegWrapper]]
+  val futureAdapter = FutureAdapter.rerunOnStateChange[Html](15.minutes)
   import futureAdapter._
 
   implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
