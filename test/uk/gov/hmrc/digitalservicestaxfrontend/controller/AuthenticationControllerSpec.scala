@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.digitalservicestaxfrontend.controller_test
+package uk.gov.hmrc.digitalservicestaxfrontend.controller
 
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
