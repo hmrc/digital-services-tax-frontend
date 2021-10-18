@@ -52,6 +52,4 @@ trait WiremockSpec extends FakeApplicationSpec with BeforeAndAfterEach with Befo
   val fakeAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig) {
     override val serviceUrl = mockServerUrl
   }
-
-
 }
