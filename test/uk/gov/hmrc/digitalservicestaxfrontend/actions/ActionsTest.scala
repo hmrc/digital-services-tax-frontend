@@ -38,30 +38,21 @@ import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views.html.{ErrorTemplate, Layout}
 import uk.gov.hmrc.digitalservicestaxfrontend.{ConfiguredPropertyChecks, TestInstances}
 import TestInstances._
+import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
+import uk.gov.hmrc.digitalservicestaxfrontend.connectors.WiremockSpec
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ActionsTest extends FakeApplicationSpec with BeforeAndAfterEach with ConfiguredPropertyChecks {
+class ActionsTest extends FakeApplicationSpec with WiremockSpec with ConfiguredPropertyChecks {
 
   // Run wiremock server on local machine with specified port.
-  val inet = new URI(authConnector.serviceUrl)
+  val inet = new URI(mockServerUrl)
   val wireMockServer = new WireMockServer(wireMockConfig().port(inet.getPort))
 
-  WireMock.configureFor(inet.getHost, inet.getPort)
-
-  override def beforeEach {
-    wireMockServer.start()
-  }
-
-  override def afterEach {
-    wireMockServer.stop()
-  }
-
-  lazy val layout = app.injector.instanceOf[Layout]
   lazy val errorTemplate = app.injector.instanceOf[ErrorTemplate]
-  lazy val action = new AuthorisedAction(mcc, layout, authConnector)(appConfig, global, messagesApi)
+  lazy val action = new AuthorisedAction(mcc, layoutInstance, fakeAuthConnector)(appConfig, global, messagesApi)
 
   "it should test an authorised action against auth connector retrievals" in {
     forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole, ag: AffinityGroup) =>
