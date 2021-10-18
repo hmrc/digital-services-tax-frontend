@@ -16,17 +16,14 @@
 
 package uk.gov.hmrc.digitalservicestaxfrontend.actions
 
-import java.net.URI
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlPathEqualTo}
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.outworkers.util.domain.ShortString
 import com.outworkers.util.samplers._
 import ltbs.uniform.UniformMessages
-import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
-import play.api.libs.json.{JsArray, JsObject, JsResultException, JsString, Json}
+import play.api.libs.json._
 import play.api.mvc.Results
 import play.api.test.FakeRequest
 import play.twirl.api.Html
@@ -35,13 +32,13 @@ import uk.gov.hmrc.auth.core.{AffinityGroup, CredentialRole, Enrolments}
 import uk.gov.hmrc.digitalservicestax.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
-import uk.gov.hmrc.digitalservicestax.views.html.{ErrorTemplate, Layout}
-import uk.gov.hmrc.digitalservicestaxfrontend.{ConfiguredPropertyChecks, TestInstances}
-import TestInstances._
-import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
+import uk.gov.hmrc.digitalservicestax.views.html.ErrorTemplate
+import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import uk.gov.hmrc.digitalservicestaxfrontend.connectors.WiremockSpec
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import uk.gov.hmrc.digitalservicestaxfrontend.{ConfiguredPropertyChecks, TestInstances}
 
+import java.net.URI
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
