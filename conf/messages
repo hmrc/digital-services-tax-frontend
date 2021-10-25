@@ -476,10 +476,17 @@ email.invalid=Please enter a valid email address
 email.length.exceeded=Email address must be 132 characters or fewer
 
 #liability start date
-not-a-date=Enter a real date
+liability-start-date.not-a-date=The date the {0} became liable must be a real date, like  31 7 2020
 liability-start-date.minimum-date=The date the {0} became liable for Digital Services Tax must be after 1 April 2020
 liability-start-date.maximum-date=The date the {0} became liable for Digital Services Tax must be earlier than {1}
 liability-start-date.day-and-month-and-year.empty=Enter the date the {0} became liable for Digital Services Tax
+liability-start-date.day.nan=The day must be in numbers, such as 3, 12 or 27
+liability-start-date.month.nan=The month must be in numbers, such as 3, 7 or 12
+liability-start-date.year.nan=The year must be in numbers, like 2021
+liability-start-date.day-and-month.nan=The day and month must be in numbers
+liability-start-date.day-and-year.nan=The day and year must be in numbers
+liability-start-date.month-and-year.nan=The month and year must be in numbers
+liability-start-date.day-and-month-and-year.nan=The date the {0} became liable must be a real date, like  31 7 2020
 liability-start-date.day.empty=The date the {0} became liable for Digital Services Tax must include a day
 liability-start-date.month.empty=The date the {0} became liable for Digital Services Tax must include a month
 liability-start-date.year.empty=The date the {0} became liable for Digital Services Tax must include a year
@@ -488,16 +495,24 @@ liability-start-date.day-and-year.empty=The date the {0} became liable for Digit
 liability-start-date.month-and-year.empty=The date the {0} became liable for Digital Services Tax must include a month and year
 
 #accounting period end date
+accounting-period-end-date.not-a-date=The end date of the {0}’s first accounting period for Digital Services Tax must be a real date, like  31 7 2020
 accounting-period-end-date.maximum-date=The end date of the {0}’s first accounting period for Digital Services Tax must be before {1}
 accounting-period-end-date.fixed-maximum-date=The end date of the {0}’s first accounting period for Digital Services Tax must be on or before {1}
 accounting-period-end-date.minimum-date=The end date of the {0}’s first accounting period for Digital Services Tax must be after 1 April 2020
-accounting-period-end-date.day-and-month-and-year.empty=Enter the end date of the {0}’s first accounting period for Digital Services Tax
+accounting-period-end-date.day.nan=The day must be in numbers, such as 3, 12 or 27
+accounting-period-end-date.month.nan=The month must be in numbers, such as 3, 7 or 12
+accounting-period-end-date.year.nan=The year must be in numbers, like 2021
+accounting-period-end-date.day-and-month.nan=The day and month must be in numbers
+accounting-period-end-date.day-and-year.nan=The day and year must be in numbers
+accounting-period-end-date.month-and-year.nan=The month and year must be in numbers
+accounting-period-end-date.day-and-month-and-year.nan=The end date of the {0}’s first accounting period for Digital Services Tax must be a real date, like  31 7 2020
 accounting-period-end-date.day.empty=The end date of the {0}’s first accounting period for Digital Services Tax must include a day
 accounting-period-end-date.month.empty=The end date of the {0}’s first accounting period for Digital Services Tax must include a month
 accounting-period-end-date.year.empty=The end date of the {0}’s first accounting period for Digital Services Tax must include a year
 accounting-period-end-date.day-and-month.empty=The end date of the {0}’s  first accounting period for Digital Services Tax must include a day and month
 accounting-period-end-date.day-and-year.empty=The end date of the {0}’s first accounting period for Digital Services Tax must include a day and year
 accounting-period-end-date.month-and-year.empty=The end date of the {0}’s first accounting period for Digital Services Tax must include a month and year
+accounting-period-end-date.day-and-month-and-year.empty=Enter the end date of the {0}’s first accounting period for Digital Services Tax
 
 #service page
 landing.heading=Digital Services Tax details

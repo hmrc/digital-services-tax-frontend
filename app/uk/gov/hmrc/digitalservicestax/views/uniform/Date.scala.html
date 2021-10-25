@@ -25,13 +25,10 @@
 
 @fields = @{List("day","month","year")}
 @fieldError(field:String) = {
-    @{if(errors.values.flatMap(_.toList).map(_.msg.toLowerCase).mkString.contains(field.toLowerCase)) {
-        s"govuk-input--error foo-$field FOOO"
-    } else if (errors.values.flatMap(_.toList).map(_.msg.toLowerCase).toList.intersect(nonFieldSpecificErrors)) {
-        s"govuk-input--error bar-$field BAR"
-    }}
+    @{if(errors.values.flatMap(_.toList).map(_.msg.toLowerCase).mkString.contains(field.toLowerCase) ||
+            errors.values.flatMap(_.toList).map(_.msg.toLowerCase).toList.intersect(nonFieldSpecificErrors)
+    ){"govuk-input--error"}}
 }
-
 @errorMessageList = {
     @for((k,errorMessages) <- errors) {
         @for(errorMessage <- errorMessages.toList) {
