@@ -59,7 +59,7 @@ package object data extends SimpleJson {
       Some(in).filter(_.toString.matches("^[0-9]+(\\.[0-9]{1,2})?$"))
     }
 
-    implicit def mon: Monoid[Money] = new Monoid[Money] {
+    implicit lazy val mon: Monoid[Money] = new Monoid[Money] {
       val base: Monoid[BigDecimal] = implicitly[Monoid[BigDecimal]]
       override def combine(a: Money, b: Money): Money = Money(base.combine(a, b))
       override def empty: Money = Money(base.empty)
@@ -146,7 +146,7 @@ package object data extends SimpleJson {
       }
     }
 
-    implicit def mon: Monoid[Percent] = new Monoid[Percent] {
+    implicit lazy val mon: Monoid[Percent] = new Monoid[Percent] {
       val base: Monoid[Float] = implicitly[Monoid[Float]]
       override def combine(a: Percent, b: Percent): Percent = Percent(base.combine(a, b))
       override def empty: Percent = Percent(base.empty)

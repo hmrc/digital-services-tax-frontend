@@ -17,27 +17,22 @@
 package uk.gov.hmrc.digitalservicestax.controllers
 
 import cats.data.Validated
-import cats.implicits._
+import cats.syntax.all._
 import enumeratum.{Enum, EnumEntry}
 import java.time.LocalDate
 
 import javax.inject.Inject
-import ltbs.uniform.common.web._
+import ltbs.uniform._, validation._, common.web._
 import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages}
-import ltbs.uniform._
-import ltbs.uniform.validation.Rule
-import ltbs.uniform.validation.Rule.nonEmpty
-import ltbs.uniform.validation._
 import org.jsoup.Jsoup
 import play.api.mvc.{AnyContent, Request}
-import play.twirl.api.HtmlFormat.Appendable
-import play.twirl.api.{Html, HtmlFormat}
+import play.twirl.api.{Html, HtmlFormat}, HtmlFormat.Appendable
 import shapeless.tag
+import tag.@@
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.views.html.{FormWrapper, Layout}
 import uk.gov.hmrc.digitalservicestax.views.html.uniform._
-import tag.@@
 import uk.gov.hmrc.digitalservicestax.views.html.helpers.CountrySelect
 
 
@@ -63,7 +58,7 @@ class DSTInterpreter @Inject()(
     new WebAsk[Html, A] {
 
       def decode(out: Input): Either[ErrorTree,A] = {out.toField[A](x =>
-        nonEmpty[String].apply(x) andThen
+        Rule.nonEmpty[String].apply(x) andThen
           ( y => Validated.catchOnly[NoSuchElementException](enum.withName(y)).leftMap(_ => ErrorTree.oneErr(ErrorMsg("invalid"))))
       )}.toEither
 
@@ -89,13 +84,13 @@ class DSTInterpreter @Inject()(
       }
     }
 
-  implicit def twirlBoolField = new WebAsk[Html, Boolean] {
+  implicit lazy val twirlBoolField = new WebAsk[Html, Boolean] {
     val True = true.toString.toUpperCase
     val False = false.toString.toUpperCase
 
     def decode(out: Input): Either[ErrorTree, Boolean] =
       out.toField[Boolean](
-        x => nonEmpty[String].apply(x) andThen ( y => Validated.catchOnly[IllegalArgumentException](y.toBoolean)
+        x => Rule.nonEmpty[String].apply(x) andThen ( y => Validated.catchOnly[IllegalArgumentException](y.toBoolean)
           .leftMap(_ => ErrorMsg("invalid").toTree))
       ).toEither
 
@@ -178,7 +173,7 @@ class DSTInterpreter @Inject()(
   }
 
 
-  implicit def phoneField =
+  implicit lazy val phoneField =
     validatedString(
       PhoneNumber,
       24
@@ -340,7 +335,7 @@ class DSTInterpreter @Inject()(
       }
     }
 
-  implicit def blah: WebAsk[Html, Unit] = new WebAsk[Html, Unit] {
+  implicit lazy val askUnit: WebAsk[Html, Unit] = new WebAsk[Html, Unit] {
     def decode(out: Input): Either[ErrorTree,Unit] = Right(())
     def encode(in: Unit): Input = Input.empty
 
@@ -364,23 +359,6 @@ class DSTInterpreter @Inject()(
 
   implicit val tellListGroupCompany = tellList{
     groupCompany: GroupCompany => Html(groupCompany.name)
-  }
-
-  // Members declared in ltbs.uniform.common.web.GenericWebInterpreter2
-  def unitAsk = new WebAsk[Html, Unit] {
-    override def render(
-      pageKey: List[String],
-      fieldKey: List[String],
-      tell: Option[Html],      
-      breadcrumbs: Breadcrumbs,
-      data: Input,
-      errors: ErrorTree,
-      messages: UniformMessages[Html]
-    ): Option[Html] = None
-
-    override def encode(in: Unit): Input = Input.empty
-
-    override def decode(out: Input): Either[ErrorTree, Unit] = Right(())
   }
 
   def renderAnd(
@@ -422,8 +400,6 @@ class DSTInterpreter @Inject()(
       tell
     )
   }
-
-  // def blankTell: Html = Html("")
 
   def messages(
     request: Request[AnyContent]
@@ -518,35 +494,32 @@ class DSTInterpreter @Inject()(
       case x => Either.fromOption(validated.of(x), ErrorMsg("invalid").toTree)
     }{x => x: BigDecimal}
 
-  implicit def postcodeField= validatedString(Postcode)(twirlStringFields(
+  implicit lazy val postcodeField= validatedString(Postcode)(twirlStringFields(
     customRender = Some(stringField(_,_,_,_,_,"govuk-input--width-10"))
   ))
 
-  implicit def nesField                       = validatedVariant(NonEmptyString)
-  implicit def utrField                       = validatedString(UTR)
-  implicit def safeIdField                    = validatedString(SafeId)
-  implicit def emailField                     = validatedString(Email, 132)
-  //  implicit def phoneField       = validatedString(PhoneNumber, 24)(twirlStringFields(
-  //    customRender = views.html.uniform.phonenumber.apply _
-  //  ))
-  implicit def percentField                   = validatedVariant(Percent)
-  implicit def moneyField                     = validatedBigDecimal(Money, 15)
-  implicit def accountNumberField             = validatedString(AccountNumber)
-  implicit def BuildingSocietyRollNumberField = inlineOptionString(BuildingSocietyRollNumber, 18)
-  implicit def accountNameField               = validatedString(AccountName, 35)
-  implicit def sortCodeField= validatedString(SortCode)(twirlStringFields(
+  implicit lazy val nesField                       = validatedVariant(NonEmptyString)
+  implicit lazy val utrField                       = validatedString(UTR)
+  implicit lazy val safeIdField                    = validatedString(SafeId)
+  implicit lazy val emailField                     = validatedString(Email, 132)
+  implicit lazy val percentField                   = validatedVariant(Percent)
+  implicit lazy val moneyField                     = validatedBigDecimal(Money, 15)
+  implicit lazy val accountNumberField             = validatedString(AccountNumber)
+  implicit lazy val BuildingSocietyRollNumberField = inlineOptionString(BuildingSocietyRollNumber, 18)
+  implicit lazy val accountNameField               = validatedString(AccountName, 35)
+  implicit lazy val sortCodeField= validatedString(SortCode)(twirlStringFields(
     customRender = Some(stringField(_,_,_,_,_,"form-control form-control-1-4"))
   ))
 
-  implicit def ibanField                      = validatedString(IBAN, 34)
-  implicit def companyNameField               = validatedString(CompanyName, 105)
-  implicit def mandatoryAddressField          = validatedString(AddressLine, 35)
-  implicit def optAddressField                = inlineOptionString(AddressLine, 35)
-  implicit def restrictField                  = validatedString(RestrictiveString, 35)
+  implicit lazy val ibanField                      = validatedString(IBAN, 34)
+  implicit lazy val companyNameField               = validatedString(CompanyName, 105)
+  implicit lazy val mandatoryAddressField          = validatedString(AddressLine, 35)
+  implicit lazy val optAddressField                = inlineOptionString(AddressLine, 35)
+  implicit lazy val restrictField                  = validatedString(RestrictiveString, 35)
 
-  implicit def optUtrField: WebAsk[Html, Option[UTR]] = inlineOptionString(UTR)
+  implicit lazy val optUtrField: WebAsk[Html, Option[UTR]] = inlineOptionString(UTR)
 
-  implicit def intField: WebAsk[Html, Int] =
+  implicit lazy val intField: WebAsk[Html, Int] =
     twirlStringFields().simap(x =>
       {
         Rule.nonEmpty[String].apply(x) andThen
@@ -554,7 +527,7 @@ class DSTInterpreter @Inject()(
       }.toEither
     )(_.toString)
 
-  implicit def floatField: WebAsk[Html, Float] =
+  implicit lazy val floatField: WebAsk[Html, Float] =
     twirlStringFields(
       customRender = Some(stringField(_,_,_,_,_,"form-control govuk-input--width-4 govuk-input-z-index"))
     ).simap(x =>
@@ -564,7 +537,7 @@ class DSTInterpreter @Inject()(
       }.toEither
     )(_.toString)
 
-  implicit def longField: WebAsk[Html, Long] =
+  implicit lazy val longField: WebAsk[Html, Long] =
     twirlStringFields().simap(x =>
       {
         Rule.nonEmpty[String].apply(x.replace("%", "")) andThen
@@ -572,7 +545,7 @@ class DSTInterpreter @Inject()(
       }.toEither
     )(_.toString)
 
-  implicit def bigdecimalField: WebAsk[Html, BigDecimal] = {
+  implicit lazy val bigdecimalField: WebAsk[Html, BigDecimal] = {
     twirlStringFields(
       customRender = Some(stringField(_,_,_,_,_,"govuk-input-money govuk-input--width-10"))
     ).simap(x => {
