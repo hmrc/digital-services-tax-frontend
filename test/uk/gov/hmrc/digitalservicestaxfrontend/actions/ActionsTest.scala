@@ -36,7 +36,7 @@ import uk.gov.hmrc.digitalservicestax.views.html.ErrorTemplate
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import uk.gov.hmrc.digitalservicestaxfrontend.connectors.WiremockSpec
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
-import uk.gov.hmrc.digitalservicestaxfrontend.{ConfiguredPropertyChecks, TestInstances}
+import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 
 import java.net.URI
 import scala.concurrent.ExecutionContext.Implicits.global
