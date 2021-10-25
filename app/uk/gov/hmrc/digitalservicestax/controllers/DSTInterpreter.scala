@@ -19,8 +19,8 @@ package uk.gov.hmrc.digitalservicestax.controllers
 import cats.data.Validated
 import cats.implicits._
 import enumeratum.{Enum, EnumEntry}
-import java.time.LocalDate
 
+import java.time.LocalDate
 import javax.inject.Inject
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages}
@@ -29,6 +29,7 @@ import ltbs.uniform.validation.Rule
 import ltbs.uniform.validation.Rule.nonEmpty
 import ltbs.uniform.validation._
 import org.jsoup.Jsoup
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import play.twirl.api.HtmlFormat.Appendable
 import play.twirl.api.{Html, HtmlFormat}
@@ -58,6 +59,8 @@ class DSTInterpreter @Inject()(
 ) extends PlayInterpreter[Html]
   with InferWebAsk[Html]
   with Widgets {
+
+  val logger = Logger(getClass)
 
   implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, A] =
     new WebAsk[Html, A] {
@@ -293,23 +296,27 @@ class DSTInterpreter @Inject()(
             out.valueAt(key).flatMap{_.find(_.trim.nonEmpty)},
             Map("empty" -> List(key))
           ).andThen(x =>
-            Validated.catchOnly[NumberFormatException](x.toInt))
-            .leftMap(_ => Map("nan" -> List("year")))
+            Validated.catchOnly[NumberFormatException](x.toInt)
+          ).leftMap(_ => Map("nan" -> List(key)))
 
-        (
+        val foo = (
           intAtKey("year"),
           intAtKey("month"),
           intAtKey("day")
-        ).tupled match {
+        ).tupled
+        println(s"XXXXXXXXX $foo")
+        foo match {
           case Validated.Valid((y,m,d)) =>
             Either.catchOnly[java.time.DateTimeException]{
               LocalDate.of(y,m,d)
             }.leftMap(_ => ErrorTree.oneErr(ErrorMsg("not-a-date")))
-
           case Validated.Invalid(errors) => (errors.get("empty"), errors.get("nan")) match {
-            case (Some(empty), _) => ??? // combine strings, Left(errorTree)
-            case (_, Some(nan)) => ??? // combine strings, Left(errorTree)
-            case _ => ??? // should never happen
+            case (Some(empty), _) => Left(ErrorMsg(empty.reverse.mkString("-and-") + ".empty").toTree)
+            case (_, Some(nan)) =>
+              Left(ErrorMsg(nan.reverse.mkString("-and-") + ".nan").toTree)
+            case _ =>
+              logger.warn("Date validation should've been caught by and empty or nan case")
+              Left(ErrorTree.oneErr(ErrorMsg("not-a-date")))
           }
         }        
       }
@@ -421,16 +428,14 @@ class DSTInterpreter @Inject()(
     )
   }
 
-  // def blankTell: Html = Html("")
-
   def messages(
     request: Request[AnyContent]
   ): UniformMessages[Html] =
-    messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+|
-      UniformMessages.bestGuess.map(HtmlFormat.escape)
+//    messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+|
+       UniformMessages.attentionSeeker.map(HtmlFormat.escape)
+//      UniformMessages.bestGuess.map(HtmlFormat.escape)
 
   // N.b. this next line very useful for correcting the keys of missing content, leave for now
-  //     UniformMessages.attentionSeeker.map(HtmlFormat.escape)
 
   override def pageChrome(
     keyList: List[String],
@@ -524,9 +529,6 @@ class DSTInterpreter @Inject()(
   implicit def utrField                       = validatedString(UTR)
   implicit def safeIdField                    = validatedString(SafeId)
   implicit def emailField                     = validatedString(Email, 132)
-  //  implicit def phoneField       = validatedString(PhoneNumber, 24)(twirlStringFields(
-  //    customRender = views.html.uniform.phonenumber.apply _
-  //  ))
   implicit def percentField                   = validatedVariant(Percent)
   implicit def moneyField                     = validatedBigDecimal(Money, 15)
   implicit def accountNumberField             = validatedString(AccountNumber)
