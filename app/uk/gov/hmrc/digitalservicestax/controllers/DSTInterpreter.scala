@@ -288,44 +288,30 @@ class DSTInterpreter @Inject()(
 
       def decode(out: Input): Either[ErrorTree, LocalDate] = {
 
-        def stringAtKey(key: String): Validated[List[String], String] =
+        def intAtKey(key: String): Validated[Map[String, List[String]], Int] =
           Validated.fromOption(
             out.valueAt(key).flatMap{_.find(_.trim.nonEmpty)},
-            List(key)
-          )
+            Map("empty" -> List(key))
+          ).andThen(x =>
+            Validated.catchOnly[NumberFormatException](x.toInt))
+            .leftMap(_ => Map("nan" -> List("year")))
 
-        def intAtKey(key: String) : Validated[List[Either[String, String]], Int] =
-          Validated.fromOption(
-            out.valueAt(key).flatMap{_.find(_.trim.nonEmpty)},
-            List(Left(key))
-          ).toEither.flatMap(x =>
-            Either.catchOnly[NumberFormatException](x.toInt))
-            .toValidated
-            .leftMap(_ => List(Right(key)))
-
-        val allFields: Validated[List[Either[String, String]], (Int, Int, Int)] = (
+        (
           intAtKey("year"),
           intAtKey("month"),
           intAtKey("day")
-          ).tupled
-
-          allFields.leftMap{x => val foo: Either[String, List[String]] = x.sequence
-            foo
-          }
-          .toEither
-          .flatMap{ case (ys,ms,ds) =>
-
-            val asNumbers: Either[Exception, (Int,Int,Int)] =
-              Either.catchOnly[NumberFormatException]{
-                (ys.toInt, ms.toInt, ds.toInt)
-              }
-
-            asNumbers.flatMap { case (y,m,d) =>
-              Either.catchOnly[java.time.DateTimeException]{
-                LocalDate.of(y,m,d)
-              }
+        ).tupled match {
+          case Validated.Valid((y,m,d)) =>
+            Either.catchOnly[java.time.DateTimeException]{
+              LocalDate.of(y,m,d)
             }.leftMap(_ => ErrorTree.oneErr(ErrorMsg("not-a-date")))
+
+          case Validated.Invalid(errors) => (errors.get("empty"), errors.get("nan")) match {
+            case (Some(empty), _) => ??? // combine strings, Left(errorTree)
+            case (_, Some(nan)) => ??? // combine strings, Left(errorTree)
+            case _ => ??? // should never happen
           }
+        }        
       }
 
       def encode(in: LocalDate): Input = Map(
