@@ -294,12 +294,24 @@ class DSTInterpreter @Inject()(
             List(key)
           )
 
-        (
-          stringAtKey("year"),
-          stringAtKey("month"),
-          stringAtKey("day")
+        def intAtKey(key: String) : Validated[List[Either[String, String]], Int] =
+          Validated.fromOption(
+            out.valueAt(key).flatMap{_.find(_.trim.nonEmpty)},
+            List(Left(key))
+          ).toEither.flatMap(x =>
+            Either.catchOnly[NumberFormatException](x.toInt))
+            .toValidated
+            .leftMap(_ => List(Right(key)))
+
+        val allFields: Validated[List[Either[String, String]], (Int, Int, Int)] = (
+          intAtKey("year"),
+          intAtKey("month"),
+          intAtKey("day")
           ).tupled
-          .leftMap{x => ErrorMsg(x.reverse.mkString("-and-") + ".empty").toTree}
+
+          allFields.leftMap{x => val foo: Either[String, List[String]] = x.sequence
+            foo
+          }
           .toEither
           .flatMap{ case (ys,ms,ds) =>
 
