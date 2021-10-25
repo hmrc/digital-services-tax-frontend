@@ -19,12 +19,13 @@ package uk.gov.hmrc.digitalservicestax.controllers
 import cats.data.Validated
 import cats.syntax.all._
 import enumeratum.{Enum, EnumEntry}
-import java.time.LocalDate
 
+import java.time.LocalDate
 import javax.inject.Inject
 import ltbs.uniform._, validation._, common.web._
 import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages}
 import org.jsoup.Jsoup
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import play.twirl.api.{Html, HtmlFormat}, HtmlFormat.Appendable
 import shapeless.tag
@@ -53,6 +54,8 @@ class DSTInterpreter @Inject()(
 ) extends PlayInterpreter[Html]
   with InferWebAsk[Html]
   with Widgets {
+
+  val logger = Logger(getClass)
 
   implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, A] =
     new WebAsk[Html, A] {
@@ -283,32 +286,34 @@ class DSTInterpreter @Inject()(
 
       def decode(out: Input): Either[ErrorTree, LocalDate] = {
 
-        def stringAtKey(key: String): Validated[List[String], String] =
+        def intAtKey(key: String): Validated[Map[String, List[String]], Int] = {
           Validated.fromOption(
             out.valueAt(key).flatMap{_.find(_.trim.nonEmpty)},
-            List(key)
+            Map("empty" -> List(key))
+          ).andThen(x =>
+            Validated.catchOnly[NumberFormatException](x.toInt)
+              .leftMap(_ => Map("nan" -> List(key)))
           )
+        }
 
         (
-          stringAtKey("year"),
-          stringAtKey("month"),
-          stringAtKey("day")
-          ).tupled
-          .leftMap{x => ErrorMsg(x.reverse.mkString("-and-") + ".empty").toTree}
-          .toEither
-          .flatMap{ case (ys,ms,ds) =>
-
-            val asNumbers: Either[Exception, (Int,Int,Int)] =
-              Either.catchOnly[NumberFormatException]{
-                (ys.toInt, ms.toInt, ds.toInt)
-              }
-
-            asNumbers.flatMap { case (y,m,d) =>
-              Either.catchOnly[java.time.DateTimeException]{
-                LocalDate.of(y,m,d)
-              }
+          intAtKey("year"),
+          intAtKey("month"),
+          intAtKey("day")
+        ).tupled match {
+          case Validated.Valid((y,m,d)) =>
+            Either.catchOnly[java.time.DateTimeException]{
+              LocalDate.of(y,m,d)
             }.leftMap(_ => ErrorTree.oneErr(ErrorMsg("not-a-date")))
+          case Validated.Invalid(errors) => (errors.get("empty"), errors.get("nan")) match {
+            case (Some(empty), _) => Left(ErrorMsg(empty.reverse.mkString("-and-") + ".empty").toTree)
+            case (_, Some(nan)) =>
+              Left(ErrorMsg(nan.reverse.mkString("-and-") + ".nan").toTree)
+            case _ =>
+              logger.warn("Date validation should've been caught by and empty or nan case")
+              Left(ErrorTree.oneErr(ErrorMsg("not-a-date")))
           }
+        }
       }
 
       def encode(in: LocalDate): Input = Map(
