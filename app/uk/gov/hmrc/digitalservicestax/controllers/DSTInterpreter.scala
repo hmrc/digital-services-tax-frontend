@@ -291,21 +291,21 @@ class DSTInterpreter @Inject()(
 
       def decode(out: Input): Either[ErrorTree, LocalDate] = {
 
-        def intAtKey(key: String): Validated[Map[String, List[String]], Int] =
+        def intAtKey(key: String): Validated[Map[String, List[String]], Int] = {
           Validated.fromOption(
             out.valueAt(key).flatMap{_.find(_.trim.nonEmpty)},
             Map("empty" -> List(key))
           ).andThen(x =>
             Validated.catchOnly[NumberFormatException](x.toInt)
-          ).leftMap(_ => Map("nan" -> List(key)))
+              .leftMap(_ => Map("nan" -> List(key)))
+          )
+        }
 
-        val foo = (
+        (
           intAtKey("year"),
           intAtKey("month"),
           intAtKey("day")
-        ).tupled
-        println(s"XXXXXXXXX $foo")
-        foo match {
+        ).tupled match {
           case Validated.Valid((y,m,d)) =>
             Either.catchOnly[java.time.DateTimeException]{
               LocalDate.of(y,m,d)
@@ -318,7 +318,7 @@ class DSTInterpreter @Inject()(
               logger.warn("Date validation should've been caught by and empty or nan case")
               Left(ErrorTree.oneErr(ErrorMsg("not-a-date")))
           }
-        }        
+        }
       }
 
       def encode(in: LocalDate): Input = Map(
@@ -431,11 +431,10 @@ class DSTInterpreter @Inject()(
   def messages(
     request: Request[AnyContent]
   ): UniformMessages[Html] =
-//    messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+|
-       UniformMessages.attentionSeeker.map(HtmlFormat.escape)
-//      UniformMessages.bestGuess.map(HtmlFormat.escape)
-
+    messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+|
+      UniformMessages.bestGuess.map(HtmlFormat.escape)
   // N.b. this next line very useful for correcting the keys of missing content, leave for now
+  //       UniformMessages.attentionSeeker.map(HtmlFormat.escape)
 
   override def pageChrome(
     keyList: List[String],

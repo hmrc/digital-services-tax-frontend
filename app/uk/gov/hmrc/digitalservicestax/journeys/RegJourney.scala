@@ -175,7 +175,9 @@ object RegJourney {
               message("liability-start-date.year.empty", groupMessage) ++
               message("liability-start-date.day-and-month.empty", groupMessage) ++
               message("liability-start-date.day-and-year.empty", groupMessage) ++
-              message("liability-start-date.month-and-year.empty", groupMessage)
+              message("liability-start-date.month-and-year.empty", groupMessage) ++
+              message("liability-start-date.day-and-month-and-year.nan", groupMessage) ++
+              message("liability-start-date.not-a-date", groupMessage)
           )
           periodEndDate <- ask[LocalDate] (
             "accounting-period-end-date",
@@ -198,7 +200,9 @@ object RegJourney {
               message("accounting-period-end-date.year.empty", groupMessage) ++
               message("accounting-period-end-date.day-and-month.empty", groupMessage) ++
               message("accounting-period-end-date.day-and-year.empty", groupMessage) ++
-              message("accounting-period-end-date.month-and-year.empty", groupMessage)
+              message("accounting-period-end-date.month-and-year.empty", groupMessage) ++
+              message("accounting-period-end-date.day-and-month-and-year.nan", groupMessage) ++
+              message("accounting-period-end-date.not-a-date", groupMessage)
           )
           emptyRegNo <- pure(None)
         } yield Registration(companyRegWrapper, contactAddress , ultimateParent, contactDetails, liabilityDate, periodEndDate, emptyRegNo)
