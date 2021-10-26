@@ -206,7 +206,7 @@ object BackendAndFrontendJson extends SimpleJson {
     }
   }
 
-  implicit def basicDateFormatWrites: Format[LocalDate] = new Format[LocalDate] {
+  implicit lazy val basicDateFormatWrites: Format[LocalDate] = new Format[LocalDate] {
 
     def writes(dt: LocalDate): JsValue = JsString(dt.toString)
 
@@ -220,7 +220,7 @@ object BackendAndFrontendJson extends SimpleJson {
   }
 
 
-  implicit def writePeriods: Writes[List[(Period, Option[LocalDate])]] = new Writes[List[(Period, Option[LocalDate])]] {
+  implicit lazy val writePeriods: Writes[List[(Period, Option[LocalDate])]] = new Writes[List[(Period, Option[LocalDate])]] {
     override def writes(o: List[(Period, Option[LocalDate])]): JsValue = {
 
       val details = o.map { case (period, mapping) =>
@@ -246,7 +246,7 @@ object BackendAndFrontendJson extends SimpleJson {
     }
   }
 
-  implicit def readPeriods: Reads[List[(Period, Option[LocalDate])]] = new Reads[List[(Period, Option[LocalDate])]] {
+  implicit lazy val readPeriods: Reads[List[(Period, Option[LocalDate])]] = new Reads[List[(Period, Option[LocalDate])]] {
     def reads(jsonOuter: JsValue): JsResult[List[(Period, Option[LocalDate])]] = {
       val JsArray(obligations) = { jsonOuter \ "obligations" }.as[JsArray]
       val periods = obligations.toList.flatMap { j =>
