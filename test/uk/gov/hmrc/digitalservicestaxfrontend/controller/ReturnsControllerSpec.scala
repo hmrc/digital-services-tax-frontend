@@ -21,7 +21,6 @@ import org.scalatest.PrivateMethodTester
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
-import play.modules.reactivemongo.ReactiveMongoApi
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoPersistence}
 import uk.gov.hmrc.digitalservicestax.controllers.{ReturnsController, routes}
 import uk.gov.hmrc.digitalservicestax.data.{CompanyRegWrapper, Period, Postcode, Registration, Return, UTR}
@@ -34,14 +33,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.postfixOps
+import uk.gov.hmrc.mongo.test.MongoSupport
 
-class ReturnsControllerSpec extends FakeApplicationSpec with PrivateMethodTester {
+class ReturnsControllerSpec extends FakeApplicationSpec with PrivateMethodTester with MongoSupport {
 
 	val returnsController = new ReturnsController(
 		fakeAuthorisedAction,
 		httpClient,
 		servicesConfig,
-		mongo = mock[ReactiveMongoApi],
+		mongoComponent,
 		interpreter,
 		checkYourAnswersRetInstance,
 		confirmationRetInstance,
@@ -50,13 +50,7 @@ class ReturnsControllerSpec extends FakeApplicationSpec with PrivateMethodTester
 		authConnector,
 		messagesApi,
 	)(implicitly) {
-		override implicit val persistence : MongoPersistence[AuthorisedRequest[AnyContent]] =   MongoPersistence[AuthorisedRequest[AnyContent]](
-			reactiveMongoApi = app.injector.instanceOf[ReactiveMongoApi],
-			collectionName = "uf-returns",
-			expireAfter = appConfig.mongoJourneyStoreExpireAfter
-		)(_.internalId)
-
-		override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
+	  override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
 	}
 	private val correctPeriodKey = "0001"
 	private val incorrectPeriodKey = "0003"

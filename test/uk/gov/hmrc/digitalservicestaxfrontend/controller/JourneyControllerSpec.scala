@@ -20,7 +20,6 @@ import org.mockito.Mockito._
 import play.api.i18n.Lang
 import play.api.test.Helpers._
 import play.api.test._
-import play.modules.reactivemongo.ReactiveMongoApi
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.{JourneyController, routes}
 import uk.gov.hmrc.digitalservicestax.data.DSTRegNumber
@@ -31,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.mongo.test.MongoSupport
 
 class JourneyControllerSpec extends FakeApplicationSpec {
 
@@ -86,8 +86,7 @@ class JourneyControllerSpec extends FakeApplicationSpec {
     authConnector,
     servicesConfig,
     layoutInstance,
-    landingInstance,
-    mongo = mock[ReactiveMongoApi]
+    landingInstance
   )(
     implicitly,
     messagesApi,

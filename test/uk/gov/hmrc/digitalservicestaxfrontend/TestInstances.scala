@@ -279,10 +279,6 @@ object TestInstances {
     Gen.option(genRepayment)
     ).mapN(Return.apply))
 
-  implicit def arbDate: Arbitrary[LocalDate] = Arbitrary(
-    date(LocalDate.of(2010, 1, 1), LocalDate.of(2020, 1, 1))
-  )
-
   implicit def periodKey: Arbitrary[@@[String, Period.Key.Tag]] = {
     val g = for {
       n <- Gen.chooseNum(1, 4)
@@ -304,7 +300,7 @@ object TestInstances {
   implicit def listOfPeriodLocalDateTuple: Arbitrary[List[(Period, Option[LocalDate])]] = {
     val foo = for {
       p <- periodArb.arbitrary
-      d <- Gen.option(arbDate.arbitrary)
+      d <- Gen.option(Arbitrary.arbLocalDate.arbitrary)
       n <- Gen.chooseNum(1, 50)
       l <- Gen.listOfN(n, (p, d))
     } yield l
