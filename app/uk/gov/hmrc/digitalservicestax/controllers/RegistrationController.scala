@@ -23,7 +23,6 @@ import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
-import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
@@ -39,14 +38,14 @@ import scala.concurrent.{ExecutionContext, Future}
 import data._
 import connectors.{DSTConnector, DSTService, MongoPersistence}
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
-
+import uk.gov.hmrc.mongo.MongoComponent
 import scala.concurrent.duration._
 
 class RegistrationController @Inject()(
   authorisedAction: Auth,
   http: HttpClient,
   servicesConfig: ServicesConfig,
-  mongo: ReactiveMongoApi,
+  mongoc: MongoComponent,
   interpreter: DSTInterpreter,
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi,
@@ -67,11 +66,11 @@ class RegistrationController @Inject()(
   import futureAdapter._
 
   implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
-    MongoPersistence[AuthorisedRequest[AnyContent]](
-      mongo,
+    new MongoPersistence[AuthorisedRequest[AnyContent]](
       collectionName = "uf-registrations",
-      appConfig.mongoJourneyStoreExpireAfter
-    )(_.internalId)
+      mongoc,
+      2 days
+    )
 
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 

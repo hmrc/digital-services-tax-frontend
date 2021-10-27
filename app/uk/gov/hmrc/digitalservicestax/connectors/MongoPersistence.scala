@@ -16,29 +16,19 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
-import ltbs.uniform._
-import interpreters.playframework._
-import reactivemongo.api.commands.WriteResult
+import ltbs.uniform.interpreters.playframework.{DB, PersistenceEngine}
+import play.api.libs.json.Format
+import play.api.mvc.{Request, AnyContent, Result}
+import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.duration.Duration
+import uk.gov.hmrc.mongo.{CurrentTimestampSupport, MongoComponent}
+import uk.gov.hmrc.mongo.cache.{CacheIdType, EntityCache, MongoCacheRepository}
+import play.api.libs.json._
 import uk.gov.hmrc.digitalservicestax.data.Return
 
-import scala.concurrent.duration._
-import java.time.LocalDateTime
-import play.modules.reactivemongo._
-import concurrent.{Future,ExecutionContext}
-import play.api._, mvc.{Codec => _,_}
-import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
-import play.api.libs.json._
-import reactivemongo.play.json._, collection._
-
 object MongoPersistence {
-  case class Wrapper(
-    session: String,
-    data: DB,
-    ret: Option[Return] = None,
-    timestamp: LocalDateTime = LocalDateTime.now
-  )
 
-  implicit val formatMap: OFormat[DB] = new OFormat[DB] {
+  val formatMap: OFormat[DB] = new OFormat[DB] {
     def writes(o: DB) = JsObject ( o.map {
       case (k,v) => (k.mkString("/"), JsString(v))
     }.toSeq )
@@ -50,99 +40,53 @@ object MongoPersistence {
       }.toMap)
       case e => JsError(s"expected an object, got $e")
     }
-  }  
+  }
 
 }
 
-case class MongoPersistence[A <: Request[AnyContent]] (
-  reactiveMongoApi: ReactiveMongoApi, 
+class MongoPersistence[A <: Request[AnyContent]](
   collectionName: String,
-  expireAfter: Duration,
-  useMongoTTL: Boolean = false
-)(getSession: A => String)(implicit ec: ExecutionContext) extends PersistenceEngine[A] {
-  import MongoPersistence._
-  import reactiveMongoApi.database
+  mongoComponent: MongoComponent,
+  ttl: Duration
+)(implicit ec: ExecutionContext) extends EntityCache[Request[Any], DB] with PersistenceEngine[A] {
 
-  def killDate: LocalDateTime = LocalDateTime.now.minusNanos(expireAfter.toNanos)
+  val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository (
+    mongoComponent = mongoComponent,
+    collectionName = collectionName,
+    ttl = ttl,
+    timestampSupport = new CurrentTimestampSupport,
+    cacheIdType = CacheIdType.SessionCacheId
+  )
 
-  def reaver: Future[Unit] = {
-    val selector = Json.obj(
-      "timestamp" -> Json.obj("$lt" -> killDate)
-    )
+  lazy val format: Format[DB] = MongoPersistence.formatMap
 
-    collection.map {
-      _.delete.one(selector, Some(100))
-    }
-  }
+  def apply(request: A)(f: DB => Future[(DB, Result)]): Future[Result] =
+    getFromCache(request)
+      .map(_.getOrElse(DB.empty))
+      .flatMap(f)
+      .flatMap{ case (newDb, result) => putCache(request)(newDb).map(_ => result)}
 
-  lazy val collection: Future[JSONCollection] = {
-    database.map(_.collection[JSONCollection](collectionName)).flatMap { c =>
+  // I think these belong under a separate collection
+  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit request: A): Future[Unit] = ??? // {
+  //   collection.flatMap(_.find(selector(request)).one[Wrapper]).map {
+  //     case Some(wrapper) if purgeStateUponCompletion => wrapper.copy(ret = Some(ret), data = DB.empty)
+  //     case Some(wrapper) => wrapper.copy(ret = Some(ret))
+  //     case None => Wrapper(getSession(request), DB.empty, Some(ret))
+  //   }.flatMap ( wrapper =>
+  //     collection.flatMap(_.update(ordered = false).one(selector(request), wrapper).map {
+  //       case wr: reactivemongo.api.commands.WriteResult if wr.writeErrors.isEmpty =>
+  //         (())
+  //       case e => throw new Exception(s"$e")
+  //     })
+  //   )
+  // }
 
-      import reactivemongo.api.indexes._
+  // I think these belong under a separate collection
+  def retrieveCachedReturn(implicit request: A): Future[Option[Return]] = ??? // {
+  //   collection.flatMap(_.find(selector(request)).one[Wrapper]).map {
+  //     case Some(wrapper) => wrapper.ret
+  //     case _ => None
+  //   }
+  // }
 
-      val sessionIndex = Index(
-        key = Seq("session" -> IndexType.Ascending),
-        unique = true
-      )
-
-      val timestamp = Index(
-        key = Seq("timestamp" -> IndexType.Ascending),
-        unique = false //,
-//        expire = Some(expireAfter.toSeconds.toInt)
-      )
-
-      val im = c.indexesManager
-
-      if (useMongoTTL) { 
-        Future.sequence(List(
-          im.ensure(sessionIndex),
-          im.ensure(timestamp)
-        )).map(_ => c)
-      } else {
-        im.ensure(sessionIndex).map(_ => c)
-      }
-    }
-  }
-
-  implicit val wrapperFormat = Json.format[Wrapper]
-
-  def selector(request: A): JsObject = Json.obj("session" -> getSession(request))
-
-  def apply(request: A)(f: DB => Future[(DB, Result)]): Future[Result] = {
-    collection.flatMap(_.find(selector(request)).one[Wrapper]).flatMap {
-      case Some(Wrapper(_, _, _, d)) if {d isBefore killDate} & !useMongoTTL =>
-        reaver.flatMap{_ => f(DB.empty)}
-      case Some(Wrapper(_, data, _, _)) =>
-        f(data)
-      case None =>
-        f(DB.empty)
-    } flatMap { case (newDb, result) =>
-        val wrapper = Wrapper(getSession(request), newDb)
-        collection.flatMap(_.update(selector(request), wrapper, upsert = true).map{
-          case wr: WriteResult if wr.writeErrors.isEmpty => result
-          case e => throw new Exception(s"$e")
-        })
-    }
-  }
-
-  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit request: A): Future[Unit] = {
-    collection.flatMap(_.find(selector(request)).one[Wrapper]).map {
-      case Some(wrapper) if purgeStateUponCompletion => wrapper.copy(ret = Some(ret), data = DB.empty)
-      case Some(wrapper) => wrapper.copy(ret = Some(ret))
-      case None => Wrapper(getSession(request), DB.empty, Some(ret))
-    }.flatMap { wrapper =>
-      collection.flatMap(_.update(ordered = false).one(selector(request), wrapper).map {
-        case wr: reactivemongo.api.commands.WriteResult if wr.writeErrors.isEmpty =>
-          (())
-        case e => throw new Exception(s"$e")
-      })
-    }
-  }
-
-  def retrieveCachedReturn(implicit request: A): Future[Option[Return]] = {
-    collection.flatMap(_.find(selector(request)).one[Wrapper]).map {
-      case Some(wrapper) => wrapper.ret
-      case _ => None
-    }
-  }
 }

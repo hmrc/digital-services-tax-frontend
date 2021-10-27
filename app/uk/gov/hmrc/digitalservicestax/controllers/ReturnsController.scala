@@ -25,7 +25,6 @@ import play.api.data.Forms._
 import play.api.data.FormBinding.Implicits._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
-import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoPersistence}
@@ -44,13 +43,14 @@ import javax.inject.Inject
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 
 import scala.concurrent.{ExecutionContext, Future}
-
+import scala.concurrent.duration._
+import uk.gov.hmrc.mongo.MongoComponent
 
 class ReturnsController @Inject()(
   authorisedAction: Auth,
   http: HttpClient,
   servicesConfig: ServicesConfig,
-  mongo: ReactiveMongoApi,
+  mongoc: MongoComponent,
   interpreter: DSTInterpreter,
   checkYourAnswersRet: CheckYourAnswersRet,
   confirmationReturn: ConfirmationReturn,
@@ -90,16 +90,20 @@ class ReturnsController @Inject()(
     )(applyKey)(unapplyKey)
   )
 
+
+  private lazy val amendmentsPersistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
+    new MongoPersistence[AuthorisedRequest[AnyContent]](
+      collectionName = "uf-amendments-returns",
+      mongoc,
+      2.days
+    )
+
+
   def showAmendments(): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
-      implicit val msg: UniformMessages[Html] = messages(request)
+    implicit val msg: UniformMessages[Html] = messages(request)
 
-       implicit val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
-         MongoPersistence[AuthorisedRequest[AnyContent]](
-           mongo,
-           collectionName = "uf-amendments-returns",
-           appConfig.mongoJourneyStoreExpireAfter
-         )(_.internalId)
+    implicit val persistence = amendmentsPersistence
 
       backend.lookupRegistration().flatMap{
         case None      => Future.successful(NotFound)
@@ -147,12 +151,15 @@ class ReturnsController @Inject()(
 
   }
 
-  implicit val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
-    MongoPersistence[AuthorisedRequest[AnyContent]](
-      mongo,
+
+
+  private lazy val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
+    new MongoPersistence[AuthorisedRequest[AnyContent]](
       collectionName = "uf-returns",
-      appConfig.mongoJourneyStoreExpireAfter
-    )(_.internalId)
+      mongoc,
+      2.days
+    )
+
 
   def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
@@ -160,6 +167,8 @@ class ReturnsController @Inject()(
     import journeys.ReturnJourney._
 
     val periodKey = Period.Key(periodKeyString)
+
+    implicit val p = persistence
 
     backend.lookupRegistration().flatMap{
       case None      => Future.successful(NotFound)
