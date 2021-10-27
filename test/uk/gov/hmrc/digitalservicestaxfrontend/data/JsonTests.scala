@@ -25,7 +25,6 @@ import play.api.libs.json._
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{Activity, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, Period, PhoneNumber, Postcode, TestSampleData, UTR}
-import uk.gov.hmrc.digitalservicestax.repo.JourneyState
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
@@ -134,29 +133,28 @@ class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks wit
       )
     }
   }
+  {
+    implicit val f = uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap
 
-  it should "serialize and de-serialise a DB instance" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap
-    forAll { sample: DB =>
-      val js = Json.toJson(sample)
+    it should "serialize and de-serialise a DB instance" in {
+      forAll { sample: DB =>
+        val js = Json.toJson(sample)
 
-      val parsed = js.validate[DB]
-      parsed.isSuccess shouldEqual true
-      //parsed.asOpt.value should contain theSameElementsAs sample
+        val parsed = js.validate[DB]
+        parsed.isSuccess shouldEqual true
+        //parsed.asOpt.value should contain theSameElementsAs sample
+      }
     }
-  }
 
-  it should "fail to parse a DB instance from a Json primitive" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap    
-    val source = JsString("bla")
-    source.validate[DB] shouldBe a [JsError]
-  }
+    it should "fail to parse a DB instance from a Json primitive" in {
+      val source = JsString("bla")
+      source.validate[DB] shouldBe a [JsError]
+    }
 
-  it should "fail to parse a formatMap from a non object" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap    
-    val obj = JsString("bla")
-
-    obj.validate[DB] shouldBe JsError(s"expected an object, got $obj")
+    it should "fail to parse a formatMap from a non object" in {
+      val obj = JsString("bla")
+      obj.validate[DB] shouldBe JsError(s"expected an object, got $obj")
+    }
   }
 
   it should "serialize and de-serialise a GroupCompany instance" in {
@@ -185,11 +183,6 @@ class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks wit
 
   it should "serialize and de-serialise a CompanyRegWrapper" in {
     testJsonRoundtrip[CompanyRegWrapper]
-  }
-
-  it should "serialize and de-serialise a Journey State" in {
-    import uk.gov.hmrc.digitalservicestax.repo.JsonConversion._
-    testJsonRoundtrip[JourneyState](Sample.generator[JourneyState])
   }
 
   it should "serialize and de-serialise an optional LocalDate" in {
