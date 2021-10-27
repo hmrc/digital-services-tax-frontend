@@ -38,7 +38,7 @@ import uk.gov.hmrc.digitalservicestax.views.html.cya.{CheckYourAnswersReg, Check
 import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, ConfirmationReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout, PayYourDst}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
-import uk.gov.hmrc.digitalservicestaxfrontend.controller_test.FakeAuthorisedAction
+import uk.gov.hmrc.digitalservicestaxfrontend.controller.FakeAuthorisedAction
 import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.mongo.MongoSpecSupport
 import uk.gov.hmrc.play.audit.http.HttpAuditing

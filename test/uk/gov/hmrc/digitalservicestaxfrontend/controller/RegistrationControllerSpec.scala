@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.digitalservicestaxfrontend.controller_test
+package uk.gov.hmrc.digitalservicestaxfrontend.controller
 
 import ltbs.uniform.interpreters.playframework.{PersistenceEngine, UnsafePersistence}
 import org.mockito.Mockito.when

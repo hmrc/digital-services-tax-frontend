@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.digitalservicestaxfrontend.controller_test
+package uk.gov.hmrc.digitalservicestaxfrontend.controller
 
 import cats.data.NonEmptyList
 import ltbs.uniform._
-import ltbs.uniform.common.web.{Breadcrumbs, WebAsk, WebAskList, WebTell}
+import ltbs.uniform.common.web.{WebAsk, WebTell}
 import org.scalatest.Assertion
 import play.api.test.Helpers._
 import play.twirl.api.Html
@@ -45,7 +45,7 @@ class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChec
       }
       forAll {(cc: CountryCode, as: Set[Activity], u: Unit, i: Int, oUtr: Option[UTR], an: AccountName) =>
         testCodecRoundtrip(cc, interpreter.twirlCountryCodeField)
-        testCodecRoundtrip(u, interpreter.blah)
+        testCodecRoundtrip(u, interpreter.askUnit)
         testCodecRoundtrip[Set[Activity]](as, interpreter.enumeratumSetField)
         testCodecRoundtrip(i, interpreter.intField)
         testCodecRoundtrip(oUtr, interpreter.optUtrField)
@@ -84,7 +84,7 @@ class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChec
       forAll { (cc: CountryCode, as: Set[Activity], u: Unit, i: Int, oUtr: Option[UTR], an: AccountName) =>
         testRender(cc, interpreter.twirlCountryCodeField)
         testRender[Set[Activity]](as, interpreter.enumeratumSetField, html => contentAsString(html) must include("""type="checkbox""""))
-        testRender(u, interpreter.blah)
+        testRender(u, interpreter.askUnit)
         testRender(i, interpreter.intField)
         testRender(oUtr, interpreter.optUtrField)
         testRender(an, interpreter.accountNameField)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.digitalservicestaxfrontend.controller_test
+package uk.gov.hmrc.digitalservicestaxfrontend.controller
 
 import uk.gov.hmrc.digitalservicestax.controllers._
 
