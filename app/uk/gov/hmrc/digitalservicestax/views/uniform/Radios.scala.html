@@ -27,7 +27,17 @@
 
 @keyWithDots=@{key.mkString(".")}
 @keyNoDots=@{key.mkString("-")}
-@inlineRadioKeys=@{key.mkString(".") == "manage-companies"}
+@inlineRadioKeys=@{
+    key.head == "manage-companies" ||
+    key.head == "global-revenues" ||
+    key.head == "uk-revenues" ||
+    key.head == "check-company-registered-office-address" ||
+    key.head == "check-unique-taxpayer-reference" ||
+    key.head == "enter-utr" ||
+    key.head == "check-contact-address" ||
+    key.head == "check-if-group" ||
+    key.head == "check-ultimate-parent-company-address"
+}
 @reverseRadios=@{
     key.head == "alternate-contact" ||
     key.head == "company-registered-office-address" ||
@@ -36,6 +46,8 @@
 @isListing = @{key.contains("manage-companies")}
 
 @indexedOptions=@{if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}}
+    <h1>@key.mkString(".")</h1>
+    <h1>@key.head</h1>
 @radios=@{indexedOptions.map{case (opt,num) =>
     RadioItem(
         content = HtmlContent(messages.decompose({key :+ opt}.mkString("."))),
