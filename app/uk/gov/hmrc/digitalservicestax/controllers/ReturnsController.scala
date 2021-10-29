@@ -27,7 +27,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoPersistence}
+import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoUniformPersistence, ReturnsRepo}
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
@@ -57,7 +57,8 @@ class ReturnsController @Inject()(
   layout: Layout,
   resubmitAReturn: ResubmitAReturn,
   val authConnector: AuthConnector,
-  val messagesApi: MessagesApi
+  val messagesApi: MessagesApi,
+  returnsCache: ReturnsRepo
 )(implicit
   ec: ExecutionContext
 ) extends ControllerHelpers
@@ -91,8 +92,8 @@ class ReturnsController @Inject()(
   )
 
 
-  private lazy val amendmentsPersistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
-    new MongoPersistence[AuthorisedRequest[AnyContent]](
+  private lazy val amendmentsPersistence: MongoUniformPersistence[AuthorisedRequest[AnyContent]] =
+    new MongoUniformPersistence[AuthorisedRequest[AnyContent]](
       collectionName = "uf-amendments-returns",
       mongoc,
       2.days
@@ -153,8 +154,8 @@ class ReturnsController @Inject()(
 
 
 
-  private lazy val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
-    new MongoPersistence[AuthorisedRequest[AnyContent]](
+  private lazy val persistence: MongoUniformPersistence[AuthorisedRequest[AnyContent]] =
+    new MongoUniformPersistence[AuthorisedRequest[AnyContent]](
       collectionName = "uf-returns",
       mongoc,
       2.days
@@ -167,7 +168,6 @@ class ReturnsController @Inject()(
     import journeys.ReturnJourney._
 
     val periodKey = Period.Key(periodKeyString)
-
     implicit val p = persistence
 
     backend.lookupRegistration().flatMap{
@@ -178,10 +178,9 @@ class ReturnsController @Inject()(
             case None => Future.successful(NotFound)
             case Some(period) =>
               interpret(returnJourney(period, reg)).run(targetId){ ret =>
-              val purgeStateUponCompletion = true
-
+                val purgeStateUponCompletion = true
                 backend.submitReturn(period, ret).map{ _ =>
-                  persistence.cacheReturn(ret, purgeStateUponCompletion)
+                  returnsCache.cacheReturn(ret, purgeStateUponCompletion)
                   Redirect(routes.ReturnsController.returnComplete(periodKeyString))
                 }
               }
@@ -194,7 +193,7 @@ class ReturnsController @Inject()(
     implicit val msg: UniformMessages[Html] = messages(request)
     val submittedPeriodKey = Period.Key(submittedPeriodKeyString)
     for {
-      ret <- persistence.retrieveCachedReturn
+      ret <- returnsCache.retrieveCachedReturn
       reg <- backend.lookupRegistration()
       outstandingPeriods <- backend.lookupOutstandingReturns()
       allReturns <- backend.lookupAllReturns()
@@ -221,6 +220,5 @@ class ReturnsController @Inject()(
       }
     }
   }
-
 
 }

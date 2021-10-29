@@ -36,7 +36,7 @@ import views.html.end._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import data._
-import connectors.{DSTConnector, DSTService, MongoPersistence}
+import connectors.{DSTConnector, DSTService, MongoUniformPersistence}
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.mongo.MongoComponent
 import scala.concurrent.duration._
@@ -66,7 +66,7 @@ class RegistrationController @Inject()(
   import futureAdapter._
 
   implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
-    new MongoPersistence[AuthorisedRequest[AnyContent]](
+    new MongoUniformPersistence[AuthorisedRequest[AnyContent]](
       collectionName = "uf-registrations",
       mongoc,
       2 days

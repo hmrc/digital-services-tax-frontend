@@ -17,16 +17,14 @@
 package uk.gov.hmrc.digitalservicestax.connectors
 
 import ltbs.uniform.interpreters.playframework.{DB, PersistenceEngine}
-import play.api.libs.json.Format
-import play.api.mvc.{Request, AnyContent, Result}
-import scala.concurrent.{Future, ExecutionContext}
-import scala.concurrent.duration.Duration
-import uk.gov.hmrc.mongo.{CurrentTimestampSupport, MongoComponent}
-import uk.gov.hmrc.mongo.cache.{CacheIdType, EntityCache, MongoCacheRepository}
 import play.api.libs.json._
-import uk.gov.hmrc.digitalservicestax.data.Return
+import play.api.mvc.{Request, AnyContent, Result}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Future, ExecutionContext}
+import uk.gov.hmrc.mongo.cache.{CacheIdType, EntityCache, MongoCacheRepository}
+import uk.gov.hmrc.mongo.{CurrentTimestampSupport, MongoComponent}
 
-object MongoPersistence {
+object MongoUniformPersistence {
 
   val formatMap: OFormat[DB] = new OFormat[DB] {
     def writes(o: DB) = JsObject ( o.map {
@@ -44,7 +42,7 @@ object MongoPersistence {
 
 }
 
-class MongoPersistence[A <: Request[AnyContent]](
+class MongoUniformPersistence[A <: Request[AnyContent]](
   collectionName: String,
   mongoComponent: MongoComponent,
   ttl: Duration
@@ -58,35 +56,11 @@ class MongoPersistence[A <: Request[AnyContent]](
     cacheIdType = CacheIdType.SessionCacheId
   )
 
-  lazy val format: Format[DB] = MongoPersistence.formatMap
+  lazy val format: Format[DB] = MongoUniformPersistence.formatMap
 
   def apply(request: A)(f: DB => Future[(DB, Result)]): Future[Result] =
     getFromCache(request)
       .map(_.getOrElse(DB.empty))
       .flatMap(f)
       .flatMap{ case (newDb, result) => putCache(request)(newDb).map(_ => result)}
-
-  // I think these belong under a separate collection
-  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit request: A): Future[Unit] = ??? // {
-  //   collection.flatMap(_.find(selector(request)).one[Wrapper]).map {
-  //     case Some(wrapper) if purgeStateUponCompletion => wrapper.copy(ret = Some(ret), data = DB.empty)
-  //     case Some(wrapper) => wrapper.copy(ret = Some(ret))
-  //     case None => Wrapper(getSession(request), DB.empty, Some(ret))
-  //   }.flatMap ( wrapper =>
-  //     collection.flatMap(_.update(ordered = false).one(selector(request), wrapper).map {
-  //       case wr: reactivemongo.api.commands.WriteResult if wr.writeErrors.isEmpty =>
-  //         (())
-  //       case e => throw new Exception(s"$e")
-  //     })
-  //   )
-  // }
-
-  // I think these belong under a separate collection
-  def retrieveCachedReturn(implicit request: A): Future[Option[Return]] = ??? // {
-  //   collection.flatMap(_.find(selector(request)).one[Wrapper]).map {
-  //     case Some(wrapper) => wrapper.ret
-  //     case _ => None
-  //   }
-  // }
-
 }
