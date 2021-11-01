@@ -120,7 +120,7 @@ enter-postcode.heading.hint=Your company details
 
 company-name.heading=What is the name of the company you want to register?
 company-name.heading.hint=Your company details
-company-name.hint=This is the name registered with an official company register, such as Companies House.
+company-name.hint=This is the name registered with an official company register, such as Companies House
 
 check-company-registered-office-address.heading=Is the company’s registered office address in the UK?
 check-company-registered-office-address.heading.hint=Your company details
@@ -192,7 +192,7 @@ check-if-group.FALSE=No
 
 ultimate-parent-company-name.heading=What is the name of the group’s ultimate global parent company?
 ultimate-parent-company-name.heading.hint=Ultimate parent company details
-ultimate-parent-company-name.hint=This is the name registered with an official company register, such as Companies House.
+ultimate-parent-company-name.hint=This is the name registered with an official company register, such as Companies House
 
 check-ultimate-parent-company-address.heading=Is the registered office address of {0} in the UK?
 check-ultimate-parent-company-address.heading.hint=Ultimate parent company details
@@ -221,9 +221,9 @@ contact-details.forename.heading=First name
 contact-details.surname.heading=Last name
 contact-details.phoneNumber.heading=Phone number
 contact-details.phoneNumber.hint=For international numbers include the country code number, \
- like 0044 808 157 0192, not +44 808 157 0192.
+ like 0044 808 157 0192, not +44 808 157 0192
 contact-details.email.heading=Email address
-contact-details.email.hint=We will use this email address to send confirmation of your registration.
+contact-details.email.hint=We will use this email address to send confirmation of your registration
 
 check-liability-date.heading=Was the group liable for Digital Services Tax from 1 April 2020?
 check-liability-date.heading.hint=Accounting period details
@@ -232,14 +232,14 @@ check-liability-date.FALSE=No
 
 liability-start-date.heading.hint=Accounting period details
 liability-start-date.heading=When did the company become liable for Digital Services Tax?
-liability-start-date.hint=For example, 31 7 2020.
+liability-start-date.hint=For example, 31 7 2020
 liability-start-date.Date.day.heading=Day
 liability-start-date.Date.month.heading=Month
 liability-start-date.Date.year.heading=Year
 
 accounting-period-end-date.heading=What is the end date of the company’s first accounting period for Digital Services Tax?
 accounting-period-end-date.heading.hint=Accounting period details
-accounting-period-end-date.hint=For example, 31 7 2020.
+accounting-period-end-date.hint=For example, 31 7 2020
 accounting-period-end-date.Date.day.heading=Day
 accounting-period-end-date.Date.month.heading=Month
 accounting-period-end-date.Date.year.heading=Year
@@ -552,7 +552,7 @@ manage-companies-add-add.heading=Company details
 manage-companies.listing.heading=Confirm the companies in your group that have a Digital Services Tax liability
 manage-companies.heading=Do you need to add another company?
 manage-companies.hint=You must tell us about all the companies in your group that have a Digital Services Tax \
-  liability for this return period.
+  liability for this return period
 manage-companies.Add=Yes
 manage-companies.Continue=No
 remove-company=Remove company
@@ -564,7 +564,7 @@ manage-companies-add-company.heading=Add company details
 manage-companies-edit-company.heading=Change company details
 company.heading=Company details
 company.name.heading=Company name
-company.name.hint=This is the name registered with an official company register, such as Companies House.
+company.name.hint=This is the name registered with an official company register, such as Companies House
 company.utr.heading=What is your Corporation Tax Unique Taxpayer Reference? (optional)
 company.utr.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation \
   Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can <a target=_blank class="govuk-link" href="https://www.gov.uk/find-lost-utr-number">find a lost UTR number (opens in a new window or tab)</a>.
@@ -577,7 +577,7 @@ utr.invalid=Enter the company’s Corporation Tax Unique Taxpayer Reference in t
 
 #Select activities
 select-activities.heading=Which activities are you reporting in this return?
-select-activities.hint=Select all that apply.
+select-activities.hint=Select all that apply
 select-activities.SocialMedia=Social media
 select-activities.SearchEngine=Search engine
 select-activities.OnlineMarketplace=Online marketplace
@@ -698,7 +698,7 @@ allowance-deducted.max-money=The amount of the £25m annual allowance you have d
 
 #Group Liability
 group-liability.heading=What is the {0}’s total UK Digital Services Tax liability for {1} to {2}?
-group-liability.hint=This is the total amount of liability after applying any deductions and allowances.
+group-liability.hint=This is the total amount of liability after applying any deductions and allowances
 group-liability.required=Enter the {0}’s total Digital Services Tax liability for {1} to {2} in pounds or pounds and pence
 group-liability.not-a-number=The {0}’s total liability must be an amount of money, like 1,234.56 or 1,560.00
 group-liability.length.exceeded=The {0}’s total liability must be 15 numbers or fewer
