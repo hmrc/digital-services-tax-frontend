@@ -25,7 +25,6 @@ import play.api.libs.json._
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{Activity, Company, CompanyRegWrapper, CountryCode, Email, GroupCompany, Money, NonEmptyString, Percent, Period, PhoneNumber, Postcode, TestSampleData, UTR}
-import uk.gov.hmrc.digitalservicestax.repo.JourneyState
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
@@ -185,11 +184,6 @@ class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks wit
 
   it should "serialize and de-serialise a CompanyRegWrapper" in {
     testJsonRoundtrip[CompanyRegWrapper]
-  }
-
-  it should "serialize and de-serialise a Journey State" in {
-    import uk.gov.hmrc.digitalservicestax.repo.JsonConversion._
-    testJsonRoundtrip[JourneyState](Sample.generator[JourneyState])
   }
 
   it should "serialize and de-serialise an optional LocalDate" in {

@@ -30,7 +30,7 @@ import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyChecks {
 

@@ -23,7 +23,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.modules.reactivemongo.ReactiveMongoApi
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
-import uk.gov.hmrc.digitalservicestax.controllers.{DSTInterpreter, RegistrationController, routes}
+import uk.gov.hmrc.digitalservicestax.controllers.{RegistrationController, routes}
 import uk.gov.hmrc.digitalservicestax.data.TestSampleData.sampleReg
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec

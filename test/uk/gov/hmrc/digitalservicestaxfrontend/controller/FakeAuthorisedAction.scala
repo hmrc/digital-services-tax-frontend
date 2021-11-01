@@ -29,7 +29,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FakeAuthorisedAction (
   mcc: MessagesControllerComponents,
-  layout: Layout,
   val authConnector: AuthConnector
 )(
   implicit val appConfig: AppConfig,

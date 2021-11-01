@@ -18,7 +18,7 @@ package uk.gov.hmrc.digitalservicestaxfrontend.controller
 
 import cats.data.NonEmptyList
 import ltbs.uniform._
-import ltbs.uniform.common.web._
+import ltbs.uniform.common.web.{WebAsk, WebTell}
 import org.scalatest.Assertion
 import play.api.test.Helpers._
 import play.twirl.api.Html
