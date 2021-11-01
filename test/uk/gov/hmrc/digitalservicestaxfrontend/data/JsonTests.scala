@@ -29,6 +29,7 @@ import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import java.time.LocalDate
+import uk.gov.hmrc.digitalservicestax.connectors.MongoUniformPersistence
 
 class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
 
@@ -134,7 +135,7 @@ class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks wit
     }
   }
   {
-    implicit val f = uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap
+    implicit val f = MongoUniformPersistence.formatMap
 
     it should "serialize and de-serialise a DB instance" in {
       forAll { sample: DB =>

@@ -69,7 +69,7 @@ class RegistrationController @Inject()(
     new MongoUniformPersistence[AuthorisedRequest[AnyContent]](
       collectionName = "uf-registrations",
       mongoc,
-      2 days
+      appConfig.mongoJourneyStoreExpireAfter
     )
 
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)

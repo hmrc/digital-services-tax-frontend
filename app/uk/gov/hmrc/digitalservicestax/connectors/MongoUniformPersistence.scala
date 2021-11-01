@@ -53,7 +53,7 @@ class MongoUniformPersistence[A <: Request[AnyContent]](
     collectionName = collectionName,
     ttl = ttl,
     timestampSupport = new CurrentTimestampSupport,
-    cacheIdType = CacheIdType.SessionCacheId
+    cacheIdType = CacheIdType.SessionUuid("sessionId")
   )
 
   lazy val format: Format[DB] = MongoUniformPersistence.formatMap

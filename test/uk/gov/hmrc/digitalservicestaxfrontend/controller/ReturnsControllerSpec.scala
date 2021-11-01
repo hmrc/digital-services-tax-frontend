@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.digitalservicestaxfrontend.controller
+package uk.gov.hmrc.digitalservicestaxfrontend
+package controller
 
 import org.mockito.Mockito.when
 import org.scalatest.PrivateMethodTester
-import play.api.mvc.{AnyContent, Result}
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
-import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoPersistence}
+import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.{ReturnsController, routes}
-import uk.gov.hmrc.digitalservicestax.data.{CompanyRegWrapper, Period, Postcode, Registration, Return, UTR}
-import uk.gov.hmrc.digitalservicestax.data.TestSampleData.{samplePeriod, sampleReg, sampleReturn}
+import uk.gov.hmrc.digitalservicestax.data.Period
+import uk.gov.hmrc.digitalservicestax.data.TestSampleData.{samplePeriod, sampleReg}
 import uk.gov.hmrc.digitalservicestax.views.html.ResubmitAReturn
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.language.postfixOps
 import uk.gov.hmrc.mongo.test.MongoSupport
 
 class ReturnsControllerSpec extends FakeApplicationSpec with PrivateMethodTester with MongoSupport {
@@ -48,7 +46,8 @@ class ReturnsControllerSpec extends FakeApplicationSpec with PrivateMethodTester
 		layoutInstance,
 		app.injector.instanceOf[ResubmitAReturn],
 		authConnector,
-		messagesApi,
+                messagesApi,
+                connectors.VolatileReturnsRepoImpl
 	)(implicitly) {
 	  override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
 	}
