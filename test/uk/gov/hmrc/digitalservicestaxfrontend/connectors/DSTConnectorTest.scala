@@ -20,12 +20,15 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalactic.anyvals.PosInt
 import play.api.libs.json.Json
+import play.mvc.Http.Status
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{CompanyRegWrapper, Period, Postcode, Registration, Return, UTR}
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+
+import scala.concurrent.Future
 
 class DSTConnectorTest extends WiremockSpec with ConfiguredPropertyChecks {
 
@@ -51,6 +54,22 @@ class DSTConnectorTest extends WiremockSpec with ConfiguredPropertyChecks {
     }
   }
 
+  "should have correct status code where registration failed" in {
+    val dstRegNumber = arbitrary[Registration].sample.value
+
+    stubFor(
+      post(urlPathEqualTo("/registration"))
+        .willReturn(aResponse().withStatus(Status.BAD_REQUEST).withBody("{}")))
+
+    val submitReg =
+      DSTTestConnector.submitRegistration(dstRegNumber).recoverWith {
+        case _: UpstreamErrorResponse => Future.successful(true)
+        case _ => Future.successful(false)
+      }.map({case b: Boolean => b})
+
+    whenReady(submitReg) {threwException => assert(threwException)}
+  }
+
   "should submit a period and a return successfully" in {
     forAll { (period: Period, ret: Return) =>
 
@@ -64,6 +83,25 @@ class DSTConnectorTest extends WiremockSpec with ConfiguredPropertyChecks {
       whenReady(response) { res =>
         res
       }
+    }
+  }
+
+  "should have correct status code where submitting return failed" in {
+    forAll { (period: Period, ret: Return) =>
+
+      val encodedKey = java.net.URLEncoder.encode(period.key, "UTF-8")
+
+      stubFor(
+        post(urlPathEqualTo(s"/returns/$encodedKey"))
+          .willReturn(aResponse().withStatus(Status.BAD_REQUEST).withBody("{}")))
+
+      val submitReturn =
+        DSTTestConnector.submitReturn(period, ret).recoverWith {
+          case _: UpstreamErrorResponse => Future.successful(true)
+          case _ => Future.successful(false)
+        }.map({case b: Boolean => b})
+
+      whenReady(submitReturn) {threwException => assert(threwException)}
     }
   }
 

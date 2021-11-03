@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
+import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.{HttpClient, _}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpClient
-import BackendAndFrontendJson._
+
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HttpReads.Implicits._
 
 class DSTConnector (
   val http: HttpClient,
@@ -32,12 +31,19 @@ class DSTConnector (
 
   val backendURL: String = servicesConfig.baseUrl("digital-services-tax") + "/digital-services-tax"
 
-  def submitRegistration(reg: Registration): Future[Unit] =
-    http.POST[Registration, Unit](s"$backendURL/registration", reg)
+  import uk.gov.hmrc.http.HttpReadsInstances._
+  def submitRegistration(reg: Registration): Future[HttpResponse] =
+    http.POST[Registration, Either[UpstreamErrorResponse,HttpResponse]](s"$backendURL/registration", reg).map {
+      case Right(value) => value
+      case Left(e) => throw e
+    }
 
-  def submitReturn(period: Period, ret: Return): Future[Unit] = {
+  def submitReturn(period: Period, ret: Return): Future[HttpResponse] = {
     val encodedKey = java.net.URLEncoder.encode(period.key, "UTF-8")
-    http.POST[Return, Unit](s"$backendURL/returns/$encodedKey", ret)
+    http.POST[Return, Either[UpstreamErrorResponse,HttpResponse]](s"$backendURL/returns/$encodedKey", ret).map {
+      case Right(value) => value
+      case Left(e) => throw e
+    }
   }
 
   def lookupCompany(): Future[Option[CompanyRegWrapper]] =
