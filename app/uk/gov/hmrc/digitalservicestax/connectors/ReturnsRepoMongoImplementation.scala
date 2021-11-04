@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Format
 import play.api.mvc.Request
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
@@ -27,6 +28,7 @@ import uk.gov.hmrc.digitalservicestax.data.Return
 import uk.gov.hmrc.mongo.cache.{CacheIdType, EntityCache, MongoCacheRepository}
 import uk.gov.hmrc.mongo.{CurrentTimestampSupport, MongoComponent}
 
+@Singleton
 class ReturnsRepoMongoImplementation @Inject()(
   mongoComponent: MongoComponent,
   config: AppConfig
