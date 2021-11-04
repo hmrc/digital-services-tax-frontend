@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.digitalservicestax.repo
+package uk.gov.hmrc.digitalservicestax.connectors
 
-import uk.gov.hmrc.cache.repository.CacheRepository
+import uk.gov.hmrc.digitalservicestax.data.Return
+import scala.concurrent.Future
+import play.api.mvc.Request
+import com.google.inject.ImplementedBy
 
-trait Store {
-
-  val expireAfterSeconds: Long
-
-  val cacheRepository: CacheRepository
-
-  val cacheRepositoryKey: String
-
-}
-
-trait JourneyStore {
-
-  val journeyKey: String
-
+@ImplementedBy(classOf[ReturnsRepoMongoImplementation])
+trait ReturnsRepo {
+  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit request: Request[Any]): Future[Unit]
+  def retrieveCachedReturn(implicit request: Request[Any]): Future[Option[Return]]
 }

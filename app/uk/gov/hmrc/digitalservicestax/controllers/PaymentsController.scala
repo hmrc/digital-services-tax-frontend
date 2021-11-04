@@ -44,7 +44,6 @@ class PaymentsController @Inject()(
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
-  val mongo: play.modules.reactivemongo.ReactiveMongoApi,
   layout: Layout,
   payYourDst: PayYourDst
 )(

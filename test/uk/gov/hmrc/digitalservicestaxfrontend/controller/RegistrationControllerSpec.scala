@@ -21,9 +21,8 @@ import org.mockito.Mockito.when
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.modules.reactivemongo.ReactiveMongoApi
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
-import uk.gov.hmrc.digitalservicestax.controllers.{DSTInterpreter, RegistrationController, routes}
+import uk.gov.hmrc.digitalservicestax.controllers.{RegistrationController, routes}
 import uk.gov.hmrc.digitalservicestax.data.TestSampleData.sampleReg
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
@@ -31,8 +30,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.mongo.test.MongoSupport
 
-class RegistrationControllerSpec extends FakeApplicationSpec {
+class RegistrationControllerSpec extends FakeApplicationSpec with MongoSupport {
 
   "RegistrationController.registerAction" must {
     "run the registration journey when there is no registration taking you to first page" in {
@@ -84,7 +84,7 @@ class RegistrationControllerSpec extends FakeApplicationSpec {
     fakeAuthorisedAction,
     httpClient,
     servicesConfig,
-    mongo = mock[ReactiveMongoApi],
+    mongoComponent,
     interpreter,
     authConnector,
     messagesApi,

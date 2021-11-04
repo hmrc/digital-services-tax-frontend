@@ -176,6 +176,7 @@ object RegJourney {
               message("liability-start-date.day-and-year.empty", groupMessage) ++
               message("liability-start-date.month-and-year.empty", groupMessage) ++
               message("liability-start-date.day-and-month-and-year.nan", groupMessage) ++
+              message("liability-start-date.day-and-month-and-year.invalid", groupMessage) ++
               message("liability-start-date.not-a-date", groupMessage)
           )
           periodEndDate <- ask[LocalDate] (
@@ -201,6 +202,7 @@ object RegJourney {
               message("accounting-period-end-date.day-and-year.empty", groupMessage) ++
               message("accounting-period-end-date.month-and-year.empty", groupMessage) ++
               message("accounting-period-end-date.day-and-month-and-year.nan", groupMessage) ++
+              message("accounting-period-end-date.day-and-month-and-year.invalid", groupMessage) ++
               message("accounting-period-end-date.not-a-date", groupMessage)
           )
           emptyRegNo <- pure(None)

@@ -16,16 +16,18 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
-import uk.gov.hmrc.digitalservicestax.data._
 import cats.~>
-  import scala.language.higherKinds
+import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.http.HttpResponse
+
+import scala.language.higherKinds
 
 trait DSTService[F[_]] {
 
   def lookupCompany(): F[Option[CompanyRegWrapper]]
   def lookupCompany(utr: UTR, postcode: Postcode): F[Option[CompanyRegWrapper]]
-  def submitRegistration(reg: Registration): F[Unit]
-  def submitReturn(period: Period, ret: Return): F[Unit]
+  def submitRegistration(reg: Registration): F[HttpResponse]
+  def submitReturn(period: Period, ret: Return): F[HttpResponse]
   def lookupRegistration(): F[Option[Registration]]
   def lookupOutstandingReturns(): F[Set[Period]]
   def lookupAmendableReturns(): F[Set[Period]]
@@ -42,9 +44,9 @@ trait DSTService[F[_]] {
         nat(old.lookupOutstandingReturns())
       def lookupRegistration(): G[Option[Registration]] =
         nat(old.lookupRegistration())
-      def submitRegistration(reg: Registration): G[Unit] =
+      def submitRegistration(reg: Registration): G[HttpResponse] =
         nat(old.submitRegistration(reg))
-      def submitReturn(period: Period,ret: Return): G[Unit] =
+      def submitReturn(period: Period,ret: Return): G[HttpResponse] =
         nat(old.submitReturn(period, ret))
       def lookupAmendableReturns(): G[Set[Period]] =
         nat(old.lookupAmendableReturns())

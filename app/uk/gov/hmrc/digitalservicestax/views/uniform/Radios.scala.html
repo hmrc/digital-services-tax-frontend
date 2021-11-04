@@ -27,7 +27,19 @@
 
 @keyWithDots=@{key.mkString(".")}
 @keyNoDots=@{key.mkString("-")}
-@inlineRadioKeys=@{key.mkString(".") == "manage-companies"}
+@inlineRadioKeys=@{
+    List(
+        "manage-companies",
+        "global-revenues",
+        "uk-revenues",
+        "check-company-registered-office-address",
+        "check-unique-taxpayer-reference",
+        "enter-utr",
+        "check-contact-address",
+        "check-if-group",
+        "check-ultimate-parent-company-address"
+    ).contains(key.head)
+}
 @reverseRadios=@{
     key.head == "alternate-contact" ||
     key.head == "company-registered-office-address" ||

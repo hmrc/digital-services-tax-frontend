@@ -24,7 +24,6 @@ import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 
 import scala.concurrent.Future
-import scala.language.postfixOps
 
 class AuthenticationControllerSpec extends FakeApplicationSpec {
   val authenticationController = new AuthenticationController(

@@ -27,8 +27,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.mvc.MessagesControllerComponents
 import play.api.{Application, ApplicationLoader}
-import play.modules.reactivemongo.DefaultReactiveMongoApi
-import reactivemongo.api.MongoConnection
 import uk.gov.hmrc.auth.core.PlayAuthConnector
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
@@ -40,7 +38,6 @@ import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout, PayYourDst}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.digitalservicestaxfrontend.controller.FakeAuthorisedAction
 import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.mongo.MongoSpecSupport
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -53,7 +50,6 @@ trait FakeApplicationSpec extends PlaySpec
   with BaseOneAppPerSuite
   with FakeApplicationFactory
   with TryValues
-  with MongoSpecSupport
   with ScalaFutures
   with TestWiring {
 
@@ -92,19 +88,10 @@ trait FakeApplicationSpec extends PlaySpec
 
   lazy val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
-  val reactiveMongoApi = new DefaultReactiveMongoApi(
-    parsedUri = MongoConnection.parseURI(mongoUri).success.value,
-    dbName = databaseName,
-    strictMode = false,
-    configuration = configuration,
-    new DefaultApplicationLifecycle
-  )
-
   implicit val defaultPatience: PatienceConfig = PatienceConfig(timeout = 5.seconds, interval = 100.millis)
 
   val fakeAuthorisedAction = new FakeAuthorisedAction(
     mcc,
-    layoutInstance,
     authConnector
   )(
     appConfig,
