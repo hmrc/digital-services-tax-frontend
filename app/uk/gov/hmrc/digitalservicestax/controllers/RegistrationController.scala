@@ -91,7 +91,6 @@ class RegistrationController @Inject()(
 
     implicit val msg: UniformMessages[Html] = messages(request)
 
-
     backend.lookupRegistration().flatMap {
       case None =>
         interpret(registrationJourney(backend)).run(targetId) { ret => 

@@ -92,7 +92,6 @@ trait FakeApplicationSpec extends PlaySpec
 
   val fakeAuthorisedAction = new FakeAuthorisedAction(
     mcc,
-    layoutInstance,
     authConnector
   )(
     appConfig,

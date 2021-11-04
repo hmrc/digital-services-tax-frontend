@@ -22,15 +22,15 @@ import org.scalatest.PrivateMethodTester
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
-import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import uk.gov.hmrc.digitalservicestax.connectors._
 import uk.gov.hmrc.digitalservicestax.controllers.{ReturnsController, routes}
 import uk.gov.hmrc.digitalservicestax.data.Period
 import uk.gov.hmrc.digitalservicestax.data.TestSampleData.{samplePeriod, sampleReg}
 import uk.gov.hmrc.digitalservicestax.views.html.ResubmitAReturn
 import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import uk.gov.hmrc.mongo.test.MongoSupport
 
 class ReturnsControllerSpec extends FakeApplicationSpec with PrivateMethodTester with MongoSupport {

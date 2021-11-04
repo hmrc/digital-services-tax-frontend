@@ -293,6 +293,17 @@ class DSTInterpreter @Inject()(
           ).andThen(x =>
             Validated.catchOnly[NumberFormatException](x.toInt)
               .leftMap(_ => Map("nan" -> List(key)))
+          ).andThen( x =>
+            Validated.cond(
+              (key, x) match {
+                case ("day", n) => n > 0 && n <= 31
+                case ("month", n) => n > 0 && n <= 12
+                case ("year", n) => n.toString.length == 4
+                case _ => false
+              },
+              x,
+              Map("invalid" -> List(key))
+            )
           )
         }
 
@@ -305,10 +316,10 @@ class DSTInterpreter @Inject()(
             Either.catchOnly[java.time.DateTimeException]{
               LocalDate.of(y,m,d)
             }.leftMap(_ => ErrorTree.oneErr(ErrorMsg("not-a-date")))
-          case Validated.Invalid(errors) => (errors.get("empty"), errors.get("nan")) match {
-            case (Some(empty), _) => Left(ErrorMsg(empty.reverse.mkString("-and-") + ".empty").toTree)
-            case (_, Some(nan)) =>
-              Left(ErrorMsg(nan.reverse.mkString("-and-") + ".nan").toTree)
+          case Validated.Invalid(errors) => (errors.get("empty"), errors.get("nan"), errors.get("invalid")) match {
+            case (Some(empty), _, _) => Left(ErrorMsg(empty.reverse.mkString("-and-") + ".empty").toTree)
+            case (_, Some(nan), _) => Left(ErrorMsg(nan.reverse.mkString("-and-") + ".nan").toTree)
+            case (_, _, Some(invalid)) => Left(ErrorMsg(invalid.reverse.mkString("-and-") + ".invalid").toTree)
             case _ =>
               logger.warn("Date validation should've been caught by and empty or nan case")
               Left(ErrorTree.oneErr(ErrorMsg("not-a-date")))

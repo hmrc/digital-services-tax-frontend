@@ -21,7 +21,6 @@ import data._
 import connectors._
 import cats.implicits._
 import config.AppConfig
-
 import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
@@ -35,8 +34,7 @@ import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.Auth
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 @Singleton
 class JourneyController @Inject()(
