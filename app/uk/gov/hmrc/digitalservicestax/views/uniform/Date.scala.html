@@ -16,6 +16,7 @@
 
 @import ltbs.uniform._
 @import collection.immutable.Seq
+@import play.twirl.api.HtmlFormat
 
 @this(govukDateInput: GovukDateInput)
 
@@ -37,6 +38,17 @@
     }
 }
 
+@headHintAndLegend=@{
+    import collection.immutable.Seq
+
+    val headHint = messages.get(s"${key.mkString(".")}.heading.hint").fold(HtmlFormat.empty) { headHint =>
+        Html(s"<span class='govuk-caption-l'>$headHint</span>")
+    }
+    val title = messages.get(s"${key.mkString(".")}.heading").getOrElse(HtmlFormat.empty)
+
+    HtmlContent(HtmlFormat.fill(Seq(headHint, title)))
+}
+
 @govukDateInput(DateInput(
     id = s"${key.head}-input",
     hint = messages.get(s"${key.mkString(".")}.hint").fold(Option.empty[Hint]){ hint =>
@@ -48,7 +60,7 @@
         Some(Fieldset(
             legend =  messages.get(s"${key.mkString(".")}.heading").fold(Option.empty[Legend]){ heading =>
                 Some(Legend(
-                    content = HtmlContent(heading),
+                    content = headHintAndLegend,
                     classes = "govuk-fieldset__legend--l",
                     isPageHeading = true
                 ))
