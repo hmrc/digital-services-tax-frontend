@@ -94,7 +94,7 @@ class RegistrationControllerSpec extends FakeApplicationSpec with MongoSupport {
     )(
       implicitly
     ) {
-    override implicit val persistence : PersistenceEngine[AuthorisedRequest[AnyContent]] = UnsafePersistence()
+    override implicit lazy val persistence : PersistenceEngine[AuthorisedRequest[AnyContent]] = UnsafePersistence()
     override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
   }
 
