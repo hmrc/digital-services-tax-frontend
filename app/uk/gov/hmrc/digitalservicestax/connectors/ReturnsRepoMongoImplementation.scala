@@ -34,7 +34,7 @@ class ReturnsRepoMongoImplementation @Inject()(
   implicit ec: ExecutionContext
 ) extends EntityCache[Request[Any],Return] with ReturnsRepo {
 
-  val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository (
+  lazy val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository (
     mongoComponent = mongoComponent,
     collectionName = "return",
     ttl = config.mongoShortLivedStoreExpireAfter,
