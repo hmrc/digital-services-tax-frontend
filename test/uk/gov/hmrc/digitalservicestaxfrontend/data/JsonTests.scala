@@ -29,6 +29,7 @@ import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import java.time.LocalDate
+import uk.gov.hmrc.digitalservicestax.connectors.MongoUniformPersistence
 
 class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
 
@@ -133,29 +134,28 @@ class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks wit
       )
     }
   }
+  {
+    implicit val f = MongoUniformPersistence.formatMap
 
-  it should "serialize and de-serialise a DB instance" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap
-    forAll { sample: DB =>
-      val js = Json.toJson(sample)
+    it should "serialize and de-serialise a DB instance" in {
+      forAll { sample: DB =>
+        val js = Json.toJson(sample)
 
-      val parsed = js.validate[DB]
-      parsed.isSuccess shouldEqual true
-      //parsed.asOpt.value should contain theSameElementsAs sample
+        val parsed = js.validate[DB]
+        parsed.isSuccess shouldEqual true
+        //parsed.asOpt.value should contain theSameElementsAs sample
+      }
     }
-  }
 
-  it should "fail to parse a DB instance from a Json primitive" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap    
-    val source = JsString("bla")
-    source.validate[DB] shouldBe a [JsError]
-  }
+    it should "fail to parse a DB instance from a Json primitive" in {
+      val source = JsString("bla")
+      source.validate[DB] shouldBe a [JsError]
+    }
 
-  it should "fail to parse a formatMap from a non object" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap    
-    val obj = JsString("bla")
-
-    obj.validate[DB] shouldBe JsError(s"expected an object, got $obj")
+    it should "fail to parse a formatMap from a non object" in {
+      val obj = JsString("bla")
+      obj.validate[DB] shouldBe JsError(s"expected an object, got $obj")
+    }
   }
 
   it should "serialize and de-serialise a GroupCompany instance" in {

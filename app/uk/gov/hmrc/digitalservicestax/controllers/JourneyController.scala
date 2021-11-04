@@ -43,8 +43,7 @@ class JourneyController @Inject()(
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
   layout: Layout,
-  landing: Landing,
-  val mongo: play.modules.reactivemongo.ReactiveMongoApi
+  landing: Landing
 )(
   implicit ec: ExecutionContext,
   val messagesApi: MessagesApi,
