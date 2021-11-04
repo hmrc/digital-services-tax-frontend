@@ -65,7 +65,7 @@ class RegistrationController @Inject()(
   val futureAdapter = FutureAdapter.rerunOnStateChange[Html](15.minutes)
   import futureAdapter._
 
-  implicit val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
+  implicit lazy val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] =
     new MongoUniformPersistence[AuthorisedRequest[AnyContent]](
       collectionName = "uf-registrations",
       mongoc,
