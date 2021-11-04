@@ -87,8 +87,7 @@ class ReturnsController @Inject()(
 
     backend.lookupRegistration().flatMap{
       case None      => Future.successful(NotFound)
-      case Some(_) => Future.successful(NotFound)
-        backend.lookupAmendableReturns().map { outstandingPeriods =>
+      case Some(_) => backend.lookupAmendableReturns().map { outstandingPeriods =>
           outstandingPeriods.toList match {
             case Nil =>
               NotFound
@@ -98,7 +97,7 @@ class ReturnsController @Inject()(
                   Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
               )(resubmitAReturn("resubmit-a-return", periods, periodForm)(msg, request)))
           }
-        }
+      }
     }
   }
 
