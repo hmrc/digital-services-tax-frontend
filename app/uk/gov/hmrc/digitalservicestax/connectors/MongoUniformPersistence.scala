@@ -48,7 +48,7 @@ class MongoUniformPersistence[A <: Request[AnyContent]](
   ttl: Duration
 )(implicit ec: ExecutionContext) extends EntityCache[Request[Any], DB] with PersistenceEngine[A] {
 
-  val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository (
+  lazy val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository (
     mongoComponent = mongoComponent,
     collectionName = collectionName,
     ttl = ttl,
