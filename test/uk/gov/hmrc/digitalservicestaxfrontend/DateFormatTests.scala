@@ -17,11 +17,11 @@
 package uk.gov.hmrc.digitalservicestaxfrontend
 
 import java.time.LocalDate
-
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.digitalservicestax.frontend._
 
-class DateFormatTests extends FlatSpec with ConfiguredPropertyChecks with Matchers {
+class DateFormatTests extends AnyFlatSpec with ConfiguredPropertyChecks with Matchers {
 
   it should "create a formatter for the time right now" in {
     formattedTimeNow.nonEmpty shouldEqual true

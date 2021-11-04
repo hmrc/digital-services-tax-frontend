@@ -17,7 +17,8 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
 import ltbs.uniform.interpreters.logictable._
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.digitalservicestax.data.Activity.SocialMedia
 import uk.gov.hmrc.digitalservicestax.data.TestSampleData._
 import uk.gov.hmrc.digitalservicestax.data._
@@ -25,7 +26,7 @@ import uk.gov.hmrc.digitalservicestax.journeys.ReturnJourney
 
 import scala.util.matching.Regex
 
-class ReturnJourneySpec extends FlatSpec with Matchers {
+class ReturnJourneySpec extends AnyFlatSpec with Matchers {
 
   val lossKeys: Regex = {s"^report-(" + Activity.values.map(Activity.toUrl).mkString("|") + ")-loss"}.r
 

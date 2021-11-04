@@ -20,7 +20,9 @@ import com.outworkers.util.samplers._
 import enumeratum.scalacheck._
 import ltbs.uniform.interpreters.playframework.DB
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.{Assertion, FlatSpec, Matchers, OptionValues}
+import org.scalatest.{Assertion, OptionValues}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import play.api.libs.json._
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
@@ -31,7 +33,7 @@ import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import java.time.LocalDate
 import uk.gov.hmrc.digitalservicestax.connectors.MongoUniformPersistence
 
-class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
+class JsonTests extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
 
   def testJsonRoundtrip[T : Arbitrary : Format]: Assertion = {
     forAll { sample: T =>
