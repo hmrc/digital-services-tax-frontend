@@ -30,10 +30,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import scala.concurrent.Future
 
-class DSTConnectorSetup extends WiremockServer with ConfiguredPropertyChecks {
+class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
-  implicit override val generatorDrivenConfig =
-    PropertyCheckConfiguration(minSize = 1, minSuccessful = PosInt(1))
+  implicit override val generatorDrivenConfig = PropertyCheckConfiguration(minSize = 1, minSuccessful = PosInt(1))
 
   object DSTTestConnector extends DSTConnector(httpClient, servicesConfig) {
     override val backendURL: String = mockServerUrl

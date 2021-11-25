@@ -3,13 +3,14 @@ package uk.gov.hmrc.digitalservicestax.util
 import akka.actor.ActorSystem
 import org.scalatest.TryValues
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.{BaseOneAppPerSuite, FakeApplicationFactory, PlaySpec}
+import play.api.{Application, Configuration, Environment}
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.DefaultApplicationLifecycle
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.mvc.MessagesControllerComponents
-import play.api.{Application, ApplicationLoader}
 import play.modules.reactivemongo.DefaultReactiveMongoApi
 import reactivemongo.api.MongoConnection
 import uk.gov.hmrc.auth.core.PlayAuthConnector
@@ -29,6 +30,8 @@ import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 
+import java.io.File
+import java.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
@@ -37,14 +40,15 @@ trait FakeApplicationSetup extends PlaySpec
   with FakeApplicationFactory
   with TryValues
   with MongoSpecSupport
-  with ScalaFutures
-  with TestWiring {
-
-  protected[this] val context: ApplicationLoader.Context = ApplicationLoader.Context.create(environment)
+  with ScalaFutures {
 
   implicit lazy val actorSystem: ActorSystem = app.actorSystem
   implicit val defaultPatience: PatienceConfig = PatienceConfig(timeout = 5.seconds, interval = 100.millis)
+  implicit val clock: Clock = Clock.systemDefaultZone()
   implicit val lang = Lang("en")
+
+  lazy val environment: Environment = Environment.simple(new File("."))
+  lazy val configuration: Configuration = Configuration.load(environment)
 
   lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
