@@ -25,18 +25,18 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    majorVersion                     := 0,
-    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
+    majorVersion := 0,
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     scalacOptions += "-Ypartial-unification"
   )
   .settings(publishingSettings: _*)
   .configs(IntegrationTest)
-  .settings(integrationTestSettings(): _*)
+  .settings(itSettings: _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     resolvers += Resolver.jcenterRepo,
     resolvers += Resolver.bintrayRepo("hmrc", "releases"),
-    scalacOptions -= "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
+    scalacOptions -= "-Xfatal-warnings", // Fail the compilation if there are any warnings.
     TwirlKeys.templateImports ++= Seq(
       "ltbs.uniform.{Input => UfInput, _}",
       "ltbs.uniform.common.web.{Breadcrumbs => UfBreadcrumbs, _}",
@@ -58,3 +58,8 @@ TwirlKeys.templateImports += "uk.gov.hmrc.digitalservicestax.data._"
 
 scalaVersion := "2.12.11"
 
+val itSettings = Defaults.itSettings ++ Seq(
+  unmanagedSourceDirectories in IntegrationTest += baseDirectory(_ / "it").value,
+  parallelExecution := false,
+  fork := true
+)

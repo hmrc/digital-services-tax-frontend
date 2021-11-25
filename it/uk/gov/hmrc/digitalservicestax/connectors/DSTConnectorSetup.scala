@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.digitalservicestaxfrontend.connectors
+package uk.gov.hmrc.digitalservicestax.connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalactic.anyvals.PosInt
 import play.api.libs.json.Json
 import play.mvc.Http.Status
-import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{CompanyRegWrapper, Period, Postcode, Registration, Return, UTR}
+import uk.gov.hmrc.digitalservicestax.util.WiremockServer
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import scala.concurrent.Future
 
-class DSTConnectorTest extends WiremockSpec with ConfiguredPropertyChecks {
+class DSTConnectorSetup extends WiremockServer with ConfiguredPropertyChecks {
 
   implicit override val generatorDrivenConfig =
     PropertyCheckConfiguration(minSize = 1, minSuccessful = PosInt(1))

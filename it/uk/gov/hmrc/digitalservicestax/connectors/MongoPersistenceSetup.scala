@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.digitalservicestaxfrontend.connectors
+package uk.gov.hmrc.digitalservicestax.connectors
 
-import java.time.format.DateTimeFormatter
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.http.Status
 import play.api.mvc.{AnyContent, Results}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.Enrolments
-import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence
 import uk.gov.hmrc.digitalservicestax.data.{InternalId, Return}
-import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
+import uk.gov.hmrc.digitalservicestax.util.FakeApplicationSetup
+import uk.gov.hmrc.digitalservicestax.util.TestInstances._
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
-import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
 
+import java.time.format.DateTimeFormatter
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
-
 import scala.concurrent.Future
 
-class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyChecks {
+class MongoPersistenceSetup extends FakeApplicationSetup {
 
   val persistence = MongoPersistence[AuthorisedRequest[AnyContent]](
-     reactiveMongoApi = reactiveMongoApi,
-     collectionName = "test_persistence",
-     expireAfter = appConfig.mongoShortLivedStoreExpireAfter,
-     useMongoTTL = true
+    reactiveMongoApi = reactiveMongoApi,
+    collectionName = "test_persistence",
+    expireAfter = appConfig.mongoShortLivedStoreExpireAfter,
+    useMongoTTL = true
   ) { req =>
     req.internalId
   }
@@ -68,7 +66,7 @@ class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyCh
   }
 
   "should cache and retrieve a Return" in {
-    forAll {(user: InternalId, enrolments: Enrolments, ret: Return, purgeState: Boolean) =>
+    forAll { (user: InternalId, enrolments: Enrolments, ret: Return, purgeState: Boolean) =>
       implicit val req: AuthorisedRequest[AnyContent] = AuthorisedRequest[AnyContent](user, enrolments, FakeRequest())
       for {
         _ <- persistence.cacheReturn(ret, purgeState)
@@ -79,5 +77,4 @@ class MongoPersistenceTest extends FakeApplicationSpec with ConfiguredPropertyCh
       }
     }
   }
-
 }

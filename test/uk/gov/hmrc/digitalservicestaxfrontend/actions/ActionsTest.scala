@@ -34,15 +34,14 @@ import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views.html.ErrorTemplate
 import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
-import uk.gov.hmrc.digitalservicestaxfrontend.connectors.WiremockSpec
-import uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import uk.gov.hmrc.digitalservicestaxfrontend.util.{FakeApplicationSpec, WiremockServer}
 import uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 
 import java.net.URI
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ActionsTest extends FakeApplicationSpec with WiremockSpec with ConfiguredPropertyChecks {
+class ActionsTest extends FakeApplicationSpec with WiremockServer with ConfiguredPropertyChecks {
 
   // Run wiremock server on local machine with specified port.
   val inet = new URI(mockServerUrl)
