@@ -17,7 +17,6 @@
 package uk.gov.hmrc.digitalservicestaxfrontend.util
 
 import akka.actor.ActorSystem
-import com.softwaremill.macwire.wire
 import org.scalatest.TryValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{BaseOneAppPerSuite, FakeApplicationFactory, PlaySpec}
@@ -76,8 +75,8 @@ trait FakeApplicationSpec extends PlaySpec
   lazy val payYourDst: PayYourDst = app.injector.instanceOf[PayYourDst]
   lazy val interpreter = app.injector.instanceOf[DSTInterpreter]
 
-  lazy val appConfig: AppConfig = wire[AppConfig]
-  val servicesConfig: ServicesConfig = wire[ServicesConfig]
+  lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  val servicesConfig: ServicesConfig = app.injector.instanceOf[ServicesConfig]
   lazy val mockDSTConnector = mock[DSTConnector]
 
   val testConnector: TestConnector = new TestConnector(httpClient, servicesConfig)

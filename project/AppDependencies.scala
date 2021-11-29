@@ -36,10 +36,6 @@ object AppDependencies {
     "org.pegdown"               %  "pegdown"                  % "1.6.0",
     "org.scalatestplus.play"    %% "scalatestplus-play"       % "3.1.3",
     "org.mockito"               %  "mockito-core"             % "3.3.3",
-    "com.softwaremill.macwire"  %% "macros"                   % "2.3.3",
-    "com.softwaremill.macwire"  %% "macrosakka"               % "2.3.3",
-    "com.softwaremill.macwire"  %% "proxy"                    % "2.3.3",
-    "com.softwaremill.macwire"  %% "util"                     % "2.3.3",
     "com.luketebbs.uniform"     %% "interpreter-logictable"   % uniformVersion
 
   ).map (_ % Test)
