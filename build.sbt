@@ -23,10 +23,7 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(publishingSettings: _*)
   .configs(IntegrationTest)
-  .settings(itSettings)
-  .settings(unitTestSettings)
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.testSettings): _*)
+  .settings(itSettings ++ unitTestSettings)
   .settings(
     resolvers ++= Seq(Resolver.bintrayRepo("hmrc", "releases"), Resolver.jcenterRepo),
     scalacOptions -= "-Xfatal-warnings", // Fail the compilation if there are any warnings.
