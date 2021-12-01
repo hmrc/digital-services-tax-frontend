@@ -1,7 +1,5 @@
 import play.sbt.PlayImport.ws
-import sbt.Defaults.testTasks
 import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
-import uk.gov.hmrc.ForkedJvmPerTestSettings.oneForkedJvmPerTest
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "digital-services-tax-frontend"
@@ -10,7 +8,6 @@ PlayKeys.playDefaultPort := 8740
 
 addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3")
 scalaVersion := "2.12.11"
-ThisBuild / scalacOptions += "-Ypartial-unification"
 routesImport += "uk.gov.hmrc.digitalservicestax.data._"
 
 lazy val microservice = Project(appName, file("."))
@@ -23,7 +20,7 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(publishingSettings: _*)
   .configs(IntegrationTest)
-  .settings(itSettings ++ unitTestSettings)
+  .settings(integrationTestSettings ++ unitTestSettings)
   .settings(
     resolvers ++= Seq(Resolver.bintrayRepo("hmrc", "releases"), Resolver.jcenterRepo),
     scalacOptions -= "-Xfatal-warnings", // Fail the compilation if there are any warnings.
@@ -53,17 +50,19 @@ lazy val scoverageSettings = {
   )
 }
 
-lazy val unitTestSettings = inConfig(Test)(testTasks) ++ Seq(
+// If you want integration tests in the test package you need to extend Test config ...
+lazy val IntegrationTest = config("it") extend Test
+
+lazy val unitTestSettings = inConfig(Test)(Defaults.testTasks) ++ Seq(
   Test / testOptions := Seq(Tests.Filter(name => name startsWith "unit")),
-  Test / unmanagedSourceDirectories := Seq((baseDirectory in Test).value / "test"),
-  Test / parallelExecution := true,
   Test / fork := true,
-  addTestReportOption(Test, "unit-test-reports")
+  Test / unmanagedSourceDirectories := Seq((baseDirectory in Test).value / "test"),
+  addTestReportOption(Test, "test-reports")
 )
 
-lazy val itSettings = inConfig(IntegrationTest)(testTasks) ++ Seq(
+lazy val integrationTestSettings = inConfig(IntegrationTest)(Defaults.testTasks) ++ Seq(
   IntegrationTest / testOptions := Seq(Tests.Filter(name => name startsWith "it")),
-  IntegrationTest / parallelExecution := false,
   IntegrationTest / fork := false,
+  IntegrationTest / parallelExecution := false,
   addTestReportOption(IntegrationTest, "integration-test-reports")
 )
