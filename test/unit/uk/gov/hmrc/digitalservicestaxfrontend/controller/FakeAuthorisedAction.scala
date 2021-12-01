@@ -21,6 +21,7 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.data.InternalId
+import uk.gov.hmrc.digitalservicestaxfrontend.TestInstances
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances
 

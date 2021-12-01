@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.digitalservicestaxfrontend
+package uk.gov.hmrc.digitalservicestax.connectors
 
-import java.time.LocalDate
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
-import uk.gov.hmrc.digitalservicestax.frontend._
+import uk.gov.hmrc.digitalservicestax.data.Return
+import scala.concurrent.Future
+import play.api.mvc.Request
+import com.google.inject.ImplementedBy
 
-class DateFormatSpec extends AnyFlatSpec with ConfiguredPropertyChecks with Matchers {
-
-  it should "create a formatter for the time right now" in {
-    formattedTimeNow.nonEmpty shouldEqual true
-  }
-
-  it should "create a date string for a date pattern" in {
-    val localDt = LocalDate.of(2020, 3, 1)
-    formatDate(localDt) shouldEqual "1 March 2020"
-  }
-
+@ImplementedBy(classOf[ReturnsRepoMongoImplementation])
+trait ReturnsRepo {
+  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit request: Request[Any]): Future[Unit]
+  def retrieveCachedReturn(implicit request: Request[Any]): Future[Option[Return]]
 }

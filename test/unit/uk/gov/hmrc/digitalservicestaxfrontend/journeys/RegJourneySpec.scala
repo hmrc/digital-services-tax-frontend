@@ -18,7 +18,8 @@ package unit.uk.gov.hmrc.digitalservicestaxfrontend.journeys
 
 import java.time.LocalDate
 import ltbs.uniform.interpreters.logictable._
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.digitalservicestax.data._
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.data.TestSampleData._
 import shapeless.tag.@@
@@ -27,7 +28,7 @@ import uk.gov.hmrc.digitalservicestax.journeys.RegJourney
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.data.TestSampleData.sampleContact
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.TestDstService
 
-class RegJourneySpec extends FlatSpec with Matchers {
+class RegJourneySpec extends AnyFlatSpec with Matchers {
 
   implicit val sampleUtrAsk: SampleData[String @@ data.UTR.Tag] = instances(UTR("1234567891"))
   implicit val samplePostcodeAsk: SampleData[String @@ data.Postcode.Tag] = instances(Postcode("BN1 1NB"))

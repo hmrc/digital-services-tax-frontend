@@ -20,7 +20,8 @@ import cats.implicits._
 import cats.kernel.Monoid
 import org.scalacheck.Gen
 import org.scalactic.anyvals.PosInt
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.frontend._
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
@@ -28,7 +29,7 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import java.time.LocalDate
 
-class ValidatedTypeSpec extends FlatSpec with Matchers with ConfiguredPropertyChecks {
+class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks {
 
   it should "fail to parse a validated tagged type using an of method" in {
     intercept[IllegalArgumentException] {

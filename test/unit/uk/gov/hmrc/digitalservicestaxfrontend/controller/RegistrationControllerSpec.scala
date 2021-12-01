@@ -21,7 +21,6 @@ import org.mockito.Mockito.when
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.modules.reactivemongo.ReactiveMongoApi
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.{RegistrationController, routes}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
@@ -31,8 +30,9 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.mongo.test.MongoSupport
 
-class RegistrationControllerSpec extends FakeApplicationServer {
+class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport {
 
   "RegistrationController.registerAction" must {
     "run the registration journey when there is no registration taking you to first page" in {
@@ -84,7 +84,7 @@ class RegistrationControllerSpec extends FakeApplicationServer {
     fakeAuthorisedAction,
     httpClient,
     servicesConfig,
-    mongo = mock[ReactiveMongoApi],
+    mongoComponent,
     interpreter,
     authConnector,
     messagesApi,
@@ -94,7 +94,7 @@ class RegistrationControllerSpec extends FakeApplicationServer {
     )(
       implicitly
     ) {
-    override implicit val persistence : PersistenceEngine[AuthorisedRequest[AnyContent]] = UnsafePersistence()
+    override implicit lazy val persistence : PersistenceEngine[AuthorisedRequest[AnyContent]] = UnsafePersistence()
     override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
   }
 

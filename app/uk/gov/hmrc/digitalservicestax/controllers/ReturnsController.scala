@@ -18,46 +18,44 @@ package uk.gov.hmrc.digitalservicestax
 package controllers
 
 import cats.implicits.catsKernelOrderingForOrder
+import javax.inject.Inject
 import ltbs.uniform._
 import ltbs.uniform.common.web._
 import play.api.data.Form
-import play.api.data.Forms._
 import play.api.data.FormBinding.Implicits._
+import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
-import play.modules.reactivemongo.ReactiveMongoApi
 import play.twirl.api.Html
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoPersistence}
+import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoUniformPersistence, ReturnsRepo}
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier,HttpClient}
+import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.http.HttpClient
+import views.html.ResubmitAReturn
 import views.html.cya.CheckYourAnswersRet
 import views.html.end.ConfirmationReturn
-import views.html.ResubmitAReturn
-
-import javax.inject.Inject
-import uk.gov.hmrc.digitalservicestax.views.html.Layout
-
-import scala.concurrent.{ExecutionContext, Future}
-
 
 class ReturnsController @Inject()(
   authorisedAction: Auth,
   http: HttpClient,
   servicesConfig: ServicesConfig,
-  mongo: ReactiveMongoApi,
+  mongoc: MongoComponent,
   interpreter: DSTInterpreter,
   checkYourAnswersRet: CheckYourAnswersRet,
   confirmationReturn: ConfirmationReturn,
   layout: Layout,
   resubmitAReturn: ResubmitAReturn,
   val authConnector: AuthConnector,
-  val messagesApi: MessagesApi
+  val messagesApi: MessagesApi,
+  returnsCache: ReturnsRepo
 )(implicit
   ec: ExecutionContext
 ) extends ControllerHelpers
@@ -74,13 +72,6 @@ class ReturnsController @Inject()(
       Some(checkYourAnswersRet(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
   }
 
-  private implicit val confirmRetTell = new WebTell[Html, Confirmation[(Return, CompanyName, Period, Period, Option[Html])]] {
-    override def render(in: Confirmation[(Return, CompanyName, Period, Period, Option[Html])], key: String, messages: UniformMessages[Html]): Option[Html] =
-      Some(
-        confirmationReturn(key: String, in.value._2: CompanyName, in.value._3: Period, in.value._4: Period, in.value._5: Option[Html])(messages)
-      )
-  }
-
   private def applyKey(key: Key): Period.Key = key
   private def unapplyKey(arg: Period.Key): Option[(Key)] = Option(arg)
 
@@ -92,67 +83,58 @@ class ReturnsController @Inject()(
 
   def showAmendments(): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
-      implicit val msg: UniformMessages[Html] = messages(request)
+    implicit val msg: UniformMessages[Html] = messages(request)
 
-       implicit val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
-         MongoPersistence[AuthorisedRequest[AnyContent]](
-           mongo,
-           collectionName = "uf-amendments-returns",
-           appConfig.mongoJourneyStoreExpireAfter
-         )(_.internalId)
-
-      backend.lookupRegistration().flatMap{
-        case None      => Future.successful(NotFound)
-        case Some(_) => Future.successful(NotFound)
-          backend.lookupAmendableReturns().map { outstandingPeriods =>
-             outstandingPeriods.toList match {
-               case Nil =>
-                NotFound
-               case periods =>
-                Ok(layout(
-                    pageTitle =
-                      Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
-                )(resubmitAReturn("resubmit-a-return", periods, periodForm)(msg, request)))
-             }
-            }
+    backend.lookupRegistration().flatMap{
+      case None      => Future.successful(NotFound)
+      case Some(_) => backend.lookupAmendableReturns().map { outstandingPeriods =>
+          outstandingPeriods.toList match {
+            case Nil =>
+              NotFound
+            case periods =>
+              Ok(layout(
+                pageTitle =
+                  Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
+              )(resubmitAReturn("resubmit-a-return", periods, periodForm)(msg, request)))
           }
       }
+    }
+  }
 
   def postAmendments(): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
     implicit val msg: UniformMessages[Html] = messages(request)
-      backend.lookupAmendableReturns().flatMap { outstandingPeriods =>
-        outstandingPeriods.toList match {
-          case Nil =>
-            Future.successful(NotFound)
-          case periods =>
-            periodForm.bindFromRequest.fold(
-              formWithErrors => {
-                Future.successful(
-                  BadRequest(layout(
+    backend.lookupAmendableReturns().flatMap { outstandingPeriods =>
+      outstandingPeriods.toList match {
+        case Nil =>
+          Future.successful(NotFound)
+        case periods =>
+          periodForm.bindFromRequest.fold(
+            formWithErrors => {
+              Future.successful(
+                BadRequest(layout(
                   pageTitle =
                     Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
                 )(resubmitAReturn("resubmit-a-return", periods, formWithErrors)(msg, request))
                   )
-                )
-              },
-              postedForm => {
-                Future.successful(
-                  Redirect(routes.ReturnsController.returnAction(postedForm, " "))
-                )
-              }
-            )
-        }
+              )
+            },
+            postedForm => {
+              Future.successful(
+                Redirect(routes.ReturnsController.returnAction(postedForm, " "))
+              )
+            }
+          )
       }
-
+    }
   }
 
-  implicit val persistence: MongoPersistence[AuthorisedRequest[AnyContent]] =
-    MongoPersistence[AuthorisedRequest[AnyContent]](
-      mongo,
+  private lazy val persistence: MongoUniformPersistence[AuthorisedRequest[AnyContent]] =
+    new MongoUniformPersistence[AuthorisedRequest[AnyContent]](
       collectionName = "uf-returns",
+      mongoc,
       appConfig.mongoJourneyStoreExpireAfter
-    )(_.internalId)
+    )
 
   def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
@@ -160,6 +142,7 @@ class ReturnsController @Inject()(
     import journeys.ReturnJourney._
 
     val periodKey = Period.Key(periodKeyString)
+    implicit val p = persistence
 
     backend.lookupRegistration().flatMap{
       case None      => Future.successful(NotFound)
@@ -169,10 +152,9 @@ class ReturnsController @Inject()(
             case None => Future.successful(NotFound)
             case Some(period) =>
               interpret(returnJourney(period, reg)).run(targetId){ ret =>
-              val purgeStateUponCompletion = true
-
+                val purgeStateUponCompletion = true
                 backend.submitReturn(period, ret).map{ _ =>
-                  persistence.cacheReturn(ret, purgeStateUponCompletion)
+                  returnsCache.cacheReturn(ret, purgeStateUponCompletion)
                   Redirect(routes.ReturnsController.returnComplete(periodKeyString))
                 }
               }
@@ -185,7 +167,7 @@ class ReturnsController @Inject()(
     implicit val msg: UniformMessages[Html] = messages(request)
     val submittedPeriodKey = Period.Key(submittedPeriodKeyString)
     for {
-      ret <- persistence.retrieveCachedReturn
+      ret <- returnsCache.retrieveCachedReturn
       reg <- backend.lookupRegistration()
       outstandingPeriods <- backend.lookupOutstandingReturns()
       allReturns <- backend.lookupAllReturns()
@@ -212,6 +194,4 @@ class ReturnsController @Inject()(
       }
     }
   }
-
-
 }

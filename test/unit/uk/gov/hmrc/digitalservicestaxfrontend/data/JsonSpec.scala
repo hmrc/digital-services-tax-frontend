@@ -19,7 +19,9 @@ package unit.uk.gov.hmrc.digitalservicestaxfrontend.data
 import com.outworkers.util.samplers._
 import ltbs.uniform.interpreters.playframework.DB
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.{Assertion, FlatSpec, Matchers, OptionValues}
+import org.scalatest.{Assertion, OptionValues}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import play.api.libs.json._
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
@@ -28,8 +30,9 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import java.time.LocalDate
+import uk.gov.hmrc.digitalservicestax.connectors.MongoUniformPersistence
 
-class JsonSpec extends FlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
+class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
 
   def testJsonRoundtrip[T : Arbitrary : Format]: Assertion = {
     forAll { sample: T =>
@@ -132,29 +135,28 @@ class JsonSpec extends FlatSpec with Matchers with ConfiguredPropertyChecks with
       )
     }
   }
+  {
+    implicit val f = MongoUniformPersistence.formatMap
 
-  it should "serialize and de-serialise a DB instance" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap
-    forAll { sample: DB =>
-      val js = Json.toJson(sample)
+    it should "serialize and de-serialise a DB instance" in {
+      forAll { sample: DB =>
+        val js = Json.toJson(sample)
 
-      val parsed = js.validate[DB]
-      parsed.isSuccess shouldEqual true
-      //parsed.asOpt.value should contain theSameElementsAs sample
+        val parsed = js.validate[DB]
+        parsed.isSuccess shouldEqual true
+        //parsed.asOpt.value should contain theSameElementsAs sample
+      }
     }
-  }
 
-  it should "fail to parse a DB instance from a Json primitive" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap    
-    val source = JsString("bla")
-    source.validate[DB] shouldBe a [JsError]
-  }
+    it should "fail to parse a DB instance from a Json primitive" in {
+      val source = JsString("bla")
+      source.validate[DB] shouldBe a [JsError]
+    }
 
-  it should "fail to parse a formatMap from a non object" in {
-    import uk.gov.hmrc.digitalservicestax.connectors.MongoPersistence.formatMap    
-    val obj = JsString("bla")
-
-    obj.validate[DB] shouldBe JsError(s"expected an object, got $obj")
+    it should "fail to parse a formatMap from a non object" in {
+      val obj = JsString("bla")
+      obj.validate[DB] shouldBe JsError(s"expected an object, got $obj")
+    }
   }
 
   it should "serialize and de-serialise a GroupCompany instance" in {

@@ -19,7 +19,6 @@ package unit.uk.gov.hmrc.digitalservicestaxfrontend.controller
 import org.mockito.Mockito.when
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.modules.reactivemongo.ReactiveMongoApi
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.{PaymentsController, routes}
 import uk.gov.hmrc.digitalservicestax.data.DSTRegNumber
@@ -38,7 +37,6 @@ class PaymentsControllerSpec extends FakeApplicationServer {
 		httpClient,
 		authConnector,
 		servicesConfig,
-		mock[ReactiveMongoApi],
 		layoutInstance,
 		app.injector.instanceOf[PayYourDst]
 	)(implicitly, messagesApi, appConfig) {
