@@ -29,13 +29,13 @@ import uk.gov.hmrc.digitalservicestax.views.html.ResubmitAReturn
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.data.TestSampleData.{samplePeriod, sampleReg}
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.postfixOps
 
-class ReturnsControllerSpec extends FakeApplicationSpec with PrivateMethodTester {
+class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTester {
 
 	val returnsController = new ReturnsController(
 		fakeAuthorisedAction,

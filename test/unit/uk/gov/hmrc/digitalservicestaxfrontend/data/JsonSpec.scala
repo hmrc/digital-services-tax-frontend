@@ -29,7 +29,7 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import java.time.LocalDate
 
-class JsonTests extends FlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
+class JsonSpec extends FlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
 
   def testJsonRoundtrip[T : Arbitrary : Format]: Assertion = {
     forAll { sample: T =>

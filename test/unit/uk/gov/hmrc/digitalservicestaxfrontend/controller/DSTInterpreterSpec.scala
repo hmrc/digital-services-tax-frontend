@@ -24,13 +24,13 @@ import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.frontend.Kickout
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.{ConfiguredPropertyChecks, TestInstances}
 import uk.gov.hmrc.govukfrontend.views.Implicits.RichHtml
 
 import java.time.LocalDate
 
-class DSTInterpreterSpec extends FakeApplicationSpec with ConfiguredPropertyChecks {
+class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyChecks {
 
   import TestInstances._
   "DSTInterpreter codec " must {

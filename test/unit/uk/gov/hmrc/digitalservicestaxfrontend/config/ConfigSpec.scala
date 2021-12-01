@@ -16,10 +16,10 @@
 
 package unit.uk.gov.hmrc.digitalservicestaxfrontend.config
 
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer
 import scala.concurrent.duration._
 
-class ConfigTest extends FakeApplicationSpec {
+class ConfigSpec extends FakeApplicationServer {
 
   "should load an app name from the configuration" in {
     appConfig.appName.nonEmpty mustEqual true

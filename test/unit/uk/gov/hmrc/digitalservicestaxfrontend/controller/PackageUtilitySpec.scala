@@ -20,7 +20,7 @@ import uk.gov.hmrc.digitalservicestax.controllers._
 
 import org.scalatest.{FlatSpec, Matchers}
 
-class PackageUtilityTests extends FlatSpec with Matchers {
+class PackageUtilitySpec extends FlatSpec with Matchers {
 
   it should "re-order a list of radio buttons" in {
     val list = List("None", "Some")

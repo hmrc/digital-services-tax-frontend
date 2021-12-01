@@ -27,12 +27,12 @@ import uk.gov.hmrc.digitalservicestax.data.DSTRegNumber
 import uk.gov.hmrc.http.HeaderCarrier
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.data.TestSampleData.sampleReg
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class JourneyControllerSpec extends FakeApplicationSpec {
+class JourneyControllerSpec extends FakeApplicationServer {
 
   "JourneyController" must {
 

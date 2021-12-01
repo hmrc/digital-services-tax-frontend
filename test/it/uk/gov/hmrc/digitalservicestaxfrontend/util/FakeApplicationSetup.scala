@@ -51,17 +51,13 @@ import java.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-trait FakeApplicationSetup extends PlaySpec
-  with BaseOneAppPerSuite
-  with FakeApplicationFactory
-  with TryValues
-  with MongoSpecSupport
-  with ScalaFutures {
+trait FakeApplicationSetup extends PlaySpec with BaseOneAppPerSuite with FakeApplicationFactory with TryValues
+  with MongoSpecSupport with ScalaFutures {
 
   implicit lazy val actorSystem: ActorSystem = app.actorSystem
   implicit val defaultPatience: PatienceConfig = PatienceConfig(timeout = 5.seconds, interval = 100.millis)
   implicit val clock: Clock = Clock.systemDefaultZone()
-  implicit val lang = Lang("en")
+  implicit val lang: Lang = Lang("en")
 
   lazy val environment: Environment = Environment.simple(new File("."))
   lazy val configuration: Configuration = Configuration.load(environment)

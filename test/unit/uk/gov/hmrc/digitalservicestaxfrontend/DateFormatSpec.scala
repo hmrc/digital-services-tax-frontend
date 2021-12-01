@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.digitalservicestaxfrontend.util
+package unit.uk.gov.hmrc.digitalservicestaxfrontend
 
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.{Configuration, Environment}
+import java.time.LocalDate
 
-import java.io.File
-import java.time.Clock
+import org.scalatest.{FlatSpec, Matchers}
+import uk.gov.hmrc.digitalservicestax.frontend._
 
-trait TestWiring extends MockitoSugar {
-  val appName: String = configuration.get[String]("appName")
+class DateFormatSpec extends FlatSpec with ConfiguredPropertyChecks with Matchers {
 
-  lazy val configuration: Configuration = Configuration.load(environment, Map(
-    "auditing.enabled" -> "false",
-    "services.auth.port" -> "11111"
-  ))
-  lazy val environment: Environment = Environment.simple(new File("."))
-  lazy val mode = environment.mode
+  it should "create a formatter for the time right now" in {
+    formattedTimeNow.nonEmpty shouldEqual true
+  }
 
-  implicit def clock: Clock = Clock.systemDefaultZone()
+  it should "create a date string for a date pattern" in {
+    val localDt = LocalDate.of(2020, 3, 1)
+    formatDate(localDt) shouldEqual "1 March 2020"
+  }
+
 }

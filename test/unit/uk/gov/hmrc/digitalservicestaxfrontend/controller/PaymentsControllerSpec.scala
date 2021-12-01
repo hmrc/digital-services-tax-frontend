@@ -26,12 +26,12 @@ import uk.gov.hmrc.digitalservicestax.data.DSTRegNumber
 import uk.gov.hmrc.digitalservicestax.views.html.PayYourDst
 import uk.gov.hmrc.http.HeaderCarrier
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.data.TestSampleData.{samplePeriod, sampleReg}
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PaymentsControllerSpec extends FakeApplicationSpec {
+class PaymentsControllerSpec extends FakeApplicationServer {
 
 	val paymentsController: PaymentsController = new PaymentsController(
 		fakeAuthorisedAction,

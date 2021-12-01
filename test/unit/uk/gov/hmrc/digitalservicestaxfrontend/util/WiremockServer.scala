@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 
 import scala.concurrent.ExecutionContext
 
-trait WiremockServer extends FakeApplicationSpec with BeforeAndAfterEach with BeforeAndAfterAll with ScalaFutures {
+trait WiremockServer extends FakeApplicationServer with BeforeAndAfterEach with BeforeAndAfterAll with ScalaFutures {
   val port: Int = 11111
 
   protected[this] val mockServer = new WireMockServer(port)

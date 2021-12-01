@@ -28,7 +28,7 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import java.time.LocalDate
 
-class ValidatedTypeTests extends FlatSpec with Matchers with ConfiguredPropertyChecks {
+class ValidatedTypeSpec extends FlatSpec with Matchers with ConfiguredPropertyChecks {
 
   it should "fail to parse a validated tagged type using an of method" in {
     intercept[IllegalArgumentException] {

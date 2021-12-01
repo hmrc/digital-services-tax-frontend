@@ -27,12 +27,12 @@ import uk.gov.hmrc.digitalservicestax.controllers.{RegistrationController, route
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.data.TestSampleData.sampleReg
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RegistrationControllerSpec extends FakeApplicationSpec {
+class RegistrationControllerSpec extends FakeApplicationServer {
 
   "RegistrationController.registerAction" must {
     "run the registration journey when there is no registration taking you to first page" in {

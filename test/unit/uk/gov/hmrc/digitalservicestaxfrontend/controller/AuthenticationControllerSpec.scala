@@ -21,11 +21,11 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.digitalservicestax.controllers.AuthenticationController
 import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationSpec
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer
 
 import scala.concurrent.Future
 
-class AuthenticationControllerSpec extends FakeApplicationSpec {
+class AuthenticationControllerSpec extends FakeApplicationServer {
   val authenticationController = new AuthenticationController(
 	  mcc,
 	  app.injector.instanceOf[TimeOut]
