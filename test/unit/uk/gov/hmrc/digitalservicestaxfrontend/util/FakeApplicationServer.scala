@@ -22,13 +22,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.{BaseOneAppPerSuite, FakeApplicationFactory, PlaySpec}
 import play.api.i18n.{Lang, MessagesApi}
-import play.api.inject.DefaultApplicationLifecycle
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.mvc.MessagesControllerComponents
 import play.api.{Application, Configuration, Environment}
-import play.modules.reactivemongo.DefaultReactiveMongoApi
-import reactivemongo.api.MongoConnection
 import uk.gov.hmrc.auth.core.PlayAuthConnector
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
@@ -39,7 +36,6 @@ import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, Confirmat
 import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout, PayYourDst}
 import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedAction
 import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.mongo.MongoSpecSupport
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -51,7 +47,7 @@ import java.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-trait FakeApplicationServer extends PlaySpec with BaseOneAppPerSuite with FakeApplicationFactory with TryValues with MongoSpecSupport
+trait FakeApplicationServer extends PlaySpec with BaseOneAppPerSuite with FakeApplicationFactory with TryValues
   with ScalaFutures with MockitoSugar {
 
   val appName: String = configuration.get[String]("appName")
@@ -95,14 +91,6 @@ trait FakeApplicationServer extends PlaySpec with BaseOneAppPerSuite with FakeAp
   }
 
   lazy val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-
-  val reactiveMongoApi = new DefaultReactiveMongoApi(
-    parsedUri = MongoConnection.parseURI(mongoUri).success.value,
-    dbName = databaseName,
-    strictMode = false,
-    configuration = configuration,
-    new DefaultApplicationLifecycle
-  )
 
   val fakeAuthorisedAction = new FakeAuthorisedAction(mcc, authConnector)(appConfig, implicitly, messagesApi)
 }
