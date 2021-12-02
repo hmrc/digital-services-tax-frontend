@@ -1,4 +1,5 @@
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import play.sbt.PlayImport.ws
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "digital-services-tax-frontend"
@@ -6,6 +7,36 @@ val appName = "digital-services-tax-frontend"
 PlayKeys.playDefaultPort := 8740
 
 addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3")
+scalaVersion := "2.12.11"
+routesImport += "uk.gov.hmrc.digitalservicestax.data._"
+
+lazy val microservice = Project(appName, file("."))
+  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
+  .settings(
+    majorVersion := 0,
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test ++ Seq(ws),
+    scalacOptions += "-Ypartial-unification"
+  )
+  .settings(publishingSettings: _*)
+  .configs(IntegrationTest)
+  .settings(integrationTestSettings ++ unitTestSettings)
+  .settings(
+    resolvers ++= Seq(Resolver.bintrayRepo("hmrc", "releases"), Resolver.jcenterRepo),
+    scalacOptions -= "-Xfatal-warnings", // Fail the compilation if there are any warnings.
+    TwirlKeys.templateImports ++= Seq(
+      "ltbs.uniform.{Input => UfInput, _}",
+      "ltbs.uniform.common.web.{Breadcrumbs => UfBreadcrumbs, _}",
+      "ltbs.uniform.interpreters.playframework._",
+      "uk.gov.hmrc.digitalservicestax.views.html.helpers._",
+      "uk.gov.hmrc.digitalservicestax.views.html.Layout",
+      "uk.gov.hmrc.govukfrontend.views.html.components._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
+      "uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages",
+      "uk.gov.hmrc.digitalservicestax.data._"
+    )
+  )
+  .settings(scoverageSettings)
 
 lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
@@ -19,42 +50,19 @@ lazy val scoverageSettings = {
   )
 }
 
-scalacOptions in ThisBuild += "-Ypartial-unification"
+// If you want integration tests in the test package you need to extend Test config ...
+lazy val IntegrationTest = config("it") extend Test
 
-lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
-  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
-  .settings(
-    majorVersion                     := 0,
-    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
-    scalacOptions += "-Ypartial-unification"
-  )
-  .settings(publishingSettings: _*)
-  .configs(IntegrationTest)
-  .settings(integrationTestSettings(): _*)
-  .settings(resolvers += Resolver.jcenterRepo)
-  .settings(
-    resolvers += Resolver.jcenterRepo,
-    resolvers += Resolver.bintrayRepo("hmrc", "releases"),
-    scalacOptions -= "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
-    TwirlKeys.templateImports ++= Seq(
-      "ltbs.uniform.{Input => UfInput, _}",
-      "ltbs.uniform.common.web.{Breadcrumbs => UfBreadcrumbs, _}",
-      "ltbs.uniform.interpreters.playframework._",
-      "uk.gov.hmrc.digitalservicestax.views.html.helpers._",
-      "uk.gov.hmrc.digitalservicestax.views.html.Layout",
-      "uk.gov.hmrc.govukfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
-      "uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages"
-    )
-  ).settings(scoverageSettings)
-
-libraryDependencies ++= Seq(
-  ws
+lazy val unitTestSettings = inConfig(Test)(Defaults.testTasks) ++ Seq(
+  Test / testOptions := Seq(Tests.Filter(name => name startsWith "unit")),
+  Test / fork := true,
+  Test / unmanagedSourceDirectories := Seq((baseDirectory in Test).value / "test"),
+  addTestReportOption(Test, "test-reports")
 )
 
-routesImport += "uk.gov.hmrc.digitalservicestax.data._"
-TwirlKeys.templateImports += "uk.gov.hmrc.digitalservicestax.data._"
-
-scalaVersion := "2.12.11"
-
+lazy val integrationTestSettings = inConfig(IntegrationTest)(Defaults.testTasks) ++ Seq(
+  IntegrationTest / testOptions := Seq(Tests.Filter(name => name startsWith "it")),
+  IntegrationTest / fork := false,
+  IntegrationTest / parallelExecution := false,
+  addTestReportOption(IntegrationTest, "integration-test-reports")
+)
