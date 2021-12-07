@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import shapeless.tag.@@
 
-case class Period(
+final case class Period(
   start: LocalDate,
   end: LocalDate,
   returnDue: LocalDate,
