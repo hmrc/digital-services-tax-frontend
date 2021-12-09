@@ -311,12 +311,10 @@ object TestInstances {
   }
 
   def neString(maxLen: Int = 255) = (
-    (
       Gen.alphaNumChar,
       arbitrary[String]
       ).mapN(_ + _).
       map{_.take(maxLen)}.map{NonEmptyString.apply}
-    )
 
   implicit def arbNEString: Arbitrary[NonEmptyString] = Arbitrary { neString() }
   implicit def arbPostcode: Arbitrary[Postcode] = Arbitrary(Postcode.gen.retryUntil(x => x == x.replaceAll(" ","")))

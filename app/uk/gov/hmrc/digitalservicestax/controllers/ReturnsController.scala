@@ -33,7 +33,7 @@ import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.cya.CheckYourAnswersRet
 import uk.gov.hmrc.digitalservicestax.views.html.end.ConfirmationReturn
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
+import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -72,7 +72,7 @@ class ReturnsController @Inject()(
   }
 
   private def applyKey(key: Key): Period.Key = key
-  private def unapplyKey(arg: Period.Key): Option[(Key)] = Option(arg)
+  private def unapplyKey(arg: Period.Key): Option[Key] = Option(arg)
 
   private val periodForm: Form[Period.Key] = Form(
     mapping(

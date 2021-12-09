@@ -138,10 +138,8 @@ object RegJourney {
                parentAddress <-
                  ask[Boolean](
                    "check-ultimate-parent-company-address",
-                   customContent = (
-                     message("check-ultimate-parent-company-address.heading", parentName) ++
+                   customContent = message("check-ultimate-parent-company-address.heading", parentName) ++
                        message("check-ultimate-parent-company-address.required", parentName)
-                     )
                  ) flatMap {
                    case true =>
                      ask[UkAddress](

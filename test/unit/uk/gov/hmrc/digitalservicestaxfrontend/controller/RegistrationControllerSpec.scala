@@ -23,7 +23,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.{RegistrationController, routes}
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.AuthorisedRequest
+import uk.gov.hmrc.digitalservicestax.actions.AuthorisedRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.data.TestSampleData.sampleReg
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.FakeApplicationServer

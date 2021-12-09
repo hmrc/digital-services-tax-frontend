@@ -122,7 +122,7 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
 
   "DSTInterpreter " must {
     "return Html for renderAnd with valid members" in {
-      val foo = (interpreter.renderAnd(
+      val foo = interpreter.renderAnd(
         Nil,
         List("foo"),
         None,
@@ -131,7 +131,7 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
         ErrorTree.empty,
         UniformMessages.echo.map(Html.apply),
         List(("foo", Html("memberA")), ("bar", Html("memberB")))
-      ))
+      )
       foo.nonEmpty mustBe true
     }
     "return Html with radios for renderOr with valid alternatives" in {
