@@ -328,9 +328,9 @@ class DSTInterpreter @Inject()(
       }
 
       def encode(in: LocalDate): Input = Map(
-        List("year") → in.getYear(),
-        List("month") → in.getMonthValue(),
-        List("day") → in.getDayOfMonth()
+        List("year") → in.getYear,
+        List("month") → in.getMonthValue,
+        List("day") → in.getDayOfMonth
       ).mapValues(_.toString.pure[List])
 
       def render(

@@ -61,7 +61,7 @@ object RegJourney {
             for {
               companyName <- ask[CompanyName](
                 "company-name",
-                validation = cond[CompanyName](nameCheck(_), "invalid")
+                validation = cond[CompanyName](nameCheck, "invalid")
               )
               companyAddress <- ask[ForeignAddress](
                 "company-registered-office-international-address",
@@ -77,7 +77,7 @@ object RegJourney {
                   for {
                     companyName <- ask[CompanyName](
                       "company-name",
-                      validation = cond[CompanyName](nameCheck(_), "invalid")
+                      validation = cond[CompanyName](nameCheck, "invalid")
                     )
                     companyAddress <- ask[UkAddress](
                       "company-registered-office-uk-address",
@@ -93,7 +93,7 @@ object RegJourney {
                         for {
                           companyName <- ask[CompanyName](
                             "company-name",
-                            validation = cond[CompanyName](nameCheck(_), "invalid")
+                            validation = cond[CompanyName](nameCheck, "invalid")
                           )
                           companyAddress <- ask[UkAddress](
                             "company-registered-office-uk-address",
@@ -209,7 +209,7 @@ object RegJourney {
       }
 
       _ <- tell("check-your-answers", CYA(registration))
-    } yield (registration)
+    } yield registration
   }
 
 }

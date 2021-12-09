@@ -44,7 +44,7 @@ object Country {
     )
     val raw = scala.io.Source.fromInputStream(stream).getLines.mkString
     val json = Json.parse(raw)
-    stream.close
+    stream.close()
     json
   }
 
