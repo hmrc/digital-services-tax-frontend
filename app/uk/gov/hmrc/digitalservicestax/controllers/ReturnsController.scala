@@ -76,7 +76,7 @@ class ReturnsController @Inject()(
 
   private val periodForm: Form[Period.Key] = Form(
     mapping(
-      "key" -> nonEmptyText.transform(Period.Key.apply, {x: Period.Key => x.toString})
+      "key" -> nonEmptyText.transform(Period.Key.apply, {x: Period.Key => x})
     )(applyKey)(unapplyKey)
   )
 

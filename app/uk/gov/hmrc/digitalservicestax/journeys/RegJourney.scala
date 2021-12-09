@@ -38,7 +38,7 @@ object RegJourney {
     Map(key -> Tuple2(key, args.toList.map { escape(_).toString } ))
   }
 
-  def nameCheck(name: CompanyName): Boolean = name.toString.matches("""^[a-zA-Z0-9 '&-]{1,105}$""")
+  def nameCheck(name: CompanyName): Boolean = name.matches("""^[a-zA-Z0-9 '&-]{1,105}$""")
 
   def registrationJourney[F[_] : Monad : TagK](
     backendService: DSTService[F]

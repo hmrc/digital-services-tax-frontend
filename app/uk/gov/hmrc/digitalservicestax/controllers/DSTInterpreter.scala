@@ -496,7 +496,7 @@ class DSTInterpreter @Inject()(
       )
     }{
       case None => ""
-      case Some(x) => x.toString
+      case Some(x) => x
     }
 
   def validatedBigDecimal(
