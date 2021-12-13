@@ -18,7 +18,6 @@ package uk.gov.hmrc.digitalservicestax
 package controllers
 
 import cats.implicits.catsKernelOrderingForOrder
-import javax.inject.Inject
 import ltbs.uniform._
 import ltbs.uniform.common.web._
 import play.api.data.Form
@@ -27,21 +26,21 @@ import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.twirl.api.Html
-import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoUniformPersistence, ReturnsRepo}
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.views.html.Layout
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.{Auth, AuthorisedRequest}
-import uk.gov.hmrc.http.{HeaderCarrier,HttpClient}
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
+import uk.gov.hmrc.digitalservicestax.views.html.cya.CheckYourAnswersRet
+import uk.gov.hmrc.digitalservicestax.views.html.end.ConfirmationReturn
+import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
-import views.html.ResubmitAReturn
-import views.html.cya.CheckYourAnswersRet
-import views.html.end.ConfirmationReturn
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsController @Inject()(
   authorisedAction: Auth,
@@ -73,11 +72,11 @@ class ReturnsController @Inject()(
   }
 
   private def applyKey(key: Key): Period.Key = key
-  private def unapplyKey(arg: Period.Key): Option[(Key)] = Option(arg)
+  private def unapplyKey(arg: Period.Key): Option[Key] = Option(arg)
 
   private val periodForm: Form[Period.Key] = Form(
     mapping(
-      "key" -> nonEmptyText.transform(Period.Key.apply, {x: Period.Key => x.toString})
+      "key" -> nonEmptyText.transform(Period.Key.apply, {x: Period.Key => x})
     )(applyKey)(unapplyKey)
   )
 

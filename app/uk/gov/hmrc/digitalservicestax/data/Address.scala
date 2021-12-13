@@ -25,7 +25,7 @@ sealed trait Address {
   def postalCode: String
 }
 
-case class UkAddress(
+final case class UkAddress(
   line1: AddressLine,
   line2: Option[AddressLine],
   line3: Option[AddressLine],
@@ -35,7 +35,7 @@ case class UkAddress(
   def countryCode = CountryCode("GB")
 }
 
-case class ForeignAddress(
+ final case class ForeignAddress(
   line1: AddressLine,
   line2: Option[AddressLine],
   line3: Option[AddressLine],

@@ -311,15 +311,13 @@ object TestInstances {
   }
 
   def neString(maxLen: Int = 255) = (
-    (
       Gen.alphaNumChar,
       arbitrary[String]
       ).mapN(_ + _).
       map{_.take(maxLen)}.map{NonEmptyString.apply}
-    )
 
   implicit def arbNEString: Arbitrary[NonEmptyString] = Arbitrary { neString() }
-  implicit def arbPostcode: Arbitrary[Postcode] = Arbitrary(Postcode.gen.retryUntil(x => x.toString == x.toString.replaceAll(" ","")))
+  implicit def arbPostcode: Arbitrary[Postcode] = Arbitrary(Postcode.gen.retryUntil(x => x == x.replaceAll(" ","")))
   implicit def arbDSTNumber: Arbitrary[DSTRegNumber] = Arbitrary(DSTRegNumber.gen)
   implicit def arbFormBundleNumber: Arbitrary[FormBundleNumber] = Arbitrary(FormBundleNumber.gen)
   implicit def arbCountryCode: Arbitrary[CountryCode] = Arbitrary(CountryCode.gen)
@@ -336,7 +334,7 @@ object TestInstances {
     (
       neString(20),
       neString(20)
-      ).mapN((a,b) => Email(s"${a}@${b}.co.uk"))
+      ).mapN((a,b) => Email(s"$a@$b.co.uk"))
   }
 
   implicit def arbForeignAddress: Arbitrary[ForeignAddress] = Arbitrary {

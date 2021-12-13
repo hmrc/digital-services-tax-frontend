@@ -33,7 +33,7 @@ import uk.gov.hmrc.digitalservicestax.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views.html.ErrorTemplate
-import uk.gov.hmrc.digitalservicestaxfrontend.actions.{AuthorisedAction, AuthorisedRequest}
+import uk.gov.hmrc.digitalservicestax.actions.{AuthorisedAction, AuthorisedRequest}
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.{FakeApplicationServer, WiremockServer}
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks

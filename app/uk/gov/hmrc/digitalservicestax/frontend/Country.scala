@@ -38,14 +38,11 @@ object Country {
   }
 
   val countriesJson: JsValue = {
-    val stream = getClass
-    .getResourceAsStream(
-    "/public/location-autocomplete-canonical-list.json"
-    )
-    val raw = scala.io.Source.fromInputStream(stream).getLines.mkString
-    val json = Json.parse(raw)
-    stream.close
-    json
+    val raw = scala.io.Source.fromInputStream(getClass
+      .getResourceAsStream(
+        "/public/location-autocomplete-canonical-list.json"
+      )).getLines.mkString
+    Json.parse(raw)
   }
 
   val countries: List[Country] =

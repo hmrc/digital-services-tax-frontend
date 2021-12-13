@@ -16,6 +16,6 @@
 
 package uk.gov.hmrc.digitalservicestax.data
 
-case class CYA[A] (
+final case class Confirmation[A] (
   value: A
 )
