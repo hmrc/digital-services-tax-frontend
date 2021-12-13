@@ -33,7 +33,7 @@ trait DSTService[F[_]] {
   def lookupAmendableReturns(): F[Set[Period]]
   def lookupAllReturns(): F[Set[Period]]
 
-  def transform[G[_]](nat: F ~> G) = {
+  def transform[G[_]](nat: F ~> G): DSTService[G] = {
     val old = this
     new DSTService[G] {
       def lookupCompany(utr: UTR,postcode: Postcode): G[Option[CompanyRegWrapper]] =

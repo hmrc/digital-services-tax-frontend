@@ -38,7 +38,7 @@ object RegJourney {
     Map(key -> Tuple2(key, args.toList.map { escape(_).toString } ))
   }
 
-  def nameCheck(name: CompanyName): Boolean = name.toString.matches("""^[a-zA-Z0-9 '&-]{1,105}$""")
+  def nameCheck(name: CompanyName): Boolean = name.matches("""^[a-zA-Z0-9 '&-]{1,105}$""")
 
   def registrationJourney[F[_] : Monad : TagK](
     backendService: DSTService[F]
@@ -61,7 +61,7 @@ object RegJourney {
             for {
               companyName <- ask[CompanyName](
                 "company-name",
-                validation = cond[CompanyName](nameCheck(_), "invalid")
+                validation = cond[CompanyName](nameCheck, "invalid")
               )
               companyAddress <- ask[ForeignAddress](
                 "company-registered-office-international-address",
@@ -77,7 +77,7 @@ object RegJourney {
                   for {
                     companyName <- ask[CompanyName](
                       "company-name",
-                      validation = cond[CompanyName](nameCheck(_), "invalid")
+                      validation = cond[CompanyName](nameCheck, "invalid")
                     )
                     companyAddress <- ask[UkAddress](
                       "company-registered-office-uk-address",
@@ -93,7 +93,7 @@ object RegJourney {
                         for {
                           companyName <- ask[CompanyName](
                             "company-name",
-                            validation = cond[CompanyName](nameCheck(_), "invalid")
+                            validation = cond[CompanyName](nameCheck, "invalid")
                           )
                           companyAddress <- ask[UkAddress](
                             "company-registered-office-uk-address",
@@ -138,10 +138,8 @@ object RegJourney {
                parentAddress <-
                  ask[Boolean](
                    "check-ultimate-parent-company-address",
-                   customContent = (
-                     message("check-ultimate-parent-company-address.heading", parentName) ++
+                   customContent = message("check-ultimate-parent-company-address.heading", parentName) ++
                        message("check-ultimate-parent-company-address.required", parentName)
-                     )
                  ) flatMap {
                    case true =>
                      ask[UkAddress](
@@ -211,7 +209,7 @@ object RegJourney {
       }
 
       _ <- tell("check-your-answers", CYA(registration))
-    } yield (registration)
+    } yield registration
   }
 
 }

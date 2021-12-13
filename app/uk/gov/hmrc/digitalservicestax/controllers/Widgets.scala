@@ -31,7 +31,7 @@ trait Widgets {
   implicit val addressTell = new WebTell[Html, Address] {
     override def render(in: Address, key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(Html(
-        s"<div id='${key}--sfer-content'>" +
+        s"<div id='$key--sfer-content'>" +
         s"<p>${in.lines.map{x => s"<span class='govuk-body-m'>${x.escapeHtml}</span>"}.mkString("<br/>")}</p>" +
         "</div>"
       ))
@@ -50,8 +50,8 @@ trait Widgets {
   implicit val companyTell = new WebTell[Html, Company] {
     override def render(in: Company, key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(Html(
-        s"<p class='govuk-body-l' id='${key}--sfer-content'>" +
-          s"${in.name.toString.escapeHtml}<br>" +
+        s"<p class='govuk-body-l' id='$key--sfer-content'>" +
+          s"${in.name.escapeHtml}<br>" +
           s"<span class='govuk-body-m'>" +
           s"${in.address.lines.map{_.escapeHtml}.mkString("<br>")}" +
           s"</span>" +
