@@ -22,6 +22,9 @@ import scala.io.Source
 import scala.util.matching.Regex
 
 class LocationParser(locationsFileSource: String = "/public/location-autocomplete-canonical-list.json") {
+  /**
+   * @see <a href="https://www.gov.uk/government/publications/open-standards-for-government/country-codes>UK GOV Country Code Standards</a>
+   */
   private val alphaTwoCodeRegex: Regex = "^([A-Z]{2}|[A-Z]{2}-[A-Z0-9]{2})$".r
 
   val locations: List[Location] = readLocations.as[List[Location]].filter(l => l.code.matches(alphaTwoCodeRegex.toString()))
