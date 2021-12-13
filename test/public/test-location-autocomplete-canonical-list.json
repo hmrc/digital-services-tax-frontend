@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Abu Dhabi",
+    "code": "AE-AZ",
+    "type": "territory"
+  },
+  {
+    "name": "Afghanistan",
+    "code": "AF",
+    "type": "country"
+  },
+  {
+    "name": "Ajman",
+    "code": "AE-AJ",
+    "type": "territory"
+  },
+  {
+    "name": "Akrotiri",
+    "code": "XQZ",
+    "type": "territory"
+  },
+  {
+    "name": "Albania",
+    "code": "AL",
+    "type": "country"
+  }
+]

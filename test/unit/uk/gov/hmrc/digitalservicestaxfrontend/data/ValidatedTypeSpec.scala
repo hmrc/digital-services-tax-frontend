@@ -56,13 +56,14 @@ class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropert
   }
 
   it should "concatenate lines in a ForeignAddress value" in {
+    val locationParser = new LocationParser()
     forAll { foreignAddress: ForeignAddress =>
       foreignAddress.lines shouldEqual List(
         foreignAddress.line1,
         foreignAddress.line2.getOrElse(""),
         foreignAddress.line3.getOrElse(""),
         foreignAddress.line4.getOrElse(""),
-        Country.name(foreignAddress.countryCode)
+        locationParser.name(foreignAddress.countryCode)
       ).filter(_.nonEmpty)
     }
   }

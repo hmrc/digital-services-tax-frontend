@@ -14,7 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.digitalservicestax.frontend.Country
+@import uk.gov.hmrc.digitalservicestax.frontend.Location
+@import uk.gov.hmrc.digitalservicestax.frontend.LocationParser
 
 @this()
 
@@ -28,8 +29,8 @@
       name="@path"
       >
       <option value="" disabled selected>@messages("countryCode.placeholder")</option>
-  @for(country <- Country.countries) {
-      <option value="@{country.code}" @{if(selectedCode.contains(country.code))"selected"}>@{country.name}</option>
+  @for(location <- new LocationParser().locations) {
+      <option value="@{location.code}" @{if(selectedCode.contains(location.code))"selected"}>@{location.name}</option>
   }
   </select>
 

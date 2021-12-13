@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.digitalservicestax
 
-import java.time.format.DateTimeFormatter
-import java.time.{LocalDate, LocalDateTime, ZoneId}
-
 import com.ibm.icu.text.SimpleDateFormat
 import com.ibm.icu.util.{TimeZone, ULocale}
+
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDate, LocalDateTime, ZoneId}
 
 package object frontend {
   private val zone = "Europe/London"
@@ -54,7 +54,7 @@ package object frontend {
 
       value match {
         case _: data.UkAddress => basic
-        case _ => basic :+ Country.name(countryCode)
+        case _ => basic :+ new LocationParser().name(countryCode)
       }
     }
 
