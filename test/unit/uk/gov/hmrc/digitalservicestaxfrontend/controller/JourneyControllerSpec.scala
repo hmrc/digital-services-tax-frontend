@@ -33,6 +33,12 @@ import scala.concurrent.Future
 
 class JourneyControllerSpec extends FakeApplicationServer {
 
+  private val contactReportTechnicalIssueUri = "/test-uri-for-referrer"
+  private val expectedContactReportTechnicalIssueUri = "%2Ftest-uri-for-referrer"
+
+  private val contactReportTechnicalIssueUrl =
+    s"http://localhost:9250/contact/report-technical-problem?newTab=true&amp;service=digital-services-tax-frontend&amp;referrerUrl=$expectedContactReportTechnicalIssueUri"
+
   "JourneyController" must {
 
     "redirect to register action when no registration" in {
@@ -51,11 +57,12 @@ class JourneyControllerSpec extends FakeApplicationServer {
         )
       )
       val result = controller.index.apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        FakeRequest("GET", contactReportTechnicalIssueUri).withSession().withHeaders("Authorization" -> "Bearer some-token")
       )
       status(result) mustBe 200
       implicit val lang = Lang("en")
       contentAsString(result) must include(messagesApi("registration.pending.title"))
+      contentAsString(result) must include(contactReportTechnicalIssueUrl)
     }
     "return Landing page when there is a registration with a registration number" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(
@@ -72,10 +79,11 @@ class JourneyControllerSpec extends FakeApplicationServer {
         Set(TestInstances.periodArb.arbitrary.sample.get)
       )
       val result = controller.index.apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        FakeRequest("GET", contactReportTechnicalIssueUri).withSession().withHeaders("Authorization" -> "Bearer some-token")
       )
       status(result) mustBe 200
       contentAsString(result) must include(messagesApi("landing.heading"))
+      contentAsString(result) must include(contactReportTechnicalIssueUrl)
     }
   }
 
