@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.digitalservicestax.frontend.Country
+@import uk.gov.hmrc.digitalservicestax.frontend.Location
 
 @this()
 
@@ -23,14 +23,11 @@
 <div class="country-code-wrapper govuk-form-group@if(hasErrors){ govuk-form-group--error}">
     <label class="govuk-label" for="location-autocomplete">@messages(s"$path.heading")</label>
     @{if(hasErrors) {error_message(path, messages(s"$path.invalid"), messages)}}
-    <select
-      id="location-autocomplete"
-      name="@path"
-      >
+    <select id="location-autocomplete" name="@path">
       <option value="" disabled selected>@messages("countryCode.placeholder")</option>
-  @for(country <- Country.countries) {
-      <option value="@{country.code}" @{if(selectedCode.contains(country.code))"selected"}>@{country.name}</option>
-  }
+    @for(location <- Location.locations) {
+        <option value="@{location.code}" @{if(selectedCode.contains(location.code))"selected"}>@{location.name}</option>
+    }
   </select>
 
 </div>

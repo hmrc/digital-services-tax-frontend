@@ -62,7 +62,7 @@ class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropert
         foreignAddress.line2.getOrElse(""),
         foreignAddress.line3.getOrElse(""),
         foreignAddress.line4.getOrElse(""),
-        Country.name(foreignAddress.countryCode)
+        Location.name(foreignAddress.countryCode)
       ).filter(_.nonEmpty)
     }
   }
