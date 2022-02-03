@@ -54,7 +54,7 @@ package object frontend {
 
       value match {
         case _: data.UkAddress => basic
-        case _ => basic :+ Country.name(countryCode)
+        case _ => basic :+ Location.name(countryCode)
       }
     }
 
