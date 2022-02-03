@@ -18,12 +18,11 @@ package unit.uk.gov.hmrc.digitalservicestaxfrontend.frontend
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.digitalservicestax.frontend.Location
 
 import scala.collection.immutable
 
-class LocationSpec extends AnyFlatSpec with Matchers with MockitoSugar {
+class LocationSpec extends AnyFlatSpec with Matchers {
 
   "Location" should "filter out Alpha-3 codes. Accepting only Alpha-2 codes" in {
     val locations: immutable.Seq[Location.Location] = Location.locations
@@ -31,11 +30,11 @@ class LocationSpec extends AnyFlatSpec with Matchers with MockitoSugar {
     locations shouldNot contain(Location.Location("Akrotiri", "XQZ", "territory"))
   }
 
-  it should "return a corresponding name to a country code" in {
+  "Location" should "return a corresponding name to a country code" in {
     Location.name("AF") shouldEqual "Afghanistan"
   }
 
-  it should "return 'unknown' for unknown country code" in {
+  "Location" should "return 'unknown' for unknown country code" in {
     Location.name("XQZ") shouldEqual "unknown"
   }
 
