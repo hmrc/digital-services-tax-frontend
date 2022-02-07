@@ -23,11 +23,8 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DSTConnector (
-  val http: HttpClient,
-  servicesConfig: ServicesConfig
-)(implicit executionContext: ExecutionContext, hc: HeaderCarrier)
-    extends DSTService[Future] {
+class DSTConnector (val http: HttpClient, servicesConfig: ServicesConfig)(implicit executionContext: ExecutionContext, hc: HeaderCarrier)
+  extends DSTService[Future] {
 
   val backendURL: String = servicesConfig.baseUrl("digital-services-tax") + "/digital-services-tax"
 
@@ -65,5 +62,4 @@ class DSTConnector (
     http.GET[List[Period]](s"$backendURL/returns/all").map{_.toSet}
 
   case class MicroServiceConnectionException(msg: String) extends Exception(msg)
-
 }

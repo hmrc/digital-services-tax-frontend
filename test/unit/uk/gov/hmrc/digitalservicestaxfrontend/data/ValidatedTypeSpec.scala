@@ -49,6 +49,11 @@ class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropert
     }
   }
 
+  "UkAddress" should "return GB as the country code" in {
+    val ukAddress = UkAddress(AddressLine("37 Baker Street"), None, None, None, Postcode("AL10 0RP"))
+    ukAddress.countryCode shouldEqual CountryCode("GB")
+  }
+
   it should "validate IBAN numbers from a series of concrete examples" in {
     forAll(Gen.oneOf(ibanList), minSuccessful(PosInt(86))) { source: String =>
       IBAN.of(source) shouldBe defined
@@ -126,6 +131,16 @@ class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropert
       a.combine(b) - b shouldEqual a
       a.combine(b) - b - a shouldEqual mon.empty
     }
+  }
+
+  "Payment Due" should "be in 10 months" in {
+    val period: Period = Period(
+      LocalDate.of(2022, 1, 31),
+      LocalDate.of(2022, 1, 31),
+      LocalDate.of(2022, 1, 31),
+      Period.Key("0001"))
+
+    period.paymentDue shouldEqual LocalDate.of(2022, 11, 1)
   }
 }
 
