@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.digitalservicestaxfrontend.data
 import com.outworkers.util.samplers._
 import ltbs.uniform.interpreters.playframework.DB
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.{Assertion, OptionValues}
+import org.scalatest.{Assertion, EitherValues, OptionValues}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import play.api.libs.json._
@@ -32,9 +32,9 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import java.time.LocalDate
 import uk.gov.hmrc.digitalservicestax.connectors.MongoUniformPersistence
 
-class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues {
+class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues with EitherValues {
 
-  def testJsonRoundtrip[T : Arbitrary : Format]: Assertion = {
+  def testJsonRoundtrip[T: Arbitrary : Format]: Assertion = {
     forAll { sample: T =>
       val js = Json.toJson(sample)
 
@@ -44,7 +44,7 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
     }
   }
 
-  def testJsonRoundtrip[T : Format](gen: Gen[T]): Assertion = {
+  def testJsonRoundtrip[T: Format](gen: Gen[T]): Assertion = {
     forAll(gen) { sample: T =>
       val js = Json.toJson(sample)
 
@@ -150,7 +150,7 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
 
     it should "fail to parse a DB instance from a Json primitive" in {
       val source = JsString("bla")
-      source.validate[DB] shouldBe a [JsError]
+      source.validate[DB] shouldBe a[JsError]
     }
 
     it should "fail to parse a formatMap from a non object" in {
@@ -165,6 +165,19 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
 
   it should "serialize and de-serialise a Money instance" in {
     testJsonRoundtrip[Money]
+  }
+
+  "Money format" should "return an error when the value is over 2 decimal places" in {
+    val jsonValue = Json.toJson(BigDecimal.valueOf(100.287))
+    assertThrows[ArithmeticException] {
+      jsonValue.validate[Money]
+    }
+  }
+
+  "Money format" should "return an error when the value is not a number" in {
+    val jsonValue = Json.toJson("some value")
+    val parsed = jsonValue.validate[Money]
+    assert(parsed.isError)
   }
 
   it should "serialize and de-serialise an Activity instance" in {
@@ -208,5 +221,28 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
   it should "serialize an enum entry as a string" in {
     val jsValue = Json.toJson(Activity.SocialMedia)
     jsValue shouldEqual JsString("SocialMedia")
+  }
+
+  //scoverage doesn't recognise that it is tested? see line 199, 217
+  //using organisation or organisationName for the name of the company doesn't work ...
+  "Company format" should "" in {
+    val companyDetails =
+      """{
+        |  "company": {
+        |    "name": "triplequote",
+        |    "address": {
+        |      "_type": "uk.gov.hmrc.digitalservicestax.data.ForeignAddress",
+        |      "line1": "Chem. du Chateau-Sec 12",
+        |      "countryCode": "CH",
+        |      "postalCode": "1009"
+        |    }
+        |  },
+        |  "safeId": "U23YRU2",
+        |  "useSafeId": false
+        |}""".stripMargin
+
+    val parsedJson = Json.parse(companyDetails)
+    val parsedType = parsedJson.validate[CompanyRegWrapper]
+    assert(parsedType.isSuccess)
   }
 }
