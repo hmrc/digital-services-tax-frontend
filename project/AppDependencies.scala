@@ -34,6 +34,7 @@ object AppDependencies {
     "wolfendale"                %% "scalacheck-gen-regexp"       % "0.1.2",
     "com.outworkers"            %% "util-samplers"               % "0.57.0",
     "com.github.tomakehurst"    %  "wiremock-jre8"               % "2.32.0",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.13.1",
     "uk.gov.hmrc.mongo"         %% s"hmrc-mongo-test-play-$play" % hmrcMongoVersion,
     "org.pegdown"               %  "pegdown"                     % "1.6.0",
     "com.vladsch.flexmark"      %   "flexmark-all"               % "0.62.2",
