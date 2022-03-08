@@ -106,11 +106,12 @@ check-unique-taxpayer-reference.TRUE=Yes
 check-unique-taxpayer-reference.FALSE=No
 check-unique-taxpayer-reference.required=Select yes if the company you are registering has a Corporation Tax Unique Taxpayer Reference
 
-enter-utr.heading=What is the company’s UK Corporation Tax Unique Taxpayer Reference (UTR)?
+enter-utr.heading=What is your Corporation Tax Unique Taxpayer Reference (UTR)?
 enter-utr.heading.hint=Your company details
-enter-utr.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. \
-  It may be called ‘reference’, ‘UTR’ or ‘official use’. \
-  You can <a target=_blank class="govuk-link" href="https://www.gov.uk/find-lost-utr-number">find a lost UTR (opens in a new window or tab)</a>.
+enter-utr.hint=A Unique Taxpayer Reference (UTR) is ten numbers long, for example 12345 67890.<br><br>\
+  It will be on:\
+  <ul><li>notices to file a return</li><li>payment reminders</li></ul> \
+  <a target=_blank class="govuk-link" href="https://www.gov.uk/find-lost-utr-number">You can find a lost UTR number online (opens in a new tab)</a>
 
 company-registered-office-postcode.heading=What is the postcode of the company’s Registered Office address?
 company-registered-office-postcode.heading.hint=Your company details
