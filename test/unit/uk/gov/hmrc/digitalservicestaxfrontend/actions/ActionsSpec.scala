@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.outworkers.util.domain.ShortString
 import com.outworkers.util.samplers._
 import ltbs.uniform.UniformMessages
+import org.scalacheck.Shrink.shrinkAny
 import play.api.http.Status
 import play.api.libs.json._
 import play.api.mvc.Results
@@ -29,14 +30,14 @@ import play.api.test.FakeRequest
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AffinityGroup, CredentialRole, Enrolments}
+import uk.gov.hmrc.digitalservicestax.actions.{AuthorisedAction, AuthorisedRequest}
 import uk.gov.hmrc.digitalservicestax.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views.html.ErrorTemplate
-import uk.gov.hmrc.digitalservicestax.actions.{AuthorisedAction, AuthorisedRequest}
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.{FakeApplicationServer, WiremockServer}
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 
 import java.net.URI
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -145,7 +146,10 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
 
       stubFor(
         post(urlPathEqualTo(s"/auth/authorise"))
-          .willReturn(aResponse().withStatus(200).withBody(Json.toJson(jsonResponse).toString())
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(Json.toJson(jsonResponse).toString())
           )
       )
 
