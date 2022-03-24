@@ -25,7 +25,7 @@ import ltbs.uniform.UniformMessages
 import org.scalacheck.Shrink.shrinkAny
 import play.api.http.Status
 import play.api.libs.json._
-import play.api.mvc.Results
+import play.api.mvc.{AnyContentAsEmpty, Results}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -49,7 +49,7 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
   val inet = new URI(mockServerUrl)
   val wireMockServer = new WireMockServer(wireMockConfig().port(inet.getPort))
 
-  lazy val errorTemplate = app.injector.instanceOf[ErrorTemplate]
+  lazy val errorTemplate: ErrorTemplate = app.injector.instanceOf[ErrorTemplate]
   lazy val action = new AuthorisedAction(mcc, layoutInstance, fakeAuthConnector)(appConfig, global, messagesApi)
 
   "it should test an authorised action against auth connector retrievals" in {
@@ -63,7 +63,10 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
 
       stubFor(
         post(urlPathEqualTo(s"/auth/authorise"))
-          .willReturn(aResponse().withStatus(200).withBody(Json.toJson(jsonResponse).toString())
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(Json.toJson(jsonResponse).toString())
           )
       )
 
@@ -71,9 +74,9 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
         _: AuthorisedRequest[_] => Future.successful(Results.Ok)
       })
 
-      whenReady(req) { res =>
+      req.map { res =>
         res.header.status mustEqual Status.OK
-      }
+      }(global)
     }
   }
 
@@ -103,15 +106,15 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
         _: AuthorisedRequest[_] => Future.successful(Results.Ok)
       })
 
-      whenReady(req.failed) { res =>
+      req.failed.foreach { res =>
         res.getMessage mustEqual "No internal ID for user"
-        res mustBe an [RuntimeException]
-      }
+        res mustBe a[RuntimeException]
+      }(global)
     }
   }
 
   "it should throw an exception in AuthorisedAction if the affinity group is not support" in {
-    forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole)  =>
+    forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole) =>
       val jsonResponse = JsObject(Seq(
         Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
         Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
@@ -121,7 +124,10 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
 
       stubFor(
         post(urlPathEqualTo(s"/auth/authorise"))
-          .willReturn(aResponse().withStatus(200).withBody(Json.toJson(jsonResponse).toString())
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(Json.toJson(jsonResponse).toString())
           )
       )
 
@@ -129,9 +135,9 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
         _: AuthorisedRequest[_] => Future.successful(Results.Ok)
       })
 
-      whenReady(req.failed) { res =>
-        res mustBe an [JsResultException]
-      }
+      req.failed.foreach { res =>
+        res mustBe a[JsResultException]
+      }(global)
     }
   }
 
@@ -157,10 +163,10 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
         _: AuthorisedRequest[_] => Future.successful(Results.Ok)
       })
 
-      whenReady(req.failed) { res =>
+      req.failed.foreach { res =>
         res.getMessage mustEqual "Invalid internal ID"
-        res mustBe an [IllegalStateException]
-      }
+        res mustBe an[IllegalStateException]
+      }(global)
     }
   }
 
@@ -171,7 +177,7 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
     val heading = gen[ShortString].value
     val message = gen[ShortString].value
 
-    implicit val req = FakeRequest()
+    implicit val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     val msg = handler.standardErrorTemplate(
       page,
