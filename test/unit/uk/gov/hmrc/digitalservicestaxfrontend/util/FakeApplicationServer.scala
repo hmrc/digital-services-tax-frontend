@@ -47,8 +47,13 @@ import java.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-trait FakeApplicationServer extends PlaySpec with BaseOneAppPerSuite with FakeApplicationFactory with TryValues
-  with ScalaFutures with MockitoSugar {
+trait FakeApplicationServer
+  extends PlaySpec
+    with BaseOneAppPerSuite
+    with FakeApplicationFactory
+    with TryValues
+    with ScalaFutures
+    with MockitoSugar {
 
   val appName: String = configuration.get[String]("appName")
 
@@ -73,8 +78,8 @@ trait FakeApplicationServer extends PlaySpec with BaseOneAppPerSuite with FakeAp
   lazy val landingInstance: Landing = app.injector.instanceOf[Landing]
   lazy val checkYourAnswersRegInstance: CheckYourAnswersReg = app.injector.instanceOf[CheckYourAnswersReg]
   lazy val checkYourAnswersRetInstance: CheckYourAnswersRet = app.injector.instanceOf[CheckYourAnswersRet]
-  lazy val confirmationRegInstance: ConfirmationReg  = app.injector.instanceOf[ConfirmationReg]
-  lazy val confirmationRetInstance: ConfirmationReturn  = app.injector.instanceOf[ConfirmationReturn]
+  lazy val confirmationRegInstance: ConfirmationReg = app.injector.instanceOf[ConfirmationReg]
+  lazy val confirmationRetInstance: ConfirmationReturn = app.injector.instanceOf[ConfirmationReturn]
   lazy val payYourDst: PayYourDst = app.injector.instanceOf[PayYourDst]
   lazy val interpreter: DSTInterpreter = app.injector.instanceOf[DSTInterpreter]
 
