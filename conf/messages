@@ -161,7 +161,7 @@ check-contact-address.TRUE=Yes
 check-contact-address.FALSE=No
 
 contact-uk-address.listing.heading=What is your contact address?
-contact-uk-address.heading.hint=Contact person’s details
+contact-uk-address.heading.hint=Contact details
 contact-uk-address.line1.heading=Building or street
 contact-uk-address.line2.heading=Building or street line 2 (optional)
 contact-uk-address.line3.heading=Town or city (optional)
@@ -169,7 +169,7 @@ contact-uk-address.line4.heading=County (optional)
 contact-uk-address.postalCode.heading=Postcode
 
 contact-international-address.listing.heading=What is your contact address?
-contact-international-address.heading.hint=Contact person’s details
+contact-international-address.heading.hint=Contact details
 contact-international-address.line1.heading=Address line 1
 contact-international-address.line2.heading=Address line 2 (optional)
 contact-international-address.line3.heading=Address line 3 (optional)
@@ -216,15 +216,14 @@ ultimate-parent-company-international-address.line3.heading=Address line 3 (opti
 ultimate-parent-company-international-address.line4.heading=Address line 4 (optional)
 ultimate-parent-company-international-address.countryCode.heading=Country
 
-contact-details.heading=Who can we contact if we need to discuss your registration?
-contact-details.heading.hint=Contact person’s details
+contact-details.heading=Who can HMRC contact to discuss your registration?
+contact-details.heading.hint=Contact details
 contact-details.forename.heading=First name
 contact-details.surname.heading=Last name
-contact-details.phoneNumber.heading=Phone number
-contact-details.phoneNumber.hint=For international numbers include the country code number, \
- like 0044 808 157 0192, not +44 808 157 0192
+contact-details.phoneNumber.heading=Telephone number
+contact-details.phoneNumber.hint=For international numbers include the country code
 contact-details.email.heading=Email address
-contact-details.email.hint=We will use this email address to send confirmation of your registration
+contact-details.email.hint=HMRC will only use this to contact you about your Digital Services Tax
 
 check-liability-date.heading=Was the group liable for Digital Services Tax from 1 April 2020?
 check-liability-date.heading.hint=Accounting period details
@@ -266,11 +265,11 @@ check-your-answers.reg.ultimate-parent-company-name.change=Change Company name
 check-your-answers.reg.ultimate-parent-company-address.question=Registered Office address
 check-your-answers.reg.ultimate-parent-company-address.change=Change Registered Office address
 
-check-your-answers.reg.contact-details.title=Contact person’s details
+check-your-answers.reg.contact-details.title=Contact details
 check-your-answers.reg.contact-details-name.question=Full name
 check-your-answers.reg.contact-details.change.name=Change full name
-check-your-answers.reg.contact-details-phone-number.question=Phone number
-check-your-answers.reg.contact-details.change.phone-number=Change phone number
+check-your-answers.reg.contact-details-phone-number.question=Telephone number
+check-your-answers.reg.contact-details.change.phone-number=Change telephone number
 check-your-answers.reg.contact-details-email.question=Email address
 check-your-answers.reg.contact-details.change.email=Change email address
 
@@ -448,32 +447,32 @@ ultimate-parent-company-international-address.countryCode.invalid=Start typing a
 countryCode.invalid=Enter a country from the list
 
 #contact details
-contact-details.forename.required=Enter the contact person’s first name
-contact-details.forename.length.exceeded=Contact person’s first name must be 35 characters or fewer
-contact-details.forename.invalid=First name must only include letters a to z, apostrophes, ampersands, hyphens and spaces
+contact-details.forename.required=Enter the contact’s first name
+contact-details.forename.length.exceeded=The contact’s first name must be 35 characters or fewer
+contact-details.forename.invalid=The contact’s first name must only include letters a to z, apostrophes, ampersands (&), hyphens and spaces
 forename.length.exceeded=Contact person’s first name must be 35 characters or fewer
 forename.required=Enter the first name
 forename.invalid=First name must only include letters a to z, apostrophes, ampersands, hyphens and spaces
 
-contact-details.surname.required=Enter the contact person’s last name
-contact-details.surname.length.exceeded=Contact person’s first name must be 35 characters or fewer
-contact-details.surname.invalid=Last name must only include letters a to z, apostrophes, ampersands, hyphens and spaces
+contact-details.surname.required=Enter the contact’s last name
+contact-details.surname.length.exceeded=The contact’s last name must be 35 characters or fewer
+contact-details.surname.invalid=The contact’s last name must only include letters a to z, apostrophes, ampersands (&), hyphens and spaces
 surname.required=Enter the last name
 surname.length.exceeded=Contact person’s first name must be 35 characters or fewer
 surname.invalid=Last name must only include letters a to z, apostrophes, ampersands, hyphens and spaces
 
-contact-details.phoneNumber.required=Enter a phone number
-contact-details.phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or 0044 808 157 0192
-contact-details.phoneNumber.length.exceeded=Phone number must be 24 characters or fewer
-phoneNumber.invalid=Enter a phone number, like 01632 960 001, 07700 900 982 or 0044 808 157 0192
-phoneNumber.required=Enter a phone number
-phoneNumber.length.exceeded=Phone number must be 24 characters or fewer
+contact-details.phoneNumber.required=Enter a telephone number
+contact-details.phoneNumber.invalid=Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0044 808 157 0192
+contact-details.phoneNumber.length.exceeded=Telephone number must be 24 characters or fewer
+phoneNumber.invalid=Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0044 808 157 0192
+phoneNumber.required=Enter a telephone number
+phoneNumber.length.exceeded=Telephone number must be 24 characters or fewer
 
 contact-details.email.required=Enter the contact person’s email address
 contact-details.email.invalid=Enter an email address in the correct format, like name@example.com
 contact-details.email.length.exceeded=Email address must be 132 characters or fewer
-email.required=Please enter an email address
-email.invalid=Please enter a valid email address
+email.required=Enter an email address
+email.invalid=Enter a valid email address
 email.length.exceeded=Email address must be 132 characters or fewer
 
 #liability start date
