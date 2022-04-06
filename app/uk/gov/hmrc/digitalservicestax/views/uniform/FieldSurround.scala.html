@@ -53,7 +53,7 @@
     } else {
         @if(messages.get(s"$key.listing.heading").isDefined) {
                 @messages.get(s"$key.heading.hint").map { headHint =>
-                    <span class="govuk-caption-xl@if(hasErrors){ flush--top}">
+                    <span class="govuk-caption-l@if(hasErrors){ flush--top}">
                     @headHint
                     </span>
                 }
