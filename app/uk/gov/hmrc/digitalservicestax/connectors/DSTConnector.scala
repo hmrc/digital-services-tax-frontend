@@ -19,6 +19,7 @@ package uk.gov.hmrc.digitalservicestax.connectors
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.http.{HttpClient, _}
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,7 +29,6 @@ class DSTConnector (val http: HttpClient, servicesConfig: ServicesConfig)(implic
 
   val backendURL: String = servicesConfig.baseUrl("digital-services-tax") + "/digital-services-tax"
 
-  import uk.gov.hmrc.http.HttpReadsInstances._
   def submitRegistration(reg: Registration): Future[HttpResponse] =
     http.POST[Registration, Either[UpstreamErrorResponse,HttpResponse]](s"$backendURL/registration", reg).map {
       case Right(value) => value

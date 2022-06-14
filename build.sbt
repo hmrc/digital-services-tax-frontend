@@ -22,7 +22,7 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(integrationTestSettings ++ unitTestSettings)
   .settings(
-    resolvers ++= Seq(Resolver.bintrayRepo("hmrc", "releases"), Resolver.jcenterRepo),
+    resolvers ++= Seq(Resolver.jcenterRepo),
     scalacOptions -= "-Xfatal-warnings", // Fail the compilation if there are any warnings.
     TwirlKeys.templateImports ++= Seq(
       "ltbs.uniform.{Input => UfInput, _}",
