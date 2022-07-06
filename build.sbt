@@ -43,8 +43,8 @@ lazy val microservice = Project(appName, file("."))
     // Make sure you only exclude warnings for the project directories, i.e. make builds reproducible
     scalacOptions += s"-P:silencer:sourceRoots=${baseDirectory.value.getCanonicalPath}",
     libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.6" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.7.6" % Provided cross CrossVersion.full
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.9" cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % "1.7.9" % Provided cross CrossVersion.full
     )
   )
 
