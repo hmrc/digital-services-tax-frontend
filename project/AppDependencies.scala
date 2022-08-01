@@ -6,7 +6,7 @@ import sbt._
 object AppDependencies {
 
   val uniformVersion = "5.0.0-RC2"
-  val hmrcMongoVersion = "0.66.0"
+  val hmrcMongoVersion = "0.68.0"
   val play = "28"
 
   val compile = Seq(
