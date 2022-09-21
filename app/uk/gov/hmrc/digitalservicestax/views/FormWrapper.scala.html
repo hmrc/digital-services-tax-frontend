@@ -52,7 +52,7 @@
     ))
   }
 }
-  @formHelper(action = play.api.mvc.Call("post", " "), 'novalidate -> "novalidate") {
+  @formHelper(action = play.api.mvc.Call("post", key), 'novalidate -> "novalidate") {
     @errorSummary(keyList, errors, messages)
     @fieldsurround(key, content, errors.definedAtRoot)
 
