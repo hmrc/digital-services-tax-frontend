@@ -49,7 +49,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       sampleReg
     )).value.run.asOutcome()
 
-    ret.companiesAmount shouldBe 'empty
+    ret.companiesAmount shouldBe Symbol("empty")
   }
 
   "If the registration is for a group we" should "see manage-companies questions" in {
@@ -58,7 +58,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       sampleRegWithParent
     )).value.run.asOutcome()
 
-    ret.companiesAmount shouldBe 'nonEmpty
+    ret.companiesAmount shouldBe Symbol("nonEmpty")
   }
 
   "Return.alternativeCharge length" should "be the same as length of reported activities" in {
@@ -79,7 +79,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       samplePeriod,
       sampleReg
     )).value.run.asOutcome()
-    ret.alternateCharge  should be ('empty)
+    ret.alternateCharge  should be (Symbol("empty"))
   }
 
   "Return.alternateCharge " should "not be empty when an alternate charge is reported" in {
@@ -88,7 +88,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       sampleReg
     )).value.run.asOutcome()
 
-    ret.alternateCharge  should be ('nonEmpty)
+    ret.alternateCharge  should be (Symbol("nonEmpty"))
   }
 
   "Return.crossBorderReliefAmount" should "be zero when report-cross-border-transaction-relief is false" in {
@@ -110,7 +110,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       sampleReg
     )).value.run.asOutcome()
 
-    ret.repayment  should be ('nonEmpty)
+    ret.repayment  should be (Symbol("nonEmpty"))
   }
 
   "Return.repayment" should "be empty when the user has not asked for a repayment" in {
@@ -122,7 +122,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       samplePeriod,
       sampleReg
     )).value.run.asOutcome()
-    ret.repayment  should be ('empty)
+    ret.repayment  should be (Symbol("empty"))
   }
 
   "Return.allowanceAmount" should "not be asked when activity doesn't apply alternative charge" in {
@@ -137,7 +137,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       samplePeriod,
       sampleReg
     )).value.run.asOutcome()
-    ret.allowanceAmount should be ('empty)
+    ret.allowanceAmount should be (Symbol("empty"))
   }
 
   "Return.allowanceAmount" should "not be asked when 0 Percentage supplied for activity" in {
@@ -155,7 +155,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       samplePeriod,
       sampleReg
     )).value.run.asOutcome()
-    ret.allowanceAmount should be ('empty)
+    ret.allowanceAmount should be (Symbol("empty"))
   }
 
   "Return.allowanceAmount" should "be asked when activity does apply alternative charge" in {
@@ -166,7 +166,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       samplePeriod,
       sampleReg
     )).value.run.asOutcome()
-    ret.allowanceAmount should be ('nonEmpty)
+    ret.allowanceAmount should be (Symbol("nonEmpty"))
   }
 
   "Return.allowanceAmount" should "be asked when positve Percentage supplied for activity" in {
@@ -180,6 +180,6 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
       samplePeriod,
       sampleReg
     )).value.run.asOutcome()
-    ret.allowanceAmount should be ('nonEmpty)
+    ret.allowanceAmount should be (Symbol("nonEmpty"))
   }
 }

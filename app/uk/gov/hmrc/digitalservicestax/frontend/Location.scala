@@ -31,7 +31,7 @@ object Location {
   }
 
   val locationsJson: JsValue = Json.parse(fromInputStream(getClass.getResourceAsStream("/public/location-autocomplete-canonical-list.json"))
-    .getLines.mkString)
+    .getLines().mkString)
 
   val locations: List[Location] = locationsJson.as[List[Location]].filter(l => l.code.matches(alphaTwoCodeRegex.toString()))
 

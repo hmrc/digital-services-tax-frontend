@@ -57,12 +57,12 @@ class DSTInterpreter @Inject()(
 
   val logger = Logger(getClass)
 
-  implicit def enumeratumField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, A] =
+  implicit def enumeratumField[A <: EnumEntry](implicit enums: Enum[A]): WebAsk[Html, A] =
     new WebAsk[Html, A] {
 
       def decode(out: Input): Either[ErrorTree,A] = {out.toField[A](x =>
         Rule.nonEmpty[String].apply(x) andThen
-          ( y => Validated.catchOnly[NoSuchElementException](enum.withName(y)).leftMap(_ => ErrorTree.oneErr(ErrorMsg("invalid"))))
+          ( y => Validated.catchOnly[NoSuchElementException](enums.withName(y)).leftMap(_ => ErrorTree.oneErr(ErrorMsg("invalid"))))
       )}.toEither
 
       def encode(in: A): Input = Input.one(List(in.entryName))
@@ -75,7 +75,7 @@ class DSTInterpreter @Inject()(
         errors: ErrorTree,
         messages: UniformMessages[Html]
       ): Option[Html] = {
-        val options = enum.values.map{_.entryName}
+        val options = enums.values.map{_.entryName}
         val existingValue = decode(data).map{_.entryName}.toOption
         radios(
           fieldKey,
@@ -183,13 +183,13 @@ class DSTInterpreter @Inject()(
     )
 
 
-  implicit def enumeratumSetField[A <: EnumEntry](implicit enum: Enum[A]): WebAsk[Html, Set[A]] =
+  implicit def enumeratumSetField[A <: EnumEntry](implicit enums: Enum[A]): WebAsk[Html, Set[A]] =
     new WebAsk[Html, Set[A]] {
 
       def decode(out: Input): Either[ErrorTree,Set[A]] = {
         val i: List[String] = out.valueAtRoot.getOrElse(Nil)
         val r: List[Either[ErrorTree, A]] = i.map{x =>
-          Either.catchOnly[NoSuchElementException](enum.withName(x))
+          Either.catchOnly[NoSuchElementException](enums.withName(x))
             .leftMap(_ => ErrorTree.oneErr(ErrorMsg("invalid")))
         }
         r.sequence.map{_.toSet}
@@ -209,7 +209,7 @@ class DSTInterpreter @Inject()(
         errors: ErrorTree,
         messages: UniformMessages[Html]
       ): Option[Html] = {
-        val options = enum.values.map{_.entryName}
+        val options = enums.values.map{_.entryName}
         val existingValues: Set[String] = decode(data).map{_.map{_.entryName}}.getOrElse(Set.empty)
         checkboxes(
           fieldKey,
@@ -328,10 +328,10 @@ class DSTInterpreter @Inject()(
       }
 
       def encode(in: LocalDate): Input = Map(
-        List("year") → in.getYear,
-        List("month") → in.getMonthValue,
-        List("day") → in.getDayOfMonth
-      ).mapValues(_.toString.pure[List])
+        List("year") -> in.getYear,
+        List("month") -> in.getMonthValue,
+        List("day") -> in.getDayOfMonth
+      ).view.mapValues(_.toString.pure[List]).toMap
 
       def render(
         pageKey: List[String],

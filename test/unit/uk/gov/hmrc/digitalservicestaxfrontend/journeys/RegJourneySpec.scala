@@ -159,7 +159,7 @@ class RegJourneySpec extends AnyFlatSpec with Matchers {
       testService
     )).value.run.asOutcome()
 
-    reg.alternativeContact should be ('defined)
+    reg.alternativeContact should be (Symbol("defined"))
   }
 
   "the Registration" should "not have an alternativeContact when user elected not to provide one" in {
@@ -167,7 +167,7 @@ class RegJourneySpec extends AnyFlatSpec with Matchers {
       testService
     )).value.run.asOutcome()
 
-    reg.alternativeContact should be ('empty)
+    reg.alternativeContact should be (Symbol("empty"))
   }
 
   "the Registration" should "have an ultimateParent when the user elected to provide one" in {
@@ -175,7 +175,7 @@ class RegJourneySpec extends AnyFlatSpec with Matchers {
       testService
     )).value.run.asOutcome()
 
-    reg.ultimateParent should be ('defined)
+    reg.ultimateParent should be (Symbol("defined"))
   }
 
   "the Registration" should "not have an ultimateParent when the user elected not to provide one" in {
@@ -188,7 +188,7 @@ class RegJourneySpec extends AnyFlatSpec with Matchers {
       testService
     )).value.run.asOutcome()
 
-    reg.ultimateParent should be ('empty)
+    reg.ultimateParent should be (Symbol("empty"))
   }
 
 }

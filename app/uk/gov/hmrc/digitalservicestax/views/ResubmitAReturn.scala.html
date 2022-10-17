@@ -31,7 +31,7 @@
         href = s"${uk.gov.hmrc.digitalservicestax.controllers.routes.JourneyController.index}",
         content = HtmlContent(messages("common.back"))
     ))
-    @formHelper(action = play.api.mvc.Call("post",  "resubmit-a-return"), 'novalidate -> "novalidate") {
+    @formHelper(action = play.api.mvc.Call("post",  "resubmit-a-return"), Symbol("novalidate") -> "novalidate") {
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(
                 ErrorSummary(

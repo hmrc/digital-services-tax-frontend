@@ -108,7 +108,7 @@ class ReturnsController @Inject()(
         case Nil =>
           Future.successful(NotFound)
         case periods =>
-          periodForm.bindFromRequest.fold(
+          periodForm.bindFromRequest().fold(
             formWithErrors => {
               Future.successful(
                 BadRequest(layout(

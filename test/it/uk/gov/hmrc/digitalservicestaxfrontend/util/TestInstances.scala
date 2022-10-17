@@ -313,7 +313,7 @@ object TestInstances {
   def neString(maxLen: Int = 255) = (
       Gen.alphaNumChar,
       arbitrary[String]
-      ).mapN(_ + _).
+      ).mapN((num, str) =>s"$num$str").
       map{_.take(maxLen)}.map{NonEmptyString.apply}
 
   implicit def arbNEString: Arbitrary[NonEmptyString] = Arbitrary { neString() }
