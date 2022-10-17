@@ -17,7 +17,6 @@
 package uk.gov.hmrc.digitalservicestax
 package journeys
 
-import scala.language.higherKinds
 import connectors.DSTService
 import data._
 import frontend.Kickout

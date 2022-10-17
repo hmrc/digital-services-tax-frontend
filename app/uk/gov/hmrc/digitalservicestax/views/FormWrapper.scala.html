@@ -16,7 +16,7 @@
 
 @import uniform._
 
-@import uk.gov.hmrc.govukfrontend.views.html.components
+@import uk.gov.hmrc.digitalservicestax.views.html.components
 
 @this(
         formHelper: FormWithCSRF,
@@ -52,7 +52,7 @@
     ))
   }
 }
-  @formHelper(action = play.api.mvc.Call("post", key), 'novalidate -> "novalidate") {
+  @formHelper(action = play.api.mvc.Call("post", key), Symbol("novalidate") -> "novalidate") {
     @errorSummary(keyList, errors, messages)
     @fieldsurround(key, content, errors.definedAtRoot)
 

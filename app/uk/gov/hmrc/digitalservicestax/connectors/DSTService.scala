@@ -20,8 +20,6 @@ import cats.~>
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.http.HttpResponse
 
-import scala.language.higherKinds
-
 trait DSTService[F[_]] {
 
   def lookupCompany(): F[Option[CompanyRegWrapper]]

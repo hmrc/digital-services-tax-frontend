@@ -6,20 +6,20 @@ import sbt._
 object AppDependencies {
 
   val uniformVersion = "5.0.0-RC2"
-  val hmrcMongoVersion = "0.71.0"
+  val hmrcMongoVersion = "0.73.0"
   val play = "28"
 
   val compile = Seq(
-    "uk.gov.hmrc"             %% "play-frontend-hmrc"             % s"3.24.0-play-$play",
-    "com.chuusai"             %% "shapeless"                      % "2.3.9",
+    "uk.gov.hmrc"             %% "play-frontend-hmrc"             % s"3.32.0-play-$play",
+    "com.chuusai"             %% "shapeless"                      % "2.4.0-M1",
     "com.beachape"            %% "enumeratum-play-json"           % "1.7.0",
     "com.luketebbs.uniform"   %% s"interpreter-play$play"         % uniformVersion,
     "uk.gov.hmrc.mongo"       %% s"hmrc-mongo-play-$play"         % hmrcMongoVersion,
     "commons-validator"       %  "commons-validator"              % "1.7",
-    "uk.gov.hmrc"             %% s"bootstrap-frontend-play-$play" % "7.3.0",
+    "uk.gov.hmrc"             %% s"bootstrap-frontend-play-$play" % "7.8.0",
     "fr.marcwrobel"           %  "jbanking"                       % "3.4.0",
     "org.jsoup"               %  "jsoup"                          % "1.15.3",
-    "joda-time"               %  "joda-time"                      % "2.11.1" // needed for hmrc-mongo
+    "joda-time"               %  "joda-time"                      % "2.12.0" // needed for hmrc-mongo
   )
 
   val test = Seq(
@@ -27,7 +27,6 @@ object AppDependencies {
     "org.jsoup"                     %  "jsoup"                        % "1.15.3",
     "com.typesafe.play"             %% "play-test"                    % current,
     "org.scalacheck"                %% "scalacheck"                   % "1.16.0",
-    "uk.gov.hmrc"                   %% "stub-data-generator"          % "0.5.3",
     "io.chrisdavenport"             %% "cats-scalacheck"              % "0.3.1",
     "com.beachape"                  %% "enumeratum-scalacheck"        % "1.7.0",
     "wolfendale"                    %% "scalacheck-gen-regexp"        % "0.1.2",
