@@ -7,7 +7,7 @@ val appName = "digital-services-tax-frontend"
 PlayKeys.playDefaultPort := 8740
 
 addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3")
-scalaVersion := "2.13.9"
+scalaVersion := "2.13.8"
 routesImport += "uk.gov.hmrc.digitalservicestax.data._"
 
 lazy val microservice = Project(appName, file("."))
