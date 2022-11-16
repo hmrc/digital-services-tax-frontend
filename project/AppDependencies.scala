@@ -16,7 +16,7 @@ object AppDependencies {
     "com.luketebbs.uniform"   %% s"interpreter-play$play"         % uniformVersion,
     "uk.gov.hmrc.mongo"       %% s"hmrc-mongo-play-$play"         % hmrcMongoVersion,
     "commons-validator"       %  "commons-validator"              % "1.7",
-    "uk.gov.hmrc"             %% s"bootstrap-frontend-play-$play" % "7.8.0",
+    "uk.gov.hmrc"             %% s"bootstrap-frontend-play-$play" % "7.11.0",
     "fr.marcwrobel"           %  "jbanking"                       % "3.4.0",
     "org.jsoup"               %  "jsoup"                          % "1.15.3",
     "joda-time"               %  "joda-time"                      % "2.12.0" // needed for hmrc-mongo
