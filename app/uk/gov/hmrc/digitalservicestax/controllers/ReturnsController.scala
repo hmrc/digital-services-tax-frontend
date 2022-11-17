@@ -67,8 +67,8 @@ class ReturnsController @Inject()(
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 
   private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
-    override def render(in: CYA[(Return, Period, CompanyName)], key: String, messages: UniformMessages[Html]): Option[Html] =
-      Some(checkYourAnswersRet(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
+    override def render(in: CYA[(Return, Period, CompanyName)], key: List[String], pageIn: PageIn[Html]): Option[Html] =
+      Some(checkYourAnswersRet(s"${key.last}.ret", in.value._1, in.value._2, in.value._3)(pageIn.messages))
   }
 
   private def applyKey(key: Key): Period.Key = key
