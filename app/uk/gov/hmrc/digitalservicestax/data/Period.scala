@@ -21,14 +21,12 @@ import java.time.LocalDate
 import shapeless.tag.@@
 
 final case class Period(start: LocalDate, end: LocalDate, returnDue: LocalDate, key: Period.Key) {
-  def paymentDue: LocalDate = {
+  def paymentDue: LocalDate =
     end match {
       case e if e.getDayOfMonth == e.lengthOfMonth() => end.plusMonths(10).withDayOfMonth(1)
-      case _ => end.plusMonths(9).plusDays(1)
+      case _                                         => end.plusMonths(9).plusDays(1)
     }
-  }
 }
-
 
 object Period {
 

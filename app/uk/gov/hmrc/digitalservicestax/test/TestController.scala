@@ -23,14 +23,16 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestController @Inject()(
+class TestController @Inject() (
   connector: TestConnector,
   mcc: MessagesControllerComponents
-)(implicit ec: ExecutionContext) extends FrontendController(mcc) {
+)(implicit ec: ExecutionContext)
+    extends FrontendController(mcc) {
 
   def triggerTaxEnrolmentCallback(seed: String): Action[AnyContent] = Action.async { implicit request =>
     connector.trigger("test-only/trigger-te-callback", seed) flatMap (_ =>
-      Future.successful(Ok("tax enrolment callback triggered")))
+      Future.successful(Ok("tax enrolment callback triggered"))
+    )
   }
 
 }

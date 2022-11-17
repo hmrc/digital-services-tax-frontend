@@ -35,7 +35,7 @@ final case class UkAddress(
   def countryCode = CountryCode("GB")
 }
 
- final case class ForeignAddress(
+final case class ForeignAddress(
   line1: AddressLine,
   line2: Option[AddressLine],
   line3: Option[AddressLine],

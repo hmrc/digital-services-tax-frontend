@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class JourneyControllerSpec extends FakeApplicationServer {
 
-  private val contactReportTechnicalIssueUri = "/test-uri-for-referrer"
+  private val contactReportTechnicalIssueUri         = "/test-uri-for-referrer"
   private val expectedContactReportTechnicalIssueUri = "%2Ftest-uri-for-referrer"
 
   private val contactReportTechnicalIssueUrl =
@@ -56,8 +56,10 @@ class JourneyControllerSpec extends FakeApplicationServer {
           sampleReg
         )
       )
-      val result = controller.index.apply(
-        FakeRequest("GET", contactReportTechnicalIssueUri).withSession().withHeaders("Authorization" -> "Bearer some-token")
+      val result        = controller.index.apply(
+        FakeRequest("GET", contactReportTechnicalIssueUri)
+          .withSession()
+          .withHeaders("Authorization" -> "Bearer some-token")
       )
       status(result) mustBe 200
       implicit val lang = Lang("en")
@@ -66,9 +68,7 @@ class JourneyControllerSpec extends FakeApplicationServer {
     }
     "return Landing page when there is a registration with a registration number" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(
-        Some(
-          sampleReg.copy(
-            registrationNumber = Some(DSTRegNumber("ABDST1234567890"))))
+        Some(sampleReg.copy(registrationNumber = Some(DSTRegNumber("ABDST1234567890"))))
       )
 
       when(mockDSTConnector.lookupOutstandingReturns()) thenReturn Future.successful(
@@ -79,7 +79,9 @@ class JourneyControllerSpec extends FakeApplicationServer {
         Set(TestInstances.periodArb.arbitrary.sample.get)
       )
       val result = controller.index.apply(
-        FakeRequest("GET", contactReportTechnicalIssueUri).withSession().withHeaders("Authorization" -> "Bearer some-token")
+        FakeRequest("GET", contactReportTechnicalIssueUri)
+          .withSession()
+          .withHeaders("Authorization" -> "Bearer some-token")
       )
       status(result) mustBe 200
       contentAsString(result) must include(messagesApi("landing.heading"))
@@ -102,6 +104,3 @@ class JourneyControllerSpec extends FakeApplicationServer {
     override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
   }
 }
-
-
-

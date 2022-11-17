@@ -28,12 +28,16 @@ import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut
 
 import play.twirl.api.HtmlFormat
 
-class AuthenticationController @Inject()(mcc: MessagesControllerComponents, timeOutView: TimeOut)
-  (implicit appConfig: AppConfig)
-  extends FrontendController(mcc) with I18nSupport {
+class AuthenticationController @Inject() (mcc: MessagesControllerComponents, timeOutView: TimeOut)(implicit
+  appConfig: AppConfig
+) extends FrontendController(mcc)
+    with I18nSupport {
 
   def signIn: Action[AnyContent] = Action {
-    Redirect(url = appConfig.ggLoginUrl, queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName)))
+    Redirect(
+      url = appConfig.ggLoginUrl,
+      queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName))
+    )
   }
 
   def signOut: Action[AnyContent] = Action {
@@ -45,7 +49,10 @@ class AuthenticationController @Inject()(mcc: MessagesControllerComponents, time
   }
 
   def timeOut: Action[AnyContent] = Action { implicit request =>
-    implicit val msg = messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+| UniformMessages.bestGuess.map(HtmlFormat.escape)
+    implicit val msg =
+      messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+| UniformMessages.bestGuess.map(
+        HtmlFormat.escape
+      )
     Ok(timeOutView()).withNewSession
   }
 }

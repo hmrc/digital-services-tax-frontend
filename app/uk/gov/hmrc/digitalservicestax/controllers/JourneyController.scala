@@ -37,21 +37,21 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvi
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 @Singleton
-class JourneyController @Inject()(
+class JourneyController @Inject() (
   authorisedAction: Auth,
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
   layout: Layout,
   landing: Landing
-)(
-  implicit ec: ExecutionContext,
+)(implicit
+  ec: ExecutionContext,
   val messagesApi: MessagesApi,
   val appConfig: AppConfig
 ) extends ControllerHelpers
-  with FrontendHeaderCarrierProvider
-  with I18nSupport
-  with AuthorisedFunctions {
+    with FrontendHeaderCarrierProvider
+    with I18nSupport
+    with AuthorisedFunctions {
 
   def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
@@ -68,21 +68,21 @@ class JourneyController @Inject()(
       case Some(reg) if reg.registrationNumber.isDefined =>
         for {
           outstandingPeriods <- backend.lookupOutstandingReturns()
-          amendedPeriods <- backend.lookupAmendableReturns()
-        } yield {
-          Ok(layout(
+          amendedPeriods     <- backend.lookupAmendableReturns()
+        } yield Ok(
+          layout(
             pageTitle = Some(s"${msg("landing.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"),
             useFullWidth = true
-          )(landing(
-            reg, outstandingPeriods.toList.sortBy(_.start), amendedPeriods.toList.sortBy(_.start))))
-          }
+          )(landing(reg, outstandingPeriods.toList.sortBy(_.start), amendedPeriods.toList.sortBy(_.start)))
+        )
 
       case Some(_) =>
         Future.successful(
-          Ok(layout(
-            pageTitle =
-              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
-          )(views.html.end.pending()(msg)))
+          Ok(
+            layout(
+              pageTitle = Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+            )(views.html.end.pending()(msg))
+          )
         )
     }
   }

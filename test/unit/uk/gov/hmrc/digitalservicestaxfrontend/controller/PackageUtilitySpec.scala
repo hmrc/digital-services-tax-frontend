@@ -25,14 +25,14 @@ class PackageUtilitySpec extends AnyFlatSpec with Matchers {
 
   it should "re-order a list of radio buttons" in {
     val list = List("None", "Some")
-    val res = list.orderYesNoRadio
+    val res  = list.orderYesNoRadio
 
     res shouldEqual list.reverse
   }
 
   it should "not re-order a list of radio buttons if the order is correct" in {
     val list = List("Some", "None")
-    val res = list.orderYesNoRadio
+    val res  = list.orderYesNoRadio
 
     res shouldEqual list
   }
@@ -44,7 +44,7 @@ class PackageUtilitySpec extends AnyFlatSpec with Matchers {
 
   it should "return the same list with orderYesNoRadio is the list length is different than two" in {
     val list = List("None", "Some", "None", "Some")
-    val res = list.orderYesNoRadio
+    val res  = list.orderYesNoRadio
 
     res shouldEqual list
   }

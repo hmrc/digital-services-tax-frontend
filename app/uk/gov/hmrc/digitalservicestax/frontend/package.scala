@@ -23,9 +23,9 @@ import com.ibm.icu.text.SimpleDateFormat
 import com.ibm.icu.util.{TimeZone, ULocale}
 
 package object frontend {
-  private val zone = "Europe/London"
-  val zoneId: ZoneId = ZoneId.of(zone)
-  private val timeFomat = "h:mma"
+  private val zone             = "Europe/London"
+  val zoneId: ZoneId           = ZoneId.of(zone)
+  private val timeFomat        = "h:mma"
   def formattedTimeNow: String = LocalDateTime.now(zoneId).format(DateTimeFormatter.ofPattern(timeFomat)).toLowerCase
 
   def formatDate(localDate: LocalDate, dateFormatPattern: String = "d MMMM yyyy"): String = {
@@ -35,7 +35,7 @@ package object frontend {
 
   def createDateFormatForPattern(pattern: String): SimpleDateFormat = {
     val locale: ULocale = ULocale.getDefault
-    val sdf = new SimpleDateFormat(pattern, locale)
+    val sdf             = new SimpleDateFormat(pattern, locale)
     sdf.setTimeZone(TimeZone.getTimeZone(zone))
     sdf
   }
@@ -43,7 +43,7 @@ package object frontend {
   implicit class RichAddress(value: data.Address) {
 
     def lines: List[String] = {
-      import value._ 
+      import value._
       val basic = List(
         line1,
         line2.getOrElse(""),
@@ -54,11 +54,10 @@ package object frontend {
 
       value match {
         case _: data.UkAddress => basic
-        case _ => basic :+ Location.name(countryCode)
+        case _                 => basic :+ Location.name(countryCode)
       }
     }
 
-    
   }
 
 }

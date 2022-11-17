@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestConnector @Inject()(
+class TestConnector @Inject() (
   http: HttpClient,
   servicesConfig: ServicesConfig
 ) {
@@ -34,6 +34,5 @@ class TestConnector @Inject()(
 
   def trigger(url: String, param: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
     http.GET[HttpResponse](s"$beUrl/$url/$param")
-
 
 }
