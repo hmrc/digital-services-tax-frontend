@@ -16,22 +16,22 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"       %% s"hmrc-mongo-play-$play"         % hmrcMongoVersion,
     "commons-validator"       %  "commons-validator"              % "1.7",
     "uk.gov.hmrc"             %% s"bootstrap-frontend-play-$play" % "7.11.0",
-    "fr.marcwrobel"           %  "jbanking"                       % "3.4.0",
+    "fr.marcwrobel"           %  "jbanking"                       % "4.0.0",
     "org.jsoup"               %  "jsoup"                          % "1.15.3",
-    "joda-time"               %  "joda-time"                      % "2.12.0" // needed for hmrc-mongo
+    "joda-time"               %  "joda-time"                      % "2.12.1" // needed for hmrc-mongo
   )
 
   val test = Seq(
-    "org.scalatest"                 %% "scalatest"                    % "3.2.13",
+    "org.scalatest"                 %% "scalatest"                    % "3.2.14",
     "org.jsoup"                     %  "jsoup"                        % "1.15.3",
     "com.typesafe.play"             %% "play-test"                    % current,
-    "org.scalacheck"                %% "scalacheck"                   % "1.16.0",
-    "io.chrisdavenport"             %% "cats-scalacheck"              % "0.3.1",
+    "org.scalacheck"                %% "scalacheck"                   % "1.17.0",
+    "io.chrisdavenport"             %% "cats-scalacheck"              % "0.3.2",
     "com.beachape"                  %% "enumeratum-scalacheck"        % "1.7.0",
     "wolfendale"                    %% "scalacheck-gen-regexp"        % "0.1.2",
     "com.outworkers"                %% "util-samplers"                % "0.57.0",
-    "com.github.tomakehurst"        %  "wiremock-jre8"                % "2.33.2",
-    "com.fasterxml.jackson.module"  %% "jackson-module-scala"         % "2.13.4",
+    "com.github.tomakehurst"        % "wiremock-standalone"           % "2.27.2",
+    "com.fasterxml.jackson.module"  %% "jackson-module-scala"         % "2.14.0",
     "uk.gov.hmrc.mongo"             %% s"hmrc-mongo-test-play-$play"  % hmrcMongoVersion,
     "org.pegdown"                   %  "pegdown"                      % "1.6.0",
     "com.vladsch.flexmark"          %  "flexmark-all"                 % "0.62.2",
