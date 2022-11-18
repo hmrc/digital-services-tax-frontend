@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import scala.concurrent.duration.Duration
 
 @Singleton
-class AppConfig @Inject()(val config: Configuration, servicesConfig: ServicesConfig) {
+class AppConfig @Inject() (val config: Configuration, servicesConfig: ServicesConfig) {
 
   private def loadConfig(key: String) = config.get[String](key)
 
@@ -35,9 +35,9 @@ class AppConfig @Inject()(val config: Configuration, servicesConfig: ServicesCon
   private lazy val companyAuthSignInPath: String  = servicesConfig.getConfString("company-auth.sign-in-path", "")
   private lazy val companyAuthSignOutPath: String = servicesConfig.getConfString("company-auth.sign-out-path", "")
   lazy val ggLoginUrl: String                     = s"$companyAuthFrontend$companyAuthSignInPath"
-  
+
   lazy val contactHost: String = loadConfig("contact-frontend.host")
-  lazy val serviceName: String    = loadConfig("serviceName")
+  lazy val serviceName: String = loadConfig("serviceName")
 
   lazy val reportAProblemPartialUrl: String = s"$contactHost/contact/problem_reports_ajax?service=$serviceName"
   lazy val reportAProblemNonJSUrl: String   = s"$contactHost/contact/problem_reports_nonjs?service=$serviceName"

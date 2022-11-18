@@ -29,11 +29,13 @@ trait Widgets {
 
   implicit val addressTell = new WebTell[Html, Address] {
     override def render(in: Address, key: List[String], pageIn: PageIn[Html]): Option[Html] =
-      Some(Html(
-        s"<div id='${key.last}--sfer-content'>" +
-          s"<p>${in.lines.map { x => s"<span class='govuk-body-m'>${x.escapeHtml}</span>" }.mkString("<br/>")}</p>" +
-          "</div>"
-      ))
+      Some(
+        Html(
+          s"<div id='${key.last}--sfer-content'>" +
+            s"<p>${in.lines.map(x => s"<span class='govuk-body-m'>${x.escapeHtml}</span>").mkString("<br/>")}</p>" +
+            "</div>"
+        )
+      )
   }
 
   implicit val kickoutTell = new WebTell[Html, Kickout] {
@@ -48,18 +50,20 @@ trait Widgets {
   implicit val companyTell = new WebTell[Html, Company] {
 
     override def render(in: Company, key: List[String], pageIn: PageIn[Html]): Option[Html] =
-      Some(Html(
-        s"<p class='govuk-body-l' id='${key.last}--sfer-content'>" +
-          s"${in.name.escapeHtml}<br>" +
-          s"<span class='govuk-body-m'>" +
-          s"${
-            in.address.lines.map {
-              _.escapeHtml
-            }.mkString("<br>")
-          }" +
-          s"</span>" +
-          "</p>"
-      ))
+      Some(
+        Html(
+          s"<p class='govuk-body-l' id='${key.last}--sfer-content'>" +
+            s"${in.name.escapeHtml}<br>" +
+            s"<span class='govuk-body-m'>" +
+            s"${in.address.lines
+                .map {
+                  _.escapeHtml
+                }
+                .mkString("<br>")}" +
+            s"</span>" +
+            "</p>"
+        )
+      )
   }
 
   implicit val booleanTell = new WebTell[Html, Boolean] {

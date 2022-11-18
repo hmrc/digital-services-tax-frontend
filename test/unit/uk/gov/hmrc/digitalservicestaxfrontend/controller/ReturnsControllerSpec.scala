@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTester with MongoSupport {
 
-  val returnsController = new ReturnsController(
+  val returnsController          = new ReturnsController(
     fakeAuthorisedAction,
     httpClient,
     servicesConfig,
@@ -51,16 +51,18 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
   )(implicitly) {
     override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
   }
-  private val correctPeriodKey = "0001"
+  private val correctPeriodKey   = "0001"
   private val incorrectPeriodKey = "0003"
 
   "returnsController.showAmendments" must {
     "return a 404 when a registration is not found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
 
-      val result = returnsController.showAmendments().apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = returnsController
+        .showAmendments()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe NOT_FOUND
     }
 
@@ -68,9 +70,11 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(Some(sampleReg))
       when(mockDSTConnector.lookupAmendableReturns()) thenReturn Future.successful(Set.empty[Period])
 
-      val result = returnsController.showAmendments().apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = returnsController
+        .showAmendments()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe NOT_FOUND
     }
 
@@ -78,9 +82,11 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(Some(sampleReg))
       when(mockDSTConnector.lookupAmendableReturns()) thenReturn Future.successful(Set(samplePeriod))
 
-      val result = returnsController.showAmendments().apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = returnsController
+        .showAmendments()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe OK
       contentAsString(result) must include(messagesApi("resubmit-a-return.title"))
     }
@@ -89,16 +95,18 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
   "ReturnsController.postAmendments" must {
     "return a 404 when no amendableReturns are found" in {
       when(mockDSTConnector.lookupAmendableReturns()) thenReturn Future.successful(Set.empty[Period])
-      val result: Future[Result] = returnsController.postAmendments().apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result: Future[Result] = returnsController
+        .postAmendments()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe NOT_FOUND
     }
 
     "return a 400 when the form contains errors" in {
       when(mockDSTConnector.lookupAmendableReturns()) thenReturn Future.successful(Set(samplePeriod))
       val incorrectKey = "notPeriodKey"
-      val request = FakeRequest()
+      val request      = FakeRequest()
         .withHeaders("Authorization" -> "Bearer some-token")
         .withFormUrlEncodedBody(incorrectKey -> correctPeriodKey)
 
@@ -122,13 +130,15 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
 
   }
 
-  "ReturnsController.returnAction" must {
+  "ReturnsController.returnAction"   must {
     "return a 404 when a registration is not found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
 
-      val result = returnsController.returnAction(correctPeriodKey).apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = returnsController
+        .returnAction(correctPeriodKey)
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe NOT_FOUND
     }
 
@@ -136,9 +146,11 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(Some(sampleReg))
       when(mockDSTConnector.lookupAllReturns()) thenReturn Future.successful(Set(samplePeriod))
 
-      val result = returnsController.returnAction(incorrectPeriodKey).apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = returnsController
+        .returnAction(incorrectPeriodKey)
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe NOT_FOUND
     }
 
@@ -146,9 +158,11 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(Some(sampleReg))
       when(mockDSTConnector.lookupAllReturns()) thenReturn Future.successful(Set(samplePeriod))
 
-      val result = returnsController.returnAction("0001").apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = returnsController
+        .returnAction("0001")
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some("/select-activities")
 
@@ -160,23 +174,27 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
       when(mockDSTConnector.lookupOutstandingReturns()) thenReturn Future.successful(Set(samplePeriod))
       when(mockDSTConnector.lookupAllReturns()) thenReturn Future.successful(Set(samplePeriod))
 
-      val result = returnsController.returnComplete(incorrectPeriodKey).apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = returnsController
+        .returnComplete(incorrectPeriodKey)
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe NOT_FOUND
     }
 
     "return a 200 and the complete page when the periodKey from lookupAllReturns() " +
       "matches the periodKey in the uri" in {
-      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(Some(sampleReg))
-      when(mockDSTConnector.lookupOutstandingReturns()) thenReturn Future.successful(Set(samplePeriod))
-      when(mockDSTConnector.lookupAllReturns()) thenReturn Future.successful(Set(samplePeriod))
+        when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(Some(sampleReg))
+        when(mockDSTConnector.lookupOutstandingReturns()) thenReturn Future.successful(Set(samplePeriod))
+        when(mockDSTConnector.lookupAllReturns()) thenReturn Future.successful(Set(samplePeriod))
 
-      val result = returnsController.returnComplete(correctPeriodKey).apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
-      status(result) mustBe OK
-      contentAsString(result) must include(messagesApi("confirmation.heading"))
-    }
+        val result = returnsController
+          .returnComplete(correctPeriodKey)
+          .apply(
+            FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+          )
+        status(result) mustBe OK
+        contentAsString(result) must include(messagesApi("confirmation.heading"))
+      }
   }
 }

@@ -30,17 +30,17 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.util.TestDstService
 
 class RegJourneySpec extends AnyFlatSpec with Matchers {
 
-  implicit val sampleUtrAsk: SampleData[String @@ data.UTR.Tag] = instances(UTR("1234567891"))
+  implicit val sampleUtrAsk: SampleData[String @@ data.UTR.Tag]           = instances(UTR("1234567891"))
   implicit val samplePostcodeAsk: SampleData[String @@ data.Postcode.Tag] = instances(Postcode("BN1 1NB"))
-  implicit val sampleDateAsk: SampleData[LocalDate] = instances(LocalDate.of(2021, 3, 31))
-  implicit val sampleContactDetailsAsk: SampleData[ContactDetails] = instances(sampleContact)
-  implicit val sampleInternationalAddressAsk: SampleData[ForeignAddress] = instances(internationalAddress)
-  implicit val sampleUkAddressAsk: SampleData[UkAddress] = instances(sampleAddress)
-  implicit val sampleBooleanAsk: SampleData[Boolean] = instances(true)
+  implicit val sampleDateAsk: SampleData[LocalDate]                       = instances(LocalDate.of(2021, 3, 31))
+  implicit val sampleContactDetailsAsk: SampleData[ContactDetails]        = instances(sampleContact)
+  implicit val sampleInternationalAddressAsk: SampleData[ForeignAddress]  = instances(internationalAddress)
+  implicit val sampleUkAddressAsk: SampleData[UkAddress]                  = instances(sampleAddress)
+  implicit val sampleBooleanAsk: SampleData[Boolean]                      = instances(true)
 
   implicit val sampleCompanyName: SampleData[String @@ data.CompanyName.Tag] = instancesF {
     case "company-name" => List(CompanyName("Supplied company name"))
-    case _ => List(CompanyName("Foo Ltd"))
+    case _              => List(CompanyName("Foo Ltd"))
   }
 
   "when the global revenue is under £500m we" should "kick the user out" in {
@@ -51,42 +51,55 @@ class RegJourneySpec extends AnyFlatSpec with Matchers {
   "when the UK revenue is under £25m we" should "kick the user out" in {
     implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "uk-revenues" => List(false)
-      case _ => List(true)
+      case _             => List(true)
     }
     assert(LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.isEmpty)
   }
 
   "when there is a Company from sign in accepting this" should "give you a Registration for that Company " in {
-    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.asOutcome()
+    val reg: Registration =
+      LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.asOutcome()
     assert(reg.companyReg.company == sampleCompany)
   }
 
   "when there is no Company from sign in and the user does not supply a UTR we" should "get a Registration with the supplied Company name" in {
     implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "check-unique-taxpayer-reference" => List(false)
-      case _ => List(true)
+      case _                                 => List(true)
     }
 
-    val reg = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      new TestDstService {
-        override def lookupCompany(): Option[CompanyRegWrapper] = None
-      }.get
-    )).value.run.asOutcome()
+    val reg = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          new TestDstService {
+            override def lookupCompany(): Option[CompanyRegWrapper] = None
+          }.get
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
     reg.companyReg.company.name shouldBe "Supplied company name"
   }
 
   "when there is no Company from sign in & no supplied UTR & an InternationalAddress is specified we" should "get a Registration with an InternatinalAddress" in {
     implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
-      case "check-unique-taxpayer-reference" => List(false)
+      case "check-unique-taxpayer-reference"         => List(false)
       case "check-company-registered-office-address" => List(false)
-      case _ => List(true)
+      case _                                         => List(true)
     }
-    val reg = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      new TestDstService {
-        override def lookupCompany(): Option[CompanyRegWrapper] = None
-      }.get
-    )).value.run.asOutcome()
+    val reg                                            = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          new TestDstService {
+            override def lookupCompany(): Option[CompanyRegWrapper] = None
+          }.get
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
     reg.companyReg.company.address shouldBe a[ForeignAddress]
   }
@@ -94,24 +107,36 @@ class RegJourneySpec extends AnyFlatSpec with Matchers {
   "when there is no Company from sign in & no supplied UTR & a UkAddress is specified we" should "get a Registration with a UkAddress" in {
     implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "check-unique-taxpayer-reference" => List(true)
-      case _ => List(true)
+      case _                                 => List(true)
     }
 
-    val reg = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      new TestDstService {
-        override def lookupCompany(): Option[CompanyRegWrapper] = None
-      }.get
-    )).value.run.asOutcome()
+    val reg = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          new TestDstService {
+            override def lookupCompany(): Option[CompanyRegWrapper] = None
+          }.get
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
     reg.companyReg.company.address shouldBe a[UkAddress]
   }
 
   "when there is no Company from sign in, but one is found using the UTR, and the user confirms it we" should "get a Registration for that company" in {
-    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      new TestDstService {
-        override def lookupCompany(): Option[CompanyRegWrapper] = None
-      }.get
-    )).value.run.asOutcome()
+    val reg: Registration = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          new TestDstService {
+            override def lookupCompany(): Option[CompanyRegWrapper] = None
+          }.get
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
     reg.companyReg.company.name shouldBe utrLookupCompanyName
   }
@@ -119,19 +144,25 @@ class RegJourneySpec extends AnyFlatSpec with Matchers {
   "when there is a Company from sign in, saying this is the wrong company" should "kick you out of the journey " in {
     implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "confirm-company-details" => List(false)
-      case _ => List(true)
+      case _                         => List(true)
     }
 
     assert(LogicTableInterpreter.interpret(RegJourney.registrationJourney(testService)).value.run.isEmpty)
   }
 
   "when there is no Company from sign in, and none found for a supplied UTR we" should "ask the user for a companyName and Address" in {
-    val reg = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-        new TestDstService {
-          override def lookupCompany(): Option[CompanyRegWrapper] = None
-          override def lookupCompany(utr: UTR, postcode: Postcode): Option[CompanyRegWrapper] = None
-        }.get
-      )).value.run.asOutcome()
+    val reg = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          new TestDstService {
+            override def lookupCompany(): Option[CompanyRegWrapper]                             = None
+            override def lookupCompany(utr: UTR, postcode: Postcode): Option[CompanyRegWrapper] = None
+          }.get
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
     reg.companyReg.company.address shouldBe a[UkAddress]
   }
@@ -139,56 +170,88 @@ class RegJourneySpec extends AnyFlatSpec with Matchers {
   "when there is no Company from sign in, and the one found by UTR is rejected by the user we" should "be kicked out" in {
     implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "confirm-company-details" => List(false)
-      case _ => List(true)
+      case _                         => List(true)
     }
 
-    assert(LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-        new TestDstService {
-          override def lookupCompany(): Option[CompanyRegWrapper] = None
-        }.get
-      )).value.run.isEmpty)
+    assert(
+      LogicTableInterpreter
+        .interpret(
+          RegJourney.registrationJourney(
+            new TestDstService {
+              override def lookupCompany(): Option[CompanyRegWrapper] = None
+            }.get
+          )
+        )
+        .value
+        .run
+        .isEmpty
+    )
   }
 
   "the Registration" should "have an alternativeContact when user elected to provide one" in {
     implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "company-contact-address" => List(false)
-      case _ => List(true)
+      case _                         => List(true)
     }
 
-    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      testService
-    )).value.run.asOutcome()
+    val reg: Registration = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          testService
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
-    reg.alternativeContact should be (Symbol("defined"))
+    reg.alternativeContact should be(Symbol("defined"))
   }
 
   "the Registration" should "not have an alternativeContact when user elected not to provide one" in {
-    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      testService
-    )).value.run.asOutcome()
+    val reg: Registration = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          testService
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
-    reg.alternativeContact should be (Symbol("empty"))
+    reg.alternativeContact should be(Symbol("empty"))
   }
 
   "the Registration" should "have an ultimateParent when the user elected to provide one" in {
-    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      testService
-    )).value.run.asOutcome()
+    val reg: Registration = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          testService
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
-    reg.ultimateParent should be (Symbol("defined"))
+    reg.ultimateParent should be(Symbol("defined"))
   }
 
   "the Registration" should "not have an ultimateParent when the user elected not to provide one" in {
     implicit val sampleBooleanAsk: SampleData[Boolean] = instancesF {
       case "check-if-group" => List(false)
-      case _ => List(true)
+      case _                => List(true)
     }
 
-    val reg: Registration = LogicTableInterpreter.interpret(RegJourney.registrationJourney(
-      testService
-    )).value.run.asOutcome()
+    val reg: Registration = LogicTableInterpreter
+      .interpret(
+        RegJourney.registrationJourney(
+          testService
+        )
+      )
+      .value
+      .run
+      .asOutcome()
 
-    reg.ultimateParent should be (Symbol("empty"))
+    reg.ultimateParent should be(Symbol("empty"))
   }
 
 }

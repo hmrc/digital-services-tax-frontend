@@ -33,7 +33,7 @@ package object journeys {
     def apply(key: String): List[A] = value(key)
   }
 
-  implicit class RichJourney[A] (in: List[(List[_], Either[ErrorTree, A])]) {
+  implicit class RichJourney[A](in: List[(List[_], Either[ErrorTree, A])]) {
     def asOutcome(debug: Boolean = false): A = {
       if (debug) {
         in.foreach { case (messages, outcome) =>
@@ -42,21 +42,21 @@ package object journeys {
         }
       }
       in.head._2 match {
-        case Right(a) => a
+        case Right(a)        => a
         case Left(errorTree) => errorTree.toThrowable
       }
     }
   }
 
-  implicit class RichErrorTree (in: ErrorTree) {
-    def humanReadable: String = in.map {
-      case (a, b) =>
+  implicit class RichErrorTree(in: ErrorTree) {
+    def humanReadable: String = in
+      .map { case (a, b) =>
         a.toList.flatten.mkString("::") + " -> " + b.toList.map(_.msg).mkString("::")
-    }.mkString(";")
+      }
+      .mkString(";")
 
-    def toThrowable = {
+    def toThrowable =
       throw new IllegalStateException(in.humanReadable)
-    }
   }
 
 }

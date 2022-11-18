@@ -42,7 +42,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvi
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReturnsController @Inject()(
+class ReturnsController @Inject() (
   authorisedAction: Auth,
   http: HttpClient,
   servicesConfig: ServicesConfig,
@@ -60,8 +60,7 @@ class ReturnsController @Inject()(
 ) extends ControllerHelpers
     with I18nSupport
     with AuthorisedFunctions
-    with FrontendHeaderCarrierProvider
-{
+    with FrontendHeaderCarrierProvider {
 
   import interpreter._
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
@@ -71,59 +70,62 @@ class ReturnsController @Inject()(
       Some(checkYourAnswersRet(s"${key.last}.ret", in.value._1, in.value._2, in.value._3)(pageIn.messages))
   }
 
-  private def applyKey(key: Key): Period.Key = key
+  private def applyKey(key: Key): Period.Key           = key
   private def unapplyKey(arg: Period.Key): Option[Key] = Option(arg)
 
   private val periodForm: Form[Period.Key] = Form(
     mapping(
-      "key" -> nonEmptyText.transform(Period.Key.apply, {x: Period.Key => x})
+      "key" -> nonEmptyText.transform(Period.Key.apply, { x: Period.Key => x })
     )(applyKey)(unapplyKey)
   )
 
-  def showAmendments(): Action[AnyContent] = authorisedAction.async {
-    implicit request: AuthorisedRequest[AnyContent] =>
+  def showAmendments(): Action[AnyContent] = authorisedAction.async { implicit request: AuthorisedRequest[AnyContent] =>
     implicit val msg: UniformMessages[Html] = messages(request)
 
-    backend.lookupRegistration().flatMap{
-      case None      => Future.successful(NotFound)
-      case Some(_) => backend.lookupAmendableReturns().map { outstandingPeriods =>
+    backend.lookupRegistration().flatMap {
+      case None    => Future.successful(NotFound)
+      case Some(_) =>
+        backend.lookupAmendableReturns().map { outstandingPeriods =>
           outstandingPeriods.toList match {
-            case Nil =>
+            case Nil     =>
               NotFound
             case periods =>
-              Ok(layout(
-                pageTitle =
-                  Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
-              )(resubmitAReturn("resubmit-a-return", periods, periodForm)(msg, request)))
+              Ok(
+                layout(
+                  pageTitle =
+                    Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
+                )(resubmitAReturn("resubmit-a-return", periods, periodForm)(msg, request))
+              )
           }
-      }
+        }
     }
   }
 
-  def postAmendments(): Action[AnyContent] = authorisedAction.async {
-    implicit request: AuthorisedRequest[AnyContent] =>
+  def postAmendments(): Action[AnyContent] = authorisedAction.async { implicit request: AuthorisedRequest[AnyContent] =>
     implicit val msg: UniformMessages[Html] = messages(request)
     backend.lookupAmendableReturns().flatMap { outstandingPeriods =>
       outstandingPeriods.toList match {
-        case Nil =>
+        case Nil     =>
           Future.successful(NotFound)
         case periods =>
-          periodForm.bindFromRequest().fold(
-            formWithErrors => {
-              Future.successful(
-                BadRequest(layout(
-                  pageTitle =
-                    Some(s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
-                )(resubmitAReturn("resubmit-a-return", periods, formWithErrors)(msg, request))
+          periodForm
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    layout(
+                      pageTitle = Some(
+                        s"${msg("resubmit-a-return.title")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
+                      )
+                    )(resubmitAReturn("resubmit-a-return", periods, formWithErrors)(msg, request))
                   )
-              )
-            },
-            postedForm => {
-              Future.successful(
-                Redirect(routes.ReturnsController.returnAction(postedForm, " "))
-              )
-            }
-          )
+                ),
+              postedForm =>
+                Future.successful(
+                  Redirect(routes.ReturnsController.returnAction(postedForm, " "))
+                )
+            )
       }
     }
   }
@@ -138,48 +140,50 @@ class ReturnsController @Inject()(
   def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
       implicit val msg: UniformMessages[Html] = interpreter.messages(request)
-    import journeys.ReturnJourney._
+      import journeys.ReturnJourney._
 
-    val periodKey = Period.Key(periodKeyString)
-    implicit val p = persistence
+      val periodKey  = Period.Key(periodKeyString)
+      implicit val p = persistence
 
-    backend.lookupRegistration().flatMap{
-      case None      => Future.successful(NotFound)
-      case Some(reg) =>
-        backend.lookupAllReturns().flatMap { periods =>
-          periods.find(_.key == periodKey) match {
-            case None => Future.successful(NotFound)
-            case Some(period) =>
-              interpret(returnJourney(period, reg)).run(targetId){ ret =>
-                val purgeStateUponCompletion = true
-                backend.submitReturn(period, ret).map{ _ =>
-                  returnsCache.cacheReturn(ret, purgeStateUponCompletion)
-                  Redirect(routes.ReturnsController.returnComplete(periodKeyString))
+      backend.lookupRegistration().flatMap {
+        case None      => Future.successful(NotFound)
+        case Some(reg) =>
+          backend.lookupAllReturns().flatMap { periods =>
+            periods.find(_.key == periodKey) match {
+              case None         => Future.successful(NotFound)
+              case Some(period) =>
+                interpret(returnJourney(period, reg)).run(targetId) { ret =>
+                  val purgeStateUponCompletion = true
+                  backend.submitReturn(period, ret).map { _ =>
+                    returnsCache.cacheReturn(ret, purgeStateUponCompletion)
+                    Redirect(routes.ReturnsController.returnComplete(periodKeyString))
+                  }
                 }
-              }
+            }
           }
-        }
-    } 
+      }
   }
 
-  def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = authorisedAction.async { implicit request =>
-    implicit val msg: UniformMessages[Html] = messages(request)
-    val submittedPeriodKey = Period.Key(submittedPeriodKeyString)
-    for {
-      ret <- returnsCache.retrieveCachedReturn
-      reg <- backend.lookupRegistration()
-      outstandingPeriods <- backend.lookupOutstandingReturns()
-      allReturns <- backend.lookupAllReturns()
-    } yield {
-      allReturns.find(_.key == submittedPeriodKey) match {
-        case None => NotFound
+  def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = authorisedAction.async {
+    implicit request =>
+      implicit val msg: UniformMessages[Html] = messages(request)
+      val submittedPeriodKey                  = Period.Key(submittedPeriodKeyString)
+      for {
+        ret                <- returnsCache.retrieveCachedReturn
+        reg                <- backend.lookupRegistration()
+        outstandingPeriods <- backend.lookupOutstandingReturns()
+        allReturns         <- backend.lookupAllReturns()
+      } yield allReturns.find(_.key == submittedPeriodKey) match {
+        case None         => NotFound
         case Some(period) =>
-          val companyName = reg.fold(CompanyName(""))(_.companyReg.company.name)
-          val printableCYA: Option[Html] = ret.map { r => checkYourAnswersRet(
-            "check-your-answers.ret", r, period, companyName, isPrint = true)(msg)}
+          val companyName                = reg.fold(CompanyName(""))(_.companyReg.company.name)
+          val printableCYA: Option[Html] = ret.map { r =>
+            checkYourAnswersRet("check-your-answers.ret", r, period, companyName, isPrint = true)(msg)
+          }
           Ok(
             layout(
-              pageTitle = Some(s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
+              pageTitle =
+                Some(s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
             )(
               confirmationReturn(
                 "confirmation",
@@ -191,6 +195,5 @@ class ReturnsController @Inject()(
             )
           )
       }
-    }
   }
 }

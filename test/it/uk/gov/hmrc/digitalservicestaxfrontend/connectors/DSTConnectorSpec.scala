@@ -46,7 +46,8 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
     stubFor(
       post(urlPathEqualTo(s"""/registration"""))
-        .willReturn(aResponse().withStatus(200).withBody("{}")))
+        .willReturn(aResponse().withStatus(200).withBody("{}"))
+    )
 
     val response = DSTTestConnector.submitRegistration(dstRegNumber)
     whenReady(response) { res =>
@@ -59,25 +60,29 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
     stubFor(
       post(urlPathEqualTo("/registration"))
-        .willReturn(aResponse().withStatus(Status.BAD_REQUEST).withBody("{}")))
+        .willReturn(aResponse().withStatus(Status.BAD_REQUEST).withBody("{}"))
+    )
 
     val submitReg =
-      DSTTestConnector.submitRegistration(dstRegNumber).recoverWith {
-        case _: UpstreamErrorResponse => Future.successful(true)
-        case _ => Future.successful(false)
-      }.map({case b: Boolean => b})
+      DSTTestConnector
+        .submitRegistration(dstRegNumber)
+        .recoverWith {
+          case _: UpstreamErrorResponse => Future.successful(true)
+          case _                        => Future.successful(false)
+        }
+        .map { case b: Boolean => b }
 
-    whenReady(submitReg) {threwException => assert(threwException)}
+    whenReady(submitReg)(threwException => assert(threwException))
   }
 
   "should submit a period and a return successfully" in {
     forAll { (period: Period, ret: Return) =>
-
       val encodedKey = java.net.URLEncoder.encode(period.key, "UTF-8")
 
       stubFor(
         post(urlPathEqualTo(s"/returns/$encodedKey"))
-          .willReturn(aResponse().withStatus(200).withBody("{}")))
+          .willReturn(aResponse().withStatus(200).withBody("{}"))
+      )
 
       val response = DSTTestConnector.submitReturn(period, ret)
       whenReady(response) { res =>
@@ -88,26 +93,28 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
   "should have correct status code where submitting return failed" in {
     forAll { (period: Period, ret: Return) =>
-
       val encodedKey = java.net.URLEncoder.encode(period.key, "UTF-8")
 
       stubFor(
         post(urlPathEqualTo(s"/returns/$encodedKey"))
-          .willReturn(aResponse().withStatus(Status.BAD_REQUEST).withBody("{}")))
+          .willReturn(aResponse().withStatus(Status.BAD_REQUEST).withBody("{}"))
+      )
 
       val submitReturn =
-        DSTTestConnector.submitReturn(period, ret).recoverWith {
-          case _: UpstreamErrorResponse => Future.successful(true)
-          case _ => Future.successful(false)
-        }.map({case b: Boolean => b})
+        DSTTestConnector
+          .submitReturn(period, ret)
+          .recoverWith {
+            case _: UpstreamErrorResponse => Future.successful(true)
+            case _                        => Future.successful(false)
+          }
+          .map { case b: Boolean => b }
 
-      whenReady(submitReturn) {threwException => assert(threwException)}
+      whenReady(submitReturn)(threwException => assert(threwException))
     }
   }
 
   "should lookup a company successfully" in {
     forAll { reg: CompanyRegWrapper =>
-
       stubFor(
         get(urlPathEqualTo(s"/lookup-company"))
           .willReturn(
@@ -126,7 +133,6 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
   "should lookup a company successfully by utr and postcode" in {
     forAll { (utr: UTR, postcode: Postcode, reg: CompanyRegWrapper) =>
-
       val escaped = postcode.replaceAll("\\s+", "")
 
       stubFor(
@@ -148,7 +154,6 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
   "should lookup a registration successfully" in {
     forAll { reg: Registration =>
-
       stubFor(
         get(urlPathEqualTo(s"/registration"))
           .willReturn(
@@ -168,7 +173,6 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
   "should lookup a list of outstanding return periods successfully" in {
     forAll { periods: Set[Period] =>
-
       stubFor(
         get(urlPathEqualTo(s"/returns/outstanding"))
           .willReturn(
@@ -187,7 +191,6 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
   "should lookup a list of submitted return periods successfully" in {
     forAll { periods: Set[Period] =>
-
       stubFor(
         get(urlPathEqualTo(s"/returns/amendable"))
           .willReturn(
@@ -206,7 +209,6 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
   "should lookup a list of all return periods successfully" in {
     forAll { periods: Set[Period] =>
-
       stubFor(
         get(urlPathEqualTo(s"/returns/all"))
           .willReturn(
@@ -223,4 +225,3 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
     }
   }
 }
-

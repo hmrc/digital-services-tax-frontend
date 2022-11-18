@@ -37,9 +37,11 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
   "RegistrationController.registerAction" must {
     "run the registration journey when there is no registration taking you to first page" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      val result = controller.registerAction("").apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = controller
+        .registerAction("")
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe 303
       redirectLocation(result) mustBe Some("/global-revenues")
     }
@@ -49,9 +51,11 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
           sampleReg
         )
       )
-      val result = controller.registerAction("").apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-      )
+      val result = controller
+        .registerAction("")
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
       status(result) mustBe 303
       redirectLocation(result) mustBe Some(routes.JourneyController.index.url)
     }
@@ -91,11 +95,11 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
     checkYourAnswersRegInstance,
     confirmationRegInstance,
     layoutInstance
-    )(
-      implicitly
-    ) {
-    override implicit lazy val persistence : PersistenceEngine[AuthorisedRequest[AnyContent]] = UnsafePersistence()
-    override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
+  )(
+    implicitly
+  ) {
+    override implicit lazy val persistence: PersistenceEngine[AuthorisedRequest[AnyContent]] = UnsafePersistence()
+    override def backend(implicit hc: HeaderCarrier): DSTConnector                           = mockDSTConnector
   }
 
 }

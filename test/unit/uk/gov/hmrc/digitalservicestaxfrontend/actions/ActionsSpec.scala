@@ -46,20 +46,22 @@ import scala.concurrent.Future
 class ActionsSpec extends FakeApplicationServer with WiremockServer with ConfiguredPropertyChecks {
 
   // Run wiremock server on local machine with specified port.
-  val inet = new URI(mockServerUrl)
+  val inet           = new URI(mockServerUrl)
   val wireMockServer = new WireMockServer(wireMockConfig().port(inet.getPort))
 
   lazy val errorTemplate: ErrorTemplate = app.injector.instanceOf[ErrorTemplate]
-  lazy val action = new AuthorisedAction(mcc, layoutInstance, fakeAuthConnector)(appConfig, global, messagesApi)
+  lazy val action                       = new AuthorisedAction(mcc, layoutInstance, fakeAuthConnector)(appConfig, global, messagesApi)
 
   "it should test an authorised action against auth connector retrievals" in {
     forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole, ag: AffinityGroup) =>
-      val jsonResponse = JsObject(Seq(
-        Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
-        Retrievals.internalId.propertyNames.head -> JsString(id),
-        Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
-        Retrievals.affinityGroup.propertyNames.head -> Json.toJson(ag)
-      ))
+      val jsonResponse = JsObject(
+        Seq(
+          Retrievals.allEnrolments.propertyNames.head  -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
+          Retrievals.internalId.propertyNames.head     -> JsString(id),
+          Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
+          Retrievals.affinityGroup.propertyNames.head  -> Json.toJson(ag)
+        )
+      )
 
       stubFor(
         post(urlPathEqualTo(s"/auth/authorise"))
@@ -70,9 +72,12 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
           )
       )
 
-      val req = action.invokeBlock(FakeRequest(), {
-        _: AuthorisedRequest[_] => Future.successful(Results.Ok)
-      })
+      val req = action.invokeBlock(
+        FakeRequest(),
+        { _: AuthorisedRequest[_] =>
+          Future.successful(Results.Ok)
+        }
+      )
 
       req.map { res =>
         res.header.status mustEqual Status.OK
@@ -87,11 +92,13 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
   "it should throw an exception in AuthorisedAction if internalId is missing from the retrieval" in {
 
     forAll { (enrolments: Enrolments, role: CredentialRole, ag: AffinityGroup) =>
-      val jsonResponse = JsObject(Seq(
-        Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
-        Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
-        Retrievals.affinityGroup.propertyNames.head -> Json.toJson(ag)
-      ))
+      val jsonResponse = JsObject(
+        Seq(
+          Retrievals.allEnrolments.propertyNames.head  -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
+          Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
+          Retrievals.affinityGroup.propertyNames.head  -> Json.toJson(ag)
+        )
+      )
 
       stubFor(
         post(urlPathEqualTo(s"/auth/authorise"))
@@ -102,9 +109,12 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
           )
       )
 
-      val req = action.invokeBlock(FakeRequest(), {
-        _: AuthorisedRequest[_] => Future.successful(Results.Ok)
-      })
+      val req = action.invokeBlock(
+        FakeRequest(),
+        { _: AuthorisedRequest[_] =>
+          Future.successful(Results.Ok)
+        }
+      )
 
       req.failed.foreach { res =>
         res.getMessage mustEqual "No internal ID for user"
@@ -115,12 +125,14 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
 
   "it should throw an exception in AuthorisedAction if the affinity group is not support" in {
     forAll { (enrolments: Enrolments, id: InternalId, role: CredentialRole) =>
-      val jsonResponse = JsObject(Seq(
-        Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
-        Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
-        Retrievals.internalId.propertyNames.head -> JsString(id),
-        Retrievals.affinityGroup.propertyNames.head -> JsString(gen[ShortString].value)
-      ))
+      val jsonResponse = JsObject(
+        Seq(
+          Retrievals.allEnrolments.propertyNames.head  -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
+          Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
+          Retrievals.internalId.propertyNames.head     -> JsString(id),
+          Retrievals.affinityGroup.propertyNames.head  -> JsString(gen[ShortString].value)
+        )
+      )
 
       stubFor(
         post(urlPathEqualTo(s"/auth/authorise"))
@@ -131,9 +143,12 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
           )
       )
 
-      val req = action.invokeBlock(FakeRequest(), {
-        _: AuthorisedRequest[_] => Future.successful(Results.Ok)
-      })
+      val req = action.invokeBlock(
+        FakeRequest(),
+        { _: AuthorisedRequest[_] =>
+          Future.successful(Results.Ok)
+        }
+      )
 
       req.failed.foreach { res =>
         res mustBe a[JsResultException]
@@ -143,12 +158,14 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
 
   "it should throw an exception in AuthorisedAction if an invalid internal ID is returned from the retrieval" in {
     forAll { (enrolments: Enrolments, role: CredentialRole, ag: AffinityGroup) =>
-      val jsonResponse = JsObject(Seq(
-        Retrievals.internalId.propertyNames.head -> JsString("___bla"),
-        Retrievals.allEnrolments.propertyNames.head -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
-        Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
-        Retrievals.affinityGroup.propertyNames.head -> Json.toJson(ag)
-      ))
+      val jsonResponse = JsObject(
+        Seq(
+          Retrievals.internalId.propertyNames.head     -> JsString("___bla"),
+          Retrievals.allEnrolments.propertyNames.head  -> JsArray(enrolments.enrolments.toSeq.map(Json.toJson(_))),
+          Retrievals.credentialRole.propertyNames.head -> Json.toJson(role),
+          Retrievals.affinityGroup.propertyNames.head  -> Json.toJson(ag)
+        )
+      )
 
       stubFor(
         post(urlPathEqualTo(s"/auth/authorise"))
@@ -159,9 +176,12 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
           )
       )
 
-      val req = action.invokeBlock(FakeRequest(), {
-        _: AuthorisedRequest[_] => Future.successful(Results.Ok)
-      })
+      val req = action.invokeBlock(
+        FakeRequest(),
+        { _: AuthorisedRequest[_] =>
+          Future.successful(Results.Ok)
+        }
+      )
 
       req.failed.foreach { res =>
         res.getMessage mustEqual "Invalid internal ID"
@@ -170,10 +190,9 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
     }
   }
 
-
   "it should produce an error template using the error handler function" in {
     val handler = app.injector.instanceOf[ErrorHandler]
-    val page = gen[ShortString].value
+    val page    = gen[ShortString].value
     val heading = gen[ShortString].value
     val message = gen[ShortString].value
 
@@ -186,9 +205,8 @@ class ActionsSpec extends FakeApplicationServer with WiremockServer with Configu
     )
     import ltbs.uniform.interpreters.playframework._
 
-    implicit val messages: UniformMessages[Html] = {
+    implicit val messages: UniformMessages[Html] =
       messagesApi.preferred(req).convertMessagesTwirlHtml()
-    }
 
     implicit val conf: AppConfig = appConfig
 

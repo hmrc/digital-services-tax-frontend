@@ -34,25 +34,23 @@ import uk.gov.hmrc.digitalservicestax.connectors.MongoUniformPersistence
 
 class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks with OptionValues with EitherValues {
 
-  def testJsonRoundtrip[T: Arbitrary : Format]: Assertion = {
+  def testJsonRoundtrip[T: Arbitrary: Format]: Assertion =
     forAll { sample: T =>
       val js = Json.toJson(sample)
 
       val parsed = js.validate[T]
-      parsed.isSuccess shouldEqual true
+      parsed.isSuccess   shouldEqual true
       parsed.asOpt.value shouldEqual sample
     }
-  }
 
-  def testJsonRoundtrip[T: Format](gen: Gen[T]): Assertion = {
+  def testJsonRoundtrip[T: Format](gen: Gen[T]): Assertion =
     forAll(gen) { sample: T =>
       val js = Json.toJson(sample)
 
       val parsed = js.validate[T]
-      parsed.isSuccess shouldEqual true
+      parsed.isSuccess   shouldEqual true
       parsed.asOpt.value shouldEqual sample
     }
-  }
 
   it should "serialize and de-serialise a Postcode instance" in {
     testJsonRoundtrip[Postcode]
@@ -61,15 +59,16 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
   it should "fail to validate a postcode from JSON if the source input doesn't match expected regex" in {
     val parsed = Json.parse(s""" "124124125125125" """).validate[Postcode]
     parsed.isSuccess shouldEqual false
-    parsed shouldEqual JsError(s"Expected a valid postcode, got 124124125125125 instead")
+    parsed           shouldEqual JsError(s"Expected a valid postcode, got 124124125125125 instead")
   }
-
 
   it should "fail to validate a postcode from JSON if the source input is in incorrect format" in {
     val generated = gen[Int]
-    val parsed = Json.parse(s"""$generated""").validate[Postcode]
+    val parsed    = Json.parse(s"""$generated""").validate[Postcode]
     parsed.isSuccess shouldEqual false
-    parsed shouldEqual JsError(JsPath -> JsonValidationError(Seq(s"""Expected a valid postcode, got $generated instead""")))
+    parsed           shouldEqual JsError(
+      JsPath -> JsonValidationError(Seq(s"""Expected a valid postcode, got $generated instead"""))
+    )
   }
 
   it should "serialize and de-serialise a PhoneNumber instance" in {
@@ -125,9 +124,8 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
     }
   }
 
-  it should "fail to validate a percentage from a non numeric value" in {
+  it             should "fail to validate a percentage from a non numeric value" in {
     forAll(Sample.generator[ShortString]) { sample =>
-
       val parsed = Json.parse(s""" "${sample.value}" """).validate[Percent]
 
       parsed shouldEqual JsError(
@@ -144,7 +142,7 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
 
         val parsed = js.validate[DB]
         parsed.isSuccess shouldEqual true
-        //parsed.asOpt.value should contain theSameElementsAs sample
+      // parsed.asOpt.value should contain theSameElementsAs sample
       }
     }
 
@@ -159,11 +157,11 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
     }
   }
 
-  it should "serialize and de-serialise a GroupCompany instance" in {
+  it             should "serialize and de-serialise a GroupCompany instance" in {
     testJsonRoundtrip[GroupCompany](genGroupCo)
   }
 
-  it should "serialize and de-serialise a Money instance" in {
+  it             should "serialize and de-serialise a Money instance" in {
     testJsonRoundtrip[Money]
   }
 
@@ -176,55 +174,53 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
 
   "Money format" should "return an error when the value is not a number" in {
     val jsonValue = Json.toJson("some value")
-    val parsed = jsonValue.validate[Money]
+    val parsed    = jsonValue.validate[Money]
     assert(parsed.isError)
   }
 
-  it should "serialize and de-serialise an Activity instance" in {
+  it             should "serialize and de-serialise an Activity instance" in {
     testJsonRoundtrip[Activity]
   }
 
-  it should "serialize and de-serialise a Company instance" in {
+  it             should "serialize and de-serialise a Company instance" in {
     testJsonRoundtrip[Company]
   }
 
-  it should "serialize and de-serialise a Map[GroupCompany, Money]" in {
+  it             should "serialize and de-serialise a Map[GroupCompany, Money]" in {
     testJsonRoundtrip[scala.collection.immutable.ListMap[GroupCompany, Money]](gencomap)
   }
 
-  it should "serialize and de-serialise a LocalDate" in {
+  it             should "serialize and de-serialise a LocalDate" in {
     testJsonRoundtrip[LocalDate]
   }
 
-  it should "serialize and de-serialise a CompanyRegWrapper" in {
+  it             should "serialize and de-serialise a CompanyRegWrapper" in {
     testJsonRoundtrip[CompanyRegWrapper]
   }
 
-  it should "serialize and de-serialise an optional LocalDate" in {
+  it             should "serialize and de-serialise an optional LocalDate" in {
     testJsonRoundtrip[Option[LocalDate]]
   }
 
-
-  it should "serialize and de-serialise a set of Enrolments" in {
+  it             should "serialize and de-serialise a set of Enrolments" in {
     testJsonRoundtrip[Set[Enrolment]]
   }
 
-  it should "serialize and de-serialise a Map[Activity, Percent]" in {
+  it             should "serialize and de-serialise a Map[Activity, Percent]" in {
     testJsonRoundtrip[Map[Activity, Percent]](genActivityPercentMap)
   }
 
-
-  it should "serialize and de-serialise a CompanyRegFormat" in {
+  it             should "serialize and de-serialise a CompanyRegFormat" in {
     testJsonRoundtrip[CompanyRegWrapper]
   }
 
-  it should "serialize an enum entry as a string" in {
+  it             should "serialize an enum entry as a string" in {
     val jsValue = Json.toJson(Activity.SocialMedia)
     jsValue shouldEqual JsString("SocialMedia")
   }
 
-  //scoverage doesn't recognise that it is tested? see line 199, 217
-  //using organisation or organisationName for the name of the company doesn't work ...
+  // scoverage doesn't recognise that it is tested? see line 199, 217
+  // using organisation or organisationName for the name of the company doesn't work ...
   "Company format" should "" in {
     val companyDetails =
       """{

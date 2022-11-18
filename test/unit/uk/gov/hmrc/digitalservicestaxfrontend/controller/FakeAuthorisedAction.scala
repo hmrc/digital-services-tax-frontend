@@ -26,8 +26,11 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeAuthorisedAction (mcc: MessagesControllerComponents, val authConnector: AuthConnector)(
-  implicit val appConfig: AppConfig, val executionContext: ExecutionContext, val messagesApi: MessagesApi) extends Auth {
+class FakeAuthorisedAction(mcc: MessagesControllerComponents, val authConnector: AuthConnector)(implicit
+  val appConfig: AppConfig,
+  val executionContext: ExecutionContext,
+  val messagesApi: MessagesApi
+) extends Auth {
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
     val enrolments = TestInstances.enrolmentsArbitrary.arbitrary.sample.get
