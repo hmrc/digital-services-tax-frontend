@@ -41,7 +41,7 @@ import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.mongo.MongoComponent
 import scala.concurrent.duration._
 
-class RegistrationController @Inject() (
+class RegistrationController @Inject()(
   authorisedAction: Auth,
   http: HttpClient,
   servicesConfig: ServicesConfig,
@@ -57,7 +57,8 @@ class RegistrationController @Inject() (
 ) extends ControllerHelpers
     with I18nSupport
     with AuthorisedFunctions
-    with FrontendHeaderCarrierProvider {
+    with FrontendHeaderCarrierProvider
+{
 
   import interpreter._
 
@@ -74,51 +75,50 @@ class RegistrationController @Inject() (
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 
   private implicit val cyaRegTell = new WebTell[Html, CYA[Registration]] {
-    override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Option[Html] =
-      Some(cyaReg(s"$key.reg", in.value)(messages))
-  }
-
-  private implicit val confirmRegTell = new WebTell[Html, Confirmation[Registration]] {
-    override def render(in: Confirmation[Registration], key: String, messages: UniformMessages[Html]): Option[Html] = {
-      val reg = in.value
-      Some(confirmationReg(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages))
+    override def render(in: CYA[Registration], key: List[String], pageIn: PageIn[Html]): Option[Html] = {
+      Some(cyaReg(s"${key.head}.reg", in.value)(pageIn.messages))
     }
   }
 
-  def registerAction(targetId: String): Action[AnyContent] = authorisedAction.async {
-    implicit request: AuthorisedRequest[AnyContent] =>
-      import journeys.RegJourney._
+  private implicit val confirmRegTell = new WebTell[Html, Confirmation[Registration]] {
 
-      implicit val msg: UniformMessages[Html] = messages(request)
+    override def render(in: Confirmation[Registration], key: List[String], pageIn: PageIn[Html]): Option[Html] = {
+      val reg = in.value
+      Some(confirmationReg(key.last, reg.companyReg.company.name: String, reg.contact.email: Email)(pageIn.messages))
+    }
+  }
 
-      backend.lookupRegistration().flatMap {
-        case None =>
-          interpret(registrationJourney(backend)).run(targetId) { ret =>
-            backend.submitRegistration(ret).map(_ => Redirect(routes.RegistrationController.registrationComplete))
-          }
+  def registerAction(targetId: String): Action[AnyContent] = authorisedAction.async { implicit request: AuthorisedRequest[AnyContent] =>
+    import journeys.RegJourney._
 
-        case Some(_) =>
-          Future.successful(Redirect(routes.JourneyController.index))
-      }
+    implicit val msg: UniformMessages[Html] = messages(request)
+
+    backend.lookupRegistration().flatMap {
+      case None =>
+        interpret(registrationJourney(backend)).run(targetId) { ret =>
+          backend.submitRegistration(ret).map { _ => Redirect(routes.RegistrationController.registrationComplete) }
+        }
+
+      case Some(_) =>
+        Future.successful(Redirect(routes.JourneyController.index))
+    }
   }
 
   def registrationComplete: Action[AnyContent] = authorisedAction.async { implicit request =>
     implicit val msg: UniformMessages[Html] = messages(request)
 
     backend.lookupRegistration().flatMap {
-      case None      =>
+      case None =>
         Future.successful(
           Redirect(routes.RegistrationController.registerAction(" "))
         )
       case Some(reg) =>
         Future.successful(
-          Ok(
-            layout(
-              pageTitle = Some(
-                s"${msg("registration-sent.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
-              )
-            )(confirmationReg("registration-sent", reg.companyReg.company.name, reg.contact.email)(msg))
-          )
+          Ok(layout(
+            pageTitle = Some(
+              s"${msg("registration-sent.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
+            )
+          )(confirmationReg("registration-sent", reg.companyReg.company.name, reg.contact.email)(msg)))
         )
     }
   }
