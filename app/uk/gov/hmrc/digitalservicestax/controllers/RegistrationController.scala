@@ -75,16 +75,14 @@ class RegistrationController @Inject()(
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 
   private implicit val cyaRegTell = new WebTell[Html, CYA[Registration]] {
-    override def render(in: CYA[Registration], key: List[String], pageIn: PageIn[Html]): Option[Html] = {
-      Some(cyaReg(s"${key.head}.reg", in.value)(pageIn.messages))
-    }
+    override def render(in: CYA[Registration], key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(cyaReg(s"$key.reg", in.value)(messages))
   }
 
   private implicit val confirmRegTell = new WebTell[Html, Confirmation[Registration]] {
-
-    override def render(in: Confirmation[Registration], key: List[String], pageIn: PageIn[Html]): Option[Html] = {
+    override def render(in: Confirmation[Registration], key: String, messages: UniformMessages[Html]): Option[Html] = {
       val reg = in.value
-      Some(confirmationReg(key.last, reg.companyReg.company.name: String, reg.contact.email: Email)(pageIn.messages))
+      Some(confirmationReg(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages))
     }
   }
 
