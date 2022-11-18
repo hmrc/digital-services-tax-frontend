@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.digitalservicestax.controllers
 
-import ltbs.uniform.common.web.{PageIn, WebTell}
+import ltbs.uniform._
+import ltbs.uniform.common.web.WebTell
 import play.twirl.api.Html
 import uk.gov.hmrc.digitalservicestax._
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
@@ -28,46 +29,38 @@ trait Widgets {
   implicit val appConfig: AppConfig
 
   implicit val addressTell = new WebTell[Html, Address] {
-    override def render(in: Address, key: List[String], pageIn: PageIn[Html]): Option[Html] =
-      Some(
-        Html(
-          s"<div id='${key.last}--sfer-content'>" +
-            s"<p>${in.lines.map(x => s"<span class='govuk-body-m'>${x.escapeHtml}</span>").mkString("<br/>")}</p>" +
-            "</div>"
-        )
-      )
+    override def render(in: Address, key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(Html(
+        s"<div id='$key--sfer-content'>" +
+        s"<p>${in.lines.map{x => s"<span class='govuk-body-m'>${x.escapeHtml}</span>"}.mkString("<br/>")}</p>" +
+        "</div>"
+      ))
   }
 
   implicit val kickoutTell = new WebTell[Html, Kickout] {
-    override def render(in: Kickout, key: List[String], pageIn: PageIn[Html]): Option[Html] =
-      Some(views.html.end.kickout(key.last)(pageIn.messages, appConfig))
+    override def render(in: Kickout, key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(views.html.end.kickout(key)(messages, appConfig))
   }
 
   implicit val groupCoTell = new WebTell[Html, GroupCompany] {
-    override def render(in: GroupCompany, key: List[String], pageIn: PageIn[Html]): Option[Html] = None /// ????
+    override def render(in: GroupCompany, key: String, messages: UniformMessages[Html]): Option[Html] =
+      None /// ????
   }
 
   implicit val companyTell = new WebTell[Html, Company] {
-
-    override def render(in: Company, key: List[String], pageIn: PageIn[Html]): Option[Html] =
-      Some(
-        Html(
-          s"<p class='govuk-body-l' id='${key.last}--sfer-content'>" +
-            s"${in.name.escapeHtml}<br>" +
-            s"<span class='govuk-body-m'>" +
-            s"${in.address.lines
-                .map {
-                  _.escapeHtml
-                }
-                .mkString("<br>")}" +
-            s"</span>" +
-            "</p>"
-        )
-      )
+    override def render(in: Company, key: String, messages: UniformMessages[Html]): Option[Html] =
+      Some(Html(
+        s"<p class='govuk-body-l' id='$key--sfer-content'>" +
+          s"${in.name.escapeHtml}<br>" +
+          s"<span class='govuk-body-m'>" +
+          s"${in.address.lines.map{_.escapeHtml}.mkString("<br>")}" +
+          s"</span>" +
+          "</p>"
+      ))
   }
 
   implicit val booleanTell = new WebTell[Html, Boolean] {
-    override def render(in: Boolean, key: List[String], pageIn: PageIn[Html]): Option[Html] =
+    override def render(in: Boolean, key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(Html(in.toString))
   }
 
