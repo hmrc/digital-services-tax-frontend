@@ -30,15 +30,15 @@ trait ValidatedType[BaseType] {
   def validateAndTransform(in: BaseType): Option[BaseType]
 
   def apply(in: BaseType): BaseType @@ Tag =
-    of(in).getOrElse{
+    of(in).getOrElse {
       throw new IllegalArgumentException(
         s""""$in" is not a valid ${className.init}"""
       )
     }
 
   def of(in: BaseType): Option[BaseType @@ Tag] =
-    validateAndTransform(in) map {
-      x => tag[Tag][BaseType](x)
+    validateAndTransform(in) map { x =>
+      tag[Tag][BaseType](x)
     }
 }
 
@@ -52,6 +52,3 @@ class RegexValidatedString(
   def validateAndTransform(in: String): Option[String] =
     transform(in).some.filter(regexCompiled.findFirstIn(_).isDefined)
 }
-
-
-

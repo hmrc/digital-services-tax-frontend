@@ -29,14 +29,15 @@ import uk.gov.hmrc.mongo.cache.{CacheIdType, EntityCache, MongoCacheRepository}
 import uk.gov.hmrc.mongo.{CurrentTimestampSupport, MongoComponent}
 
 @Singleton
-class ReturnsRepoMongoImplementation @Inject()(
+class ReturnsRepoMongoImplementation @Inject() (
   mongoComponent: MongoComponent,
   config: AppConfig
-)(
-  implicit ec: ExecutionContext
-) extends EntityCache[Request[Any],Return] with ReturnsRepo {
+)(implicit
+  ec: ExecutionContext
+) extends EntityCache[Request[Any], Return]
+    with ReturnsRepo {
 
-  lazy val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository (
+  lazy val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository(
     mongoComponent = mongoComponent,
     collectionName = "return",
     ttl = config.mongoShortLivedStoreExpireAfter,
@@ -45,10 +46,10 @@ class ReturnsRepoMongoImplementation @Inject()(
   )
 
   lazy val format: Format[Return] = returnFormat
-   
-  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean)(implicit request: Request[Any]): Future[Unit] = putCache(request)(ret)
-  def retrieveCachedReturn(implicit request: Request[Any]): Future[Option[Return]] =
+
+  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean)(implicit request: Request[Any]): Future[Unit] =
+    putCache(request)(ret)
+  def retrieveCachedReturn(implicit request: Request[Any]): Future[Option[Return]]                              =
     getFromCache(request)
 
 }
-

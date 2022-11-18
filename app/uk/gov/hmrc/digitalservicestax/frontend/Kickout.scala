@@ -16,4 +16,4 @@
 
 package uk.gov.hmrc.digitalservicestax.frontend
 
-case class Kickout( name: String )
+case class Kickout(name: String)

@@ -27,69 +27,77 @@ import scala.concurrent.Future
 
 class AuthenticationControllerSpec extends FakeApplicationServer {
   val authenticationController = new AuthenticationController(
-	  mcc,
-	  app.injector.instanceOf[TimeOut]
+    mcc,
+    app.injector.instanceOf[TimeOut]
   )(appConfig)
 
   "AuthenticationController.signIn" must {
-	  "redirect to the gg login page" in {
-		  val result = authenticationController.signIn().apply(
-			  FakeRequest().withSession().withHeaders(
-					  "continue" -> appConfig.dstIndexPage,
-				  "origin" -> appConfig.appName
-			  )
-		  )
+    "redirect to the gg login page" in {
+      val result = authenticationController
+        .signIn()
+        .apply(
+          FakeRequest()
+            .withSession()
+            .withHeaders(
+              "continue" -> appConfig.dstIndexPage,
+              "origin"   -> appConfig.appName
+            )
+        )
 
-		  status(result) mustBe 303
-		  redirectLocation(result) mustBe
-			  redirectLocation(
-				  Future.successful(
-					  Redirect(
-						  url = appConfig.ggLoginUrl,
-						  queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName))
-					  )
-				  )
-			  )
-	  }
+      status(result) mustBe 303
+      redirectLocation(result) mustBe
+        redirectLocation(
+          Future.successful(
+            Redirect(
+              url = appConfig.ggLoginUrl,
+              queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName))
+            )
+          )
+        )
+    }
   }
 
-	"AuthenticationController.signOut" must {
-		"sign the user out of the service" in {
-			val result = authenticationController.signOut().apply(FakeRequest().withSession())
+  "AuthenticationController.signOut" must {
+    "sign the user out of the service" in {
+      val result = authenticationController.signOut().apply(FakeRequest().withSession())
 
-			status(result) mustBe 303
-			redirectLocation(result) mustBe Some(appConfig.signOutDstUrl)
-		}
-	}
+      status(result) mustBe 303
+      redirectLocation(result) mustBe Some(appConfig.signOutDstUrl)
+    }
+  }
 
-	"AuthenticationController.timeIn" must {
-		"sign the user back into the service after time out event" in {
-			val referrer = "test-referrer"
-			val result = authenticationController.timeIn(referrer).apply(
-				FakeRequest().withSession().withHeaders(
-					"continue" -> referrer,
-					"origin" -> appConfig.appName
-				)
-			)
+  "AuthenticationController.timeIn" must {
+    "sign the user back into the service after time out event" in {
+      val referrer = "test-referrer"
+      val result   = authenticationController
+        .timeIn(referrer)
+        .apply(
+          FakeRequest()
+            .withSession()
+            .withHeaders(
+              "continue" -> referrer,
+              "origin"   -> appConfig.appName
+            )
+        )
 
-			status(result) mustBe 303
-			redirectLocation(result) mustBe redirectLocation(
-				Future.successful(
-					Redirect(
-						appConfig.ggLoginUrl,
-						Map("continue" -> Seq(referrer), "origin" -> Seq(appConfig.appName))
-					)
-				)
-			)
-		}
-	}
+      status(result) mustBe 303
+      redirectLocation(result) mustBe redirectLocation(
+        Future.successful(
+          Redirect(
+            appConfig.ggLoginUrl,
+            Map("continue" -> Seq(referrer), "origin" -> Seq(appConfig.appName))
+          )
+        )
+      )
+    }
+  }
 
-	"AuthenticationController.timeOut" must {
-		"sign the user out of the service " in {
-			val result = authenticationController.timeOut.apply(FakeRequest().withSession())
+  "AuthenticationController.timeOut" must {
+    "sign the user out of the service " in {
+      val result = authenticationController.timeOut.apply(FakeRequest().withSession())
 
-			status(result) mustBe 200
-			contentAsString(result) must include(messagesApi("time-out.title"))
-		}
-	}
+      status(result) mustBe 200
+      contentAsString(result) must include(messagesApi("time-out.title"))
+    }
+  }
 }

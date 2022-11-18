@@ -26,7 +26,7 @@ package object controllers {
   implicit class OrderedYesNo(val l: List[String]) extends AnyVal {
     def orderYesNoRadio: List[String] = l match {
       case "None" :: "Some" :: _ if l.length == 2 => l.reverse
-      case _ => l
+      case _                                      => l
     }
   }
 

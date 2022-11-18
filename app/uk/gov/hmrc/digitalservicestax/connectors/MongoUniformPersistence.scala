@@ -18,25 +18,26 @@ package uk.gov.hmrc.digitalservicestax.connectors
 
 import ltbs.uniform.interpreters.playframework.{DB, PersistenceEngine}
 import play.api.libs.json._
-import play.api.mvc.{Request, AnyContent, Result}
+import play.api.mvc.{AnyContent, Request, Result}
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.mongo.cache.{CacheIdType, EntityCache, MongoCacheRepository}
 import uk.gov.hmrc.mongo.{CurrentTimestampSupport, MongoComponent}
 
 object MongoUniformPersistence {
 
   val formatMap: OFormat[DB] = new OFormat[DB] {
-    def writes(o: DB) = JsObject ( o.map {
-      case (k,v) => (k.mkString("/"), JsString(v))
-    }.toSeq )
+    def writes(o: DB) = JsObject(o.map { case (k, v) =>
+      (k.mkString("/"), JsString(v))
+    }.toSeq)
 
     def reads(json: JsValue): JsResult[DB] = json match {
-      case JsObject(data) => JsSuccess(data.map {
-        case (k, JsString(v)) => (k.split("/").toList, v)
-        case e => throw new IllegalArgumentException(s"cannot parse $e")
-      }.toMap)
-      case e => JsError(s"expected an object, got $e")
+      case JsObject(data) =>
+        JsSuccess(data.map {
+          case (k, JsString(v)) => (k.split("/").toList, v)
+          case e                => throw new IllegalArgumentException(s"cannot parse $e")
+        }.toMap)
+      case e              => JsError(s"expected an object, got $e")
     }
   }
 
@@ -46,9 +47,11 @@ class MongoUniformPersistence[A <: Request[AnyContent]](
   collectionName: String,
   mongoComponent: MongoComponent,
   ttl: Duration
-)(implicit ec: ExecutionContext) extends EntityCache[Request[Any], DB] with PersistenceEngine[A] {
+)(implicit ec: ExecutionContext)
+    extends EntityCache[Request[Any], DB]
+    with PersistenceEngine[A] {
 
-  lazy val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository (
+  lazy val cacheRepo: MongoCacheRepository[Request[Any]] = new MongoCacheRepository(
     mongoComponent = mongoComponent,
     collectionName = collectionName,
     ttl = ttl,
@@ -62,5 +65,5 @@ class MongoUniformPersistence[A <: Request[AnyContent]](
     getFromCache(request)
       .map(_.getOrElse(DB.empty))
       .flatMap(f)
-      .flatMap{ case (newDb, result) => putCache(request)(newDb).map(_ => result)}
+      .flatMap { case (newDb, result) => putCache(request)(newDb).map(_ => result) }
 }

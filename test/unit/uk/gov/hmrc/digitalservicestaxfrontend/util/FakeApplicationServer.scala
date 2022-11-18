@@ -48,7 +48,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 trait FakeApplicationServer
-  extends PlaySpec
+    extends PlaySpec
     with BaseOneAppPerSuite
     with FakeApplicationFactory
     with TryValues
@@ -57,43 +57,45 @@ trait FakeApplicationServer
 
   val appName: String = configuration.get[String]("appName")
 
-  implicit lazy val actorSystem: ActorSystem = app.actorSystem
+  implicit lazy val actorSystem: ActorSystem   = app.actorSystem
   implicit val defaultPatience: PatienceConfig = PatienceConfig(timeout = 5.seconds, interval = 100.millis)
-  implicit val clock: Clock = Clock.systemDefaultZone()
-  implicit val lang: Lang = Lang("en")
+  implicit val clock: Clock                    = Clock.systemDefaultZone()
+  implicit val lang: Lang                      = Lang("en")
 
-  lazy val environment: Environment = Environment.simple(new File("."))
-  lazy val configuration: Configuration = Configuration.load(environment, Map(
-    "auditing.enabled" -> "false",
-    "services.auth.port" -> "11111"
-  ))
+  lazy val environment: Environment     = Environment.simple(new File("."))
+  lazy val configuration: Configuration = Configuration.load(
+    environment,
+    Map(
+      "auditing.enabled"   -> "false",
+      "services.auth.port" -> "11111"
+    )
+  )
 
-  lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-  lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
-  lazy val httpAuditing: HttpAuditing = app.injector.instanceOf[HttpAuditing]
-  lazy val httpClient: HttpClient = new DefaultHttpClient(configuration, httpAuditing, wsClient, actorSystem)
-  lazy val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
-  lazy val authConnector: PlayAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig)
-  lazy val layoutInstance: Layout = app.injector.instanceOf[Layout]
-  lazy val landingInstance: Landing = app.injector.instanceOf[Landing]
+  lazy val messagesApi: MessagesApi                         = app.injector.instanceOf[MessagesApi]
+  lazy val wsClient: WSClient                               = app.injector.instanceOf[WSClient]
+  lazy val httpAuditing: HttpAuditing                       = app.injector.instanceOf[HttpAuditing]
+  lazy val httpClient: HttpClient                           = new DefaultHttpClient(configuration, httpAuditing, wsClient, actorSystem)
+  lazy val authorisedAction: AuthorisedAction               = app.injector.instanceOf[AuthorisedAction]
+  lazy val authConnector: PlayAuthConnector                 = new DefaultAuthConnector(httpClient, servicesConfig)
+  lazy val layoutInstance: Layout                           = app.injector.instanceOf[Layout]
+  lazy val landingInstance: Landing                         = app.injector.instanceOf[Landing]
   lazy val checkYourAnswersRegInstance: CheckYourAnswersReg = app.injector.instanceOf[CheckYourAnswersReg]
   lazy val checkYourAnswersRetInstance: CheckYourAnswersRet = app.injector.instanceOf[CheckYourAnswersRet]
-  lazy val confirmationRegInstance: ConfirmationReg = app.injector.instanceOf[ConfirmationReg]
-  lazy val confirmationRetInstance: ConfirmationReturn = app.injector.instanceOf[ConfirmationReturn]
-  lazy val payYourDst: PayYourDst = app.injector.instanceOf[PayYourDst]
-  lazy val interpreter: DSTInterpreter = app.injector.instanceOf[DSTInterpreter]
+  lazy val confirmationRegInstance: ConfirmationReg         = app.injector.instanceOf[ConfirmationReg]
+  lazy val confirmationRetInstance: ConfirmationReturn      = app.injector.instanceOf[ConfirmationReturn]
+  lazy val payYourDst: PayYourDst                           = app.injector.instanceOf[PayYourDst]
+  lazy val interpreter: DSTInterpreter                      = app.injector.instanceOf[DSTInterpreter]
 
-  lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  val servicesConfig: ServicesConfig = app.injector.instanceOf[ServicesConfig]
+  lazy val appConfig: AppConfig           = app.injector.instanceOf[AppConfig]
+  val servicesConfig: ServicesConfig      = app.injector.instanceOf[ServicesConfig]
   lazy val mockDSTConnector: DSTConnector = mock[DSTConnector]
 
   val testConnector: TestConnector = new TestConnector(httpClient, servicesConfig)
 
-  override def fakeApplication(): Application = {
+  override def fakeApplication(): Application =
     GuiceApplicationBuilder(environment = environment)
       .configure(Map("tax-enrolments.enabled" -> "true"))
       .build()
-  }
 
   lazy val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 

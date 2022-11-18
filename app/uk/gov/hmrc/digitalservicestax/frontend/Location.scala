@@ -30,10 +30,14 @@ object Location {
     implicit val LocationReads: Reads[Location] = Json.reads[Location]
   }
 
-  val locationsJson: JsValue = Json.parse(fromInputStream(getClass.getResourceAsStream("/public/location-autocomplete-canonical-list.json"))
-    .getLines().mkString)
+  val locationsJson: JsValue = Json.parse(
+    fromInputStream(getClass.getResourceAsStream("/public/location-autocomplete-canonical-list.json"))
+      .getLines()
+      .mkString
+  )
 
-  val locations: List[Location] = locationsJson.as[List[Location]].filter(l => l.code.matches(alphaTwoCodeRegex.toString()))
+  val locations: List[Location] =
+    locationsJson.as[List[Location]].filter(l => l.code.matches(alphaTwoCodeRegex.toString()))
 
   def name(code: String): String = locations.find(x => x.code == code).map(_.name).getOrElse("unknown")
 }

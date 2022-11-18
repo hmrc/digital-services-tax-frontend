@@ -23,9 +23,11 @@ import scala.concurrent.Future
 
 object VolatileReturnsRepoImpl extends ReturnsRepo {
 
-  private var state: Map[Request[Any],Return] = Map.empty[Request[Any], Return]
+  private var state: Map[Request[Any], Return] = Map.empty[Request[Any], Return]
 
-  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit request: Request[Any]): Future[Unit] = {
+  def cacheReturn(ret: Return, purgeStateUponCompletion: Boolean = false)(implicit
+    request: Request[Any]
+  ): Future[Unit] = {
     state = state + (request -> ret)
     Future.successful(())
   }

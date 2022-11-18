@@ -27,7 +27,7 @@ class LocationSpec extends AnyFlatSpec with Matchers {
   "Location" should "filter out Alpha-3 codes. Accepting only Alpha-2 codes" in {
     val locations: immutable.Seq[Location.Location] = Location.locations
     locations.length shouldBe 275
-    locations shouldNot contain(Location.Location("Akrotiri", "XQZ", "territory"))
+    locations       shouldNot contain(Location.Location("Akrotiri", "XQZ", "territory"))
   }
 
   "Location" should "return a corresponding name to a country code" in {

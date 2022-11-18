@@ -41,7 +41,9 @@ trait DSTService[F[_]] {
   def transform[G[_]](nat: F ~> G): DSTService[G] = {
     val old = this
     new DSTService[G] {
-      def lookupCompany(utr: UTR, postcode: Postcode): G[Option[CompanyRegWrapper]] = nat(old.lookupCompany(utr, postcode))
+      def lookupCompany(utr: UTR, postcode: Postcode): G[Option[CompanyRegWrapper]] = nat(
+        old.lookupCompany(utr, postcode)
+      )
 
       def lookupCompany(): G[Option[CompanyRegWrapper]] = nat(old.lookupCompany())
 

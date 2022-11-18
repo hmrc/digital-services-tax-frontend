@@ -23,10 +23,9 @@ import uk.gov.hmrc.digitalservicestax.data.{AccountName, AccountNumber, Activity
 import java.time.LocalDate
 import scala.collection.immutable.ListMap
 
-
 object TestSampleData {
 
-  val sampleAddress = UkAddress (
+  val sampleAddress = UkAddress(
     AddressLine("12 The Street"),
     AddressLine("False Crescent").some,
     AddressLine("Genericford").some,
@@ -43,12 +42,12 @@ object TestSampleData {
   )
 
   val sampleCompanyName = CompanyName("TestCo Ltd")
-  val sampleCompany = Company (
+  val sampleCompany     = Company(
     sampleCompanyName,
     sampleAddress
   )
 
-  val utrLookupCompanyName = "UTR Lookup Ltd"
+  val utrLookupCompanyName       = "UTR Lookup Ltd"
   val utrLookupCompanyRegWrapper =
     CompanyRegWrapper(sampleCompany.copy(name = CompanyName(utrLookupCompanyName)))
 
@@ -63,7 +62,7 @@ object TestSampleData {
     Email("john.smith@mailprovider.co.uk")
   )
 
-  val sampleReg = Registration (
+  val sampleReg = Registration(
     sampleCompanyRegWrapper,
     None,
     None,
@@ -72,7 +71,7 @@ object TestSampleData {
     LocalDate.of(2021, 4, 5)
   )
 
-  val sampleRegWithParent = Registration (
+  val sampleRegWithParent = Registration(
     sampleCompanyRegWrapper,
     None,
     sampleCompany.some,
@@ -81,19 +80,19 @@ object TestSampleData {
     LocalDate.of(2021, 4, 5)
   )
 
-  val sampleMoney: Money = Money(BigDecimal(100.00).setScale(2))
-  val sampleActivitySet: Set[Activity] = Set(SocialMedia, SearchEngine, OnlineMarketplace)
-  val sampleForeignBankAccount: ForeignBankAccount = ForeignBankAccount(IBAN("GB82 WEST 1234 5698 7654 32"))
+  val sampleMoney: Money                             = Money(BigDecimal(100.00).setScale(2))
+  val sampleActivitySet: Set[Activity]               = Set(SocialMedia, SearchEngine, OnlineMarketplace)
+  val sampleForeignBankAccount: ForeignBankAccount   = ForeignBankAccount(IBAN("GB82 WEST 1234 5698 7654 32"))
   val sampleDomesticBankAccount: DomesticBankAccount = DomesticBankAccount(
     SortCode("11-22-33"),
     AccountNumber("88888888"),
     Some(BuildingSocietyRollNumber("ABC - 123"))
   )
-  val sampleRepaymentDetails: RepaymentDetails = RepaymentDetails(
+  val sampleRepaymentDetails: RepaymentDetails       = RepaymentDetails(
     AccountName("DigitalService"),
     sampleDomesticBankAccount
   )
-  val samplePercent: Percent = Percent(50)
+  val samplePercent: Percent                         = Percent(50)
 
   val sampleGroupCompany: GroupCompany = GroupCompany(
     sampleCompanyName,

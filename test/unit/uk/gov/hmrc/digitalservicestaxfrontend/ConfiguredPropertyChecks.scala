@@ -21,4 +21,3 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 trait ConfiguredPropertyChecks extends ScalaCheckDrivenPropertyChecks {
   implicit val numberSuccessfulTests: PropertyCheckConfiguration = PropertyCheckConfiguration(10)
 }
-

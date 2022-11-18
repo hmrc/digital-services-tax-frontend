@@ -25,13 +25,14 @@ import play.twirl.api.Html
 
 object AdaptMessages {
 
-  implicit def ufMessagesToPlayMessages(implicit ufMessages: UniformMessages[Html], request: RequestHeader): Messages = new Messages {
-    def lang: Lang = new Lang(Locale.ENGLISH)
-    def apply(key: String, args: Any*): String = ufMessages.apply(key, args:_*).toString
-    def apply(keys: Seq[String], args: Any*): String = ufMessages.apply(keys.toList, args:_*).toString
-    def translate(key: String, args: Seq[Any]): Option[String] = ufMessages.get(key, args:_*).map{_.toString}
-    def isDefinedAt(key: String): Boolean = ufMessages.get(key).isDefined
-    def asJava: play.i18n.Messages = ???
-  }
+  implicit def ufMessagesToPlayMessages(implicit ufMessages: UniformMessages[Html], request: RequestHeader): Messages =
+    new Messages {
+      def lang: Lang                                             = new Lang(Locale.ENGLISH)
+      def apply(key: String, args: Any*): String                 = ufMessages.apply(key, args: _*).toString
+      def apply(keys: Seq[String], args: Any*): String           = ufMessages.apply(keys.toList, args: _*).toString
+      def translate(key: String, args: Seq[Any]): Option[String] = ufMessages.get(key, args: _*).map(_.toString)
+      def isDefinedAt(key: String): Boolean                      = ufMessages.get(key).isDefined
+      def asJava: play.i18n.Messages                             = ???
+    }
 
 }

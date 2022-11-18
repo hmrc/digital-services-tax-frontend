@@ -35,7 +35,7 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
   import TestInstances._
   "DSTInterpreter codec " must {
     "have round trip parity " in {
-      forAll {(ld: LocalDate, fa: ForeignAddress, uka: UkAddress, a: Activity, s: String, b: Boolean) =>
+      forAll { (ld: LocalDate, fa: ForeignAddress, uka: UkAddress, a: Activity, s: String, b: Boolean) =>
         testCodecRoundtrip(ld, interpreter.twirlDateField)
         testCodecRoundtrip(fa, interpreter.twirlForeignAddressField)
         testCodecRoundtrip(uka, interpreter.twirlUKAddressField)
@@ -43,7 +43,7 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
         testCodecRoundtrip(s, interpreter.twirlStringFields())
         testCodecRoundtrip(b, interpreter.twirlBoolField)
       }
-      forAll {(cc: CountryCode, as: Set[Activity], u: Unit, i: Int, oUtr: Option[UTR], an: AccountName) =>
+      forAll { (cc: CountryCode, as: Set[Activity], u: Unit, i: Int, oUtr: Option[UTR], an: AccountName) =>
         testCodecRoundtrip(cc, interpreter.twirlCountryCodeField)
         testCodecRoundtrip(u, interpreter.askUnit)
         testCodecRoundtrip[Set[Activity]](as, interpreter.enumeratumSetField)
@@ -52,13 +52,21 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
         testCodecRoundtrip(an, interpreter.accountNameField)
 
       }
-      forAll { (anf: AccountNumber, bd: BigDecimal, bsri: Option[BuildingSocietyRollNumber], iban: IBAN, sc: SortCode, m: Money) =>
-        testCodecRoundtrip(anf, interpreter.accountNumberField)
-        testCodecRoundtrip(bd, interpreter.bigdecimalField)
-        testCodecRoundtrip(bsri, interpreter.BuildingSocietyRollNumberField)
-        testCodecRoundtrip(iban, interpreter.ibanField)
-        testCodecRoundtrip(sc, interpreter.sortCodeField)
-        testCodecRoundtrip(m, interpreter.moneyField)
+      forAll {
+        (
+          anf: AccountNumber,
+          bd: BigDecimal,
+          bsri: Option[BuildingSocietyRollNumber],
+          iban: IBAN,
+          sc: SortCode,
+          m: Money
+        ) =>
+          testCodecRoundtrip(anf, interpreter.accountNumberField)
+          testCodecRoundtrip(bd, interpreter.bigdecimalField)
+          testCodecRoundtrip(bsri, interpreter.BuildingSocietyRollNumberField)
+          testCodecRoundtrip(iban, interpreter.ibanField)
+          testCodecRoundtrip(sc, interpreter.sortCodeField)
+          testCodecRoundtrip(m, interpreter.moneyField)
       }
       forAll { (p: Percent, f: Float, l: Long, nes: NonEmptyString) =>
         testCodecRoundtrip(p, interpreter.percentField)
@@ -83,19 +91,31 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
       }
       forAll { (cc: CountryCode, as: Set[Activity], u: Unit, i: Int, oUtr: Option[UTR], an: AccountName) =>
         testRender(cc, interpreter.twirlCountryCodeField)
-        testRender[Set[Activity]](as, interpreter.enumeratumSetField, html => contentAsString(html) must include("""type="checkbox""""))
+        testRender[Set[Activity]](
+          as,
+          interpreter.enumeratumSetField,
+          html => contentAsString(html) must include("""type="checkbox"""")
+        )
         testRender(u, interpreter.askUnit)
         testRender(i, interpreter.intField)
         testRender(oUtr, interpreter.optUtrField)
         testRender(an, interpreter.accountNameField)
       }
-      forAll { (anf: AccountNumber, bd: BigDecimal, bsri: Option[BuildingSocietyRollNumber], iban: IBAN, sc: SortCode, m: Money) =>
-        testRender(anf, interpreter.accountNumberField)
-        testRender(bd, interpreter.bigdecimalField)
-        testRender(bsri, interpreter.BuildingSocietyRollNumberField)
-        testRender(iban, interpreter.ibanField)
-        testRender(sc, interpreter.sortCodeField)
-        testRender(m, interpreter.moneyField)
+      forAll {
+        (
+          anf: AccountNumber,
+          bd: BigDecimal,
+          bsri: Option[BuildingSocietyRollNumber],
+          iban: IBAN,
+          sc: SortCode,
+          m: Money
+        ) =>
+          testRender(anf, interpreter.accountNumberField)
+          testRender(bd, interpreter.bigdecimalField)
+          testRender(bsri, interpreter.BuildingSocietyRollNumberField)
+          testRender(iban, interpreter.ibanField)
+          testRender(sc, interpreter.sortCodeField)
+          testRender(m, interpreter.moneyField)
       }
       forAll { (p: Percent, f: Float, l: Long, nes: NonEmptyString) =>
         testRender(p, interpreter.percentField)
@@ -108,15 +128,23 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
 
   "DSTInterpreter codecs" must {
     "handle invalid input" in {
-        testErrors(interpreter.twirlBoolField)
-        testErrors[Activity](interpreter.enumeratumField)
-        testErrors[Set[Activity]](interpreter.enumeratumSetField)
-        testErrors(interpreter.twirlDateField, "day-and-month-and-year.empty")
-        testErrors(interpreter.twirlDateField, "not-a-date", Map(List("year") -> List("2017"), List("month") -> List("2"), List("day") -> List("30")))
-        testErrors(interpreter.nesField,"invalid", Map(Nil -> List("")))
-        testErrors(interpreter.BuildingSocietyRollNumberField, "length.exceeded", Map(Nil -> List("asdfasdfasdfasdfasdf")))
-        testErrors(interpreter.BuildingSocietyRollNumberField, "invalid", Map(Nil -> List("!!!")))
-        testErrors(interpreter.bigdecimalField, "not-a-number")
+      testErrors(interpreter.twirlBoolField)
+      testErrors[Activity](interpreter.enumeratumField)
+      testErrors[Set[Activity]](interpreter.enumeratumSetField)
+      testErrors(interpreter.twirlDateField, "day-and-month-and-year.empty")
+      testErrors(
+        interpreter.twirlDateField,
+        "not-a-date",
+        Map(List("year") -> List("2017"), List("month") -> List("2"), List("day") -> List("30"))
+      )
+      testErrors(interpreter.nesField, "invalid", Map(Nil -> List("")))
+      testErrors(
+        interpreter.BuildingSocietyRollNumberField,
+        "length.exceeded",
+        Map(Nil -> List("asdfasdfasdfasdfasdf"))
+      )
+      testErrors(interpreter.BuildingSocietyRollNumberField, "invalid", Map(Nil -> List("!!!")))
+      testErrors(interpreter.bigdecimalField, "not-a-number")
     }
   }
 
@@ -160,11 +188,11 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
   }
 
   def testErrors[A](
-        ask: WebAsk[Html, A],
-        expectedErrMsg: String = "invalid",
-        badInput: Input = Map(Nil -> List("bar")),
+    ask: WebAsk[Html, A],
+    expectedErrMsg: String = "invalid",
+    badInput: Input = Map(Nil -> List("bar"))
   ): Assertion = {
-    val Left(foo) = ask.decode(badInput)
+    val Left(foo)            = ask.decode(badInput)
     val NonEmptyList(err, _) = foo.values.toList.head
     err.msg mustBe expectedErrMsg
   }
@@ -173,7 +201,7 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
     tell: WebTell[Html, A],
     in: A,
     key: String = "foo",
-    extraAssertion: Html =>  Assertion = _ => 1 mustBe 1,
+    extraAssertion: Html => Assertion = _ => 1 mustBe 1,
     msg: UniformMessages[Html] = UniformMessages.echo.map(Html.apply)
   ): Assertion = {
     val foo = tell.render(in, key, msg)
@@ -184,7 +212,7 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
   def testRender[A](
     raw: A,
     ask: WebAsk[Html, A],
-    extraAssertion: Html =>  Assertion = _ => 1 mustBe 1,
+    extraAssertion: Html => Assertion = _ => 1 mustBe 1,
     pageKey: List[String] = Nil
   ): Assertion = {
     val foo = ask.render(

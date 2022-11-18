@@ -18,7 +18,7 @@ package uk.gov.hmrc.digitalservicestax.data
 
 import scala.collection.immutable.ListMap
 
-final case class Return (
+final case class Return(
   reportedActivities: Set[Activity],
   alternateCharge: Map[Activity, Percent],
   crossBorderReliefAmount: Money,

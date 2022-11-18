@@ -55,6 +55,16 @@ This will start all the required services
 
     sbt test
 
+## Running scalafmt
+
+To apply scalafmt formatting using the rules configured in the .scalafmt.conf, run:
+
+`sbt scalafmtAll`
+
+To check the files have been formatted correctly, run:
+
+`sbt scalafmtCheckAll`
+
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")

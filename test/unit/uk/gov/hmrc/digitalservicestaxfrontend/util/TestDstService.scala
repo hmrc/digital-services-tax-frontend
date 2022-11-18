@@ -25,13 +25,13 @@ import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.http.HttpResponse
 
 trait TestDstService extends DSTService[Id] {
-  def lookupCompany(): Option[CompanyRegWrapper] = sampleCompanyRegWrapper.some
+  def lookupCompany(): Option[CompanyRegWrapper]                             = sampleCompanyRegWrapper.some
   def lookupCompany(utr: UTR, postcode: Postcode): Option[CompanyRegWrapper] = utrLookupCompanyRegWrapper.some
-  def submitRegistration(reg: Registration): HttpResponse = HttpResponse(200, "")
-  def submitReturn(period: Period, ret: Return): HttpResponse = HttpResponse(200, "")
-  def lookupRegistration(): Option[Registration] = sampleReg.some
-  def lookupOutstandingReturns(): Set[Period] = Set.empty
-  def lookupAmendableReturns(): Set[Period] = Set.empty
-  def lookupAllReturns(): Set[Period] = Set.empty
-  def get: DSTService[Logic] = this.transform(ToLogic)
+  def submitRegistration(reg: Registration): HttpResponse                    = HttpResponse(200, "")
+  def submitReturn(period: Period, ret: Return): HttpResponse                = HttpResponse(200, "")
+  def lookupRegistration(): Option[Registration]                             = sampleReg.some
+  def lookupOutstandingReturns(): Set[Period]                                = Set.empty
+  def lookupAmendableReturns(): Set[Period]                                  = Set.empty
+  def lookupAllReturns(): Set[Period]                                        = Set.empty
+  def get: DSTService[Logic]                                                 = this.transform(ToLogic)
 }

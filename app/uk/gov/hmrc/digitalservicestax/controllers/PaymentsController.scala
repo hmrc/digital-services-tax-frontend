@@ -39,47 +39,48 @@ import uk.gov.hmrc.http.HttpClient
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PaymentsController @Inject()(
+class PaymentsController @Inject() (
   authorisedAction: Auth,
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
   layout: Layout,
   payYourDst: PayYourDst
-)(
-  implicit ec: ExecutionContext,
+)(implicit
+  ec: ExecutionContext,
   val messagesApi: MessagesApi,
   val appConfig: AppConfig
 ) extends ControllerHelpers
-  with FrontendHeaderCarrierProvider
-  with I18nSupport
-  with AuthorisedFunctions {
+    with FrontendHeaderCarrierProvider
+    with I18nSupport
+    with AuthorisedFunctions {
 
   def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   def payYourDST: Action[AnyContent] = authorisedAction.async { implicit request =>
-
     implicit val msg: UniformMessages[Html] =
       implicitly[Messages].convertMessagesTwirlHtml(false)
 
     backend.lookupRegistration().flatMap {
-      case None =>
+      case None                                          =>
         Future.successful(
           Redirect(routes.RegistrationController.registerAction(" "))
         )
       case Some(reg) if reg.registrationNumber.isDefined =>
         backend.lookupOutstandingReturns().map { periods =>
-          Ok(layout(
-            pageTitle =
-              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
-          )(payYourDst(reg.registrationNumber, periods.toList.sortBy(_.start))(msg)))
+          Ok(
+            layout(
+              pageTitle = Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+            )(payYourDst(reg.registrationNumber, periods.toList.sortBy(_.start))(msg))
+          )
         }
-      case Some(_) =>
+      case Some(_)                                       =>
         Future.successful(
-          Ok(layout(
-            pageTitle =
-              Some(s"${msg("common.title.short")} - ${msg("common.title")}")
-          )(views.html.end.pending()(msg)))
+          Ok(
+            layout(
+              pageTitle = Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+            )(views.html.end.pending()(msg))
+          )
         )
     }
   }

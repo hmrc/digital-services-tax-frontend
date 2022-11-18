@@ -32,55 +32,61 @@ import scala.concurrent.Future
 
 class PaymentsControllerSpec extends FakeApplicationServer {
 
-	val paymentsController: PaymentsController = new PaymentsController(
-		fakeAuthorisedAction,
-		httpClient,
-		authConnector,
-		servicesConfig,
-		layoutInstance,
-		app.injector.instanceOf[PayYourDst]
-	)(implicitly, messagesApi, appConfig) {
-		override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
-	}
+  val paymentsController: PaymentsController = new PaymentsController(
+    fakeAuthorisedAction,
+    httpClient,
+    authConnector,
+    servicesConfig,
+    layoutInstance,
+    app.injector.instanceOf[PayYourDst]
+  )(implicitly, messagesApi, appConfig) {
+    override def backend(implicit hc: HeaderCarrier): DSTConnector = mockDSTConnector
+  }
 
-	"PaymentsController.payYourDST" must {
-		"redirect back to the start of the journey if a registration isn't found" in {
-			when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-			val result = paymentsController.payYourDST().apply(
-				FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-			)
-			status(result) mustBe 303
-			redirectLocation(result) mustBe Some(routes.RegistrationController.registerAction(" ").url)
-		}
+  "PaymentsController.payYourDST" must {
+    "redirect back to the start of the journey if a registration isn't found" in {
+      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      val result = paymentsController
+        .payYourDST()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
+      status(result) mustBe 303
+      redirectLocation(result) mustBe Some(routes.RegistrationController.registerAction(" ").url)
+    }
 
-		"show the payYourDST page when return periods and registrationNumber is defined" in {
-			when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(
-				Some(
-					sampleReg.copy(
-						registrationNumber = Some(DSTRegNumber("ABDST1234567890"))
-					)
-				)
-			)
-			when(mockDSTConnector.lookupOutstandingReturns()) thenReturn Future.successful(
-				Set(samplePeriod)
-			)
+    "show the payYourDST page when return periods and registrationNumber is defined" in {
+      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(
+        Some(
+          sampleReg.copy(
+            registrationNumber = Some(DSTRegNumber("ABDST1234567890"))
+          )
+        )
+      )
+      when(mockDSTConnector.lookupOutstandingReturns()) thenReturn Future.successful(
+        Set(samplePeriod)
+      )
 
-			val result = paymentsController.payYourDST().apply(
-				FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-			)
-			status(result) mustBe 200
-			contentAsString(result) must include(messagesApi("pay-your-dst.heading"))
-		}
+      val result = paymentsController
+        .payYourDST()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
+      status(result) mustBe 200
+      contentAsString(result) must include(messagesApi("pay-your-dst.heading"))
+    }
 
-		"show the pending page when a registrationNumber is not defined" in {
-			when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(Some(sampleReg))
+    "show the pending page when a registrationNumber is not defined" in {
+      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(Some(sampleReg))
 
-			val result = paymentsController.payYourDST().apply(
-				FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
-			)
-			status(result) mustBe 200
-			contentAsString(result) must include(messagesApi("registration.pending.title"))
-		}
-	}
+      val result = paymentsController
+        .payYourDST()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
+      status(result) mustBe 200
+      contentAsString(result) must include(messagesApi("registration.pending.title"))
+    }
+  }
 
 }
