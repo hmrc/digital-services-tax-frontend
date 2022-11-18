@@ -1,9 +1,11 @@
 import play.core.PlayVersion.current
+import play.sbt.PlayImport._
+import sbt.Keys.libraryDependencies
 import sbt._
 
 object AppDependencies {
 
-  val uniformVersion = "5.0.0-RC6"
+  val uniformVersion = "5.0.0-RC2"
   val hmrcMongoVersion = "0.73.0"
   val play = "28"
 
@@ -11,8 +13,7 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "play-frontend-hmrc"             % s"3.32.0-play-$play",
     "com.chuusai"             %% "shapeless"                      % "2.4.0-M1",
     "com.beachape"            %% "enumeratum-play-json"           % "1.7.0",
-    "com.luketebbs.uniform"   %% s"interpreter-play$play"          % uniformVersion,
-    "com.luketebbs.uniform"   %% "core"                           % uniformVersion,
+    "com.luketebbs.uniform"   %% s"interpreter-play$play"         % uniformVersion,
     "uk.gov.hmrc.mongo"       %% s"hmrc-mongo-play-$play"         % hmrcMongoVersion,
     "commons-validator"       %  "commons-validator"              % "1.7",
     "uk.gov.hmrc"             %% s"bootstrap-frontend-play-$play" % "7.11.0",

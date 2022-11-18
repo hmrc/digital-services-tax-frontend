@@ -18,8 +18,7 @@ package unit.uk.gov.hmrc.digitalservicestaxfrontend.controller
 
 import cats.data.NonEmptyList
 import ltbs.uniform._
-import ltbs.uniform.common.web.{DB, JourneyConfig, PageIn, StepDetails, WebAsk, WebTell}
-import ltbs.uniform.validation.Rule
+import ltbs.uniform.common.web.{WebAsk, WebTell}
 import org.scalatest.Assertion
 import play.api.test.Helpers._
 import play.twirl.api.Html
@@ -34,9 +33,6 @@ import java.time.LocalDate
 class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyChecks {
 
   import TestInstances._
-
-
-
   "DSTInterpreter codec " must {
     "have round trip parity " in {
       forAll {(ld: LocalDate, fa: ForeignAddress, uka: UkAddress, a: Activity, s: String, b: Boolean) =>
@@ -125,26 +121,31 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
   }
 
   "DSTInterpreter " must {
-
     "return Html for renderAnd with valid members" in {
       val foo = interpreter.renderAnd(
-        pageIn,
-        stepDef,
+        Nil,
+        List("foo"),
+        None,
+        Nil,
+        Input.empty,
+        ErrorTree.empty,
+        UniformMessages.echo.map(Html.apply),
         List(("foo", Html("memberA")), ("bar", Html("memberB")))
       )
       foo.nonEmpty mustBe true
     }
-
-
-
     "return Html with radios for renderOr with valid alternatives" in {
       val foo = interpreter.renderOr(
-        pageIn,
-        stepDef,
+        Nil,
+        List("foo"),
+        None,
+        Nil,
+        Input.empty,
+        ErrorTree.empty,
+        UniformMessages.echo.map(Html.apply),
         List(("foo", None), ("bar", None)),
         None
       )
-
       foo.nonEmpty mustBe true
       containsRadio(foo)
     }
@@ -157,27 +158,6 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
       }
     }
   }
-
-
-  val pageIn: PageIn[Html] = PageIn[Html](
-    targetId = Nil,
-    breadcrumbs = Nil,
-    request = None,
-    state = DB.empty,
-    pathPrefix = Nil,
-    JourneyConfig(),
-    UniformMessages.echo.map(Html.apply),
-    Map.empty
-  )
-
-  val stepDef: StepDetails[Html, String] = StepDetails[Html, String](
-    stepKey = List.empty,
-    fieldKey = List("foo"),
-    tell = None,
-    data = Input.empty,
-    errors = ErrorTree.empty,
-    validation = Rule.alwaysPass[String]
-  )
 
   def testErrors[A](
         ask: WebAsk[Html, A],
@@ -196,8 +176,7 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
     extraAssertion: Html =>  Assertion = _ => 1 mustBe 1,
     msg: UniformMessages[Html] = UniformMessages.echo.map(Html.apply)
   ): Assertion = {
-
-    val foo = tell.render(in, List(key), pageIn)
+    val foo = tell.render(in, key, msg)
     foo.nonEmpty mustBe true
     extraAssertion(foo.get)
   }
@@ -208,21 +187,15 @@ class DSTInterpreterSpec extends FakeApplicationServer with ConfiguredPropertyCh
     extraAssertion: Html =>  Assertion = _ => 1 mustBe 1,
     pageKey: List[String] = Nil
   ): Assertion = {
-
-    val stepDef = StepDetails[Html, A](
-      stepKey = List.empty,
-      fieldKey = List("foo"),
-      tell = None,
-      data = ask.encode(raw),
-      errors = ErrorTree.empty,
-      validation = Rule.alwaysPass[A]
-    )
-
     val foo = ask.render(
-      pageIn,
-      stepDef,
+      pageKey,
+      List("foo"),
+      None,
+      Nil,
+      ask.encode(raw),
+      ErrorTree.empty,
+      UniformMessages.echo.map(Html.apply)
     )
-
     foo.nonEmpty mustBe true
     extraAssertion(foo.get)
   }

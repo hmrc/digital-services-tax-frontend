@@ -66,20 +66,23 @@ class DSTInterpreter @Inject()(
       )}.toEither
 
       def encode(in: A): Input = Input.one(List(in.entryName))
-
-      override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, A]): Option[Html] = {
-        val options = enums.values.map {
-          _.entryName
-        }
-        val existingValue = decode(stepDetails.data).map {
-          _.entryName
-        }.toOption
+      def render(
+        pageKey: List[String],
+        fieldKey: List[String],
+        tell: Option[Html],
+        path: Breadcrumbs,
+        data: Input,
+        errors: ErrorTree,
+        messages: UniformMessages[Html]
+      ): Option[Html] = {
+        val options = enums.values.map{_.entryName}
+        val existingValue = decode(data).map{_.entryName}.toOption
         radios(
-          stepDetails.fieldKey,
+          fieldKey,
           options,
           existingValue,
-          stepDetails.errors,
-          pageIn.messages
+          errors,
+          messages
         ).some
       }
     }
@@ -96,15 +99,23 @@ class DSTInterpreter @Inject()(
 
     def encode(in: Boolean): Input = Input.one(List(in.toString))
 
-    override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, Boolean]): Option[Html] = {
-      val options = if (stepDetails.stepKey.contains("about-you") || stepDetails.stepKey.contains("user-employed")) List(False, True) else List(True, False)
-      val existingValue = stepDetails.data.toStringField().toOption
-      radios(stepDetails.fieldKey,
+    def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      path: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = {
+      val options = if (pageKey.contains("about-you") || pageKey.contains("user-employed")) List(False, True) else List(True, False)
+      val existingValue = data.toStringField().toOption
+      radios(fieldKey,
         options,
         existingValue,
-        stepDetails.errors,
-        pageIn.messages,
-        tell = stepDetails.tell).some
+        errors,
+        messages,
+        tell = tell).some
     }
   }
 
@@ -112,15 +123,20 @@ class DSTInterpreter @Inject()(
 
   implicit val twirlCountryCodeField = new WebAsk[Html, CountryCode] {
 
-    override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, CountryCode]): Option[Html] = {
+    override def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      breadcrumbs: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]): Option[Html] =
       countrySelect(
-        stepDetails.fieldKey.mkString("."),
-        stepDetails.data.values.flatten.headOption,
-        stepDetails.errors.nonEmpty,
-        pageIn.messages
+        fieldKey.mkString("."),
+        data.values.flatten.headOption,
+        errors.nonEmpty,
+        messages
       ).some
-    }
-
 
     override def encode(in: CountryCode): Input =
       validatedVariant(CountryCode).encode(in)
@@ -141,14 +157,21 @@ class DSTInterpreter @Inject()(
 
     def encode(in: String): Input = Input.one(List(in))
 
-    override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, String]): Option[Html] = {
-      val existingValue: String = stepDetails.data.valueAtRoot.flatMap {
-        _.headOption
-      }.getOrElse("")
+    def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      path: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = {
+      val existingValue: String = data.valueAtRoot.flatMap{_.headOption}.getOrElse("")
 
-      customRender.fold(stringField.apply(stepDetails.fieldKey, existingValue, stepDetails.errors, pageIn.messages, autoFields).some) { cr =>
-        cr(stepDetails.fieldKey, existingValue, stepDetails.errors, pageIn.messages, autoFields).some
+      customRender.fold(stringField.apply(fieldKey, existingValue, errors, messages, autoFields).some) { cr =>
+        cr(fieldKey, existingValue, errors, messages, autoFields).some
       }
+
     }
   }
 
@@ -177,23 +200,26 @@ class DSTInterpreter @Inject()(
         Map(Nil -> in.toList.map{_.entryName})
 
       // Members declared in ltbs.uniform.common.web.WebAsk
-      override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, Set[A]]): Option[Html] = {
-        val options = enums.values.map {
-          _.entryName
-        }
-        val existingValues: Set[String] = decode(stepDetails.data).map {
-          _.map {
-            _.entryName
-          }
-        }.getOrElse(Set.empty)
+      def render(
+        pageKey: List[String],
+        fieldKey: List[String],
+        tell: Option[Html],
+        breadcrumbs: Breadcrumbs,
+        data: Input,
+        errors: ErrorTree,
+        messages: UniformMessages[Html]
+      ): Option[Html] = {
+        val options = enums.values.map{_.entryName}
+        val existingValues: Set[String] = decode(data).map{_.map{_.entryName}}.getOrElse(Set.empty)
         checkboxes(
-          stepDetails.fieldKey,
+          fieldKey,
           options,
           existingValues,
-          stepDetails.errors,
-          pageIn.messages
+          errors,
+          messages
         ).some
       }
+
     }
 
 
@@ -207,12 +233,20 @@ class DSTInterpreter @Inject()(
     def decode(out: Input): Either[ErrorTree, UkAddress] = codec.decode(out)
     def encode(in: UkAddress): Input = codec.encode(in)
 
-    override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, UkAddress]): Option[Html] = {
+    def render(
+      pagekey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      path: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = {
       address(
-        stepDetails.fieldKey,
-        stepDetails.data,
-        stepDetails.errors,
-        pageIn.messages,
+        fieldKey,
+        data,
+        errors,
+        messages,
         "UkAddress"
       ).some
     }
@@ -228,12 +262,20 @@ class DSTInterpreter @Inject()(
     def decode(out: Input): Either[ErrorTree, ForeignAddress] = codec.decode(out)
     def encode(in: ForeignAddress): Input = codec.encode(in)
 
-    override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, ForeignAddress]): Option[Html] = {
+    def render(
+      pagekey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      path: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = {
       address(
-        stepDetails.fieldKey,
-        stepDetails.data,
-        stepDetails.errors,
-        pageIn.messages
+        fieldKey,
+        data,
+        errors,
+        messages
       ).some
     }
   }
@@ -291,12 +333,20 @@ class DSTInterpreter @Inject()(
         List("day") -> in.getDayOfMonth
       ).view.mapValues(_.toString.pure[List]).toMap
 
-      override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, LocalDate]): Option[Html] = {
+      def render(
+        pageKey: List[String],
+        fieldKey: List[String],
+        tell: Option[Html],
+        path: Breadcrumbs,
+        data: Input,
+        errors: ErrorTree,
+        messages: UniformMessages[Html]
+      ): Option[Html] = {
         date(
-          stepDetails.fieldKey,
-          stepDetails.data,
-          stepDetails.errors,
-          pageIn.messages
+          fieldKey,
+          data,
+          errors,
+          messages
         ).some
       }
     }
@@ -305,16 +355,21 @@ class DSTInterpreter @Inject()(
     def decode(out: Input): Either[ErrorTree,Unit] = Right(())
     def encode(in: Unit): Input = Input.empty
 
-    override def render(pageIn: PageIn[Html], stepDetails: StepDetails[Html, Unit]): Option[Html] = {
-      Some(standardField(stepDetails.stepKey,stepDetails.errors,pageIn.messages)(stepDetails.tell.getOrElse(Html(""))))
-    }
+    def render(
+      pageKey: List[String],
+      fieldKey: List[String],
+      tell: Option[Html],
+      breadcrumbs: Breadcrumbs,
+      data: Input,
+      errors: ErrorTree,
+      messages: UniformMessages[Html]
+    ): Option[Html] = Some(standardField(pageKey,errors,messages)(tell.getOrElse(Html(""))))
   }
 
 
   def tellList[A](f: A => Html) = new WebTell[Html, WebAskList.ListingTable[A]] {
-
-    override def render(in: WebAskList.ListingTable[A], key: List[String], pageIn: PageIn[Html]): Option[Html] = {
-      Some(listing(key.last, in.value.map(f), pageIn.messages))
+    def render(in: WebAskList.ListingTable[A], key: String, messages: UniformMessages[Html]): Option[Html] = {
+      Some(listing(key, in.value.map(f), messages))
     }
   }
 
@@ -322,27 +377,43 @@ class DSTInterpreter @Inject()(
     groupCompany: GroupCompany => Html(groupCompany.name)
   }
 
-  override def renderAnd[T](pageIn: PageIn[Html], stepDetails: StepDetails[Html, T], members: Seq[(String, Html)]): Html = {
-    Html(
-      members.map { x =>
-        x._2.toString
-      }.mkString
-    )
-  }
+  def renderAnd(
+    pageKey: List[String],
+    fieldKey: List[String],
+    tell: Option[Html],
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    members: Seq[(String, Html)]
+  ): Html = Html(
+    members.map { x =>
+      x._2.toString
+    }.mkString
+  )
 
-  override def renderOr[T](pageIn: PageIn[Html], stepDetails: StepDetails[Html, T], alternatives: Seq[(String, Option[Html])], selected: Option[String]): Html = {
+  def renderOr(
+    pageKey: List[String],
+    fieldKey: List[String],
+    tell: Option[Html],    
+    breadcrumbs: Breadcrumbs,
+    data: Input,
+    errors: ErrorTree,
+    messages: UniformMessages[Html],
+    alternatives: Seq[(String, Option[Html])],
+    selected: Option[String]): Html = {
     radios(
-      stepDetails.fieldKey,
+      fieldKey,
       alternatives.map {
         _._1
       },
       selected,
-      stepDetails.errors,
-      pageIn.messages,
+      errors,
+      messages,
       alternatives.collect {
         case (name, Some(html)) => name -> html
       }.toMap,
-      stepDetails.tell
+      tell
     )
   }
 
@@ -425,7 +496,7 @@ class DSTInterpreter @Inject()(
       )
     }{
       case None => ""
-      case Some(x) => x.in
+      case Some(x) => x
     }
 
   def validatedBigDecimal(
