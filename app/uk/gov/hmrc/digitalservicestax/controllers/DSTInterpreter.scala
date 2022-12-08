@@ -59,14 +59,16 @@ class DSTInterpreter @Inject() (
   implicit def enumeratumField[A <: EnumEntry](implicit enums: Enum[A]): WebAsk[Html, A] =
     new WebAsk[Html, A] {
 
-      def decode(out: Input): Either[ErrorTree, A] = out.toField[A](x =>
-        Rule.nonEmpty[String].apply(x) andThen
-          (y =>
-            Validated
-              .catchOnly[NoSuchElementException](enums.withName(y))
-              .leftMap(_ => ErrorTree.oneErr(ErrorMsg("invalid")))
-          )
-      ).toEither
+      def decode(out: Input): Either[ErrorTree, A] = out
+        .toField[A](x =>
+          Rule.nonEmpty[String].apply(x) andThen
+            (y =>
+              Validated
+                .catchOnly[NoSuchElementException](enums.withName(y))
+                .leftMap(_ => ErrorTree.oneErr(ErrorMsg("invalid")))
+            )
+        )
+        .toEither
 
       def encode(in: A): Input = Input.one(List(in.entryName))
       def render(
