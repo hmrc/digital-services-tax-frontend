@@ -40,7 +40,7 @@
             appConfig.appName,
             appConfig.appName,
             if (
-                ufMessagesToPlayMessages(messages, request).lang.code == "cy"
+                ufMessagesToPlayMessages(messages).lang.code == "cy"
             ) Cy else En,
             baseUrl = Some(appConfig.contactHost),
             referrerUrl = Some(request.uri),

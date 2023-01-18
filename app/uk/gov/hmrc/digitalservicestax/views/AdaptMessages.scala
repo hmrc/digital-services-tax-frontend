@@ -20,12 +20,11 @@ import java.util.Locale
 
 import ltbs.uniform._
 import play.api.i18n.{Lang, Messages}
-import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 
 object AdaptMessages {
 
-  implicit def ufMessagesToPlayMessages(implicit ufMessages: UniformMessages[Html], request: RequestHeader): Messages =
+  implicit def ufMessagesToPlayMessages(implicit ufMessages: UniformMessages[Html]): Messages =
     new Messages {
       def lang: Lang                                             = new Lang(Locale.ENGLISH)
       def apply(key: String, args: Any*): String                 = ufMessages.apply(key, args: _*).toString
