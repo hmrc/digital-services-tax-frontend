@@ -78,13 +78,6 @@ class RegistrationController @Inject() (
       Some(cyaReg(s"$key.reg", in.value)(messages))
   }
 
-  private implicit val confirmRegTell = new WebTell[Html, Confirmation[Registration]] {
-    override def render(in: Confirmation[Registration], key: String, messages: UniformMessages[Html]): Option[Html] = {
-      val reg = in.value
-      Some(confirmationReg(key: String, reg.companyReg.company.name: String, reg.contact.email: Email)(messages))
-    }
-  }
-
   def registerAction(targetId: String): Action[AnyContent] = authorisedAction.async {
     implicit request: AuthorisedRequest[AnyContent] =>
       import journeys.RegJourney._
