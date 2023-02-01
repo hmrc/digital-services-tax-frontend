@@ -52,4 +52,7 @@ class AppConfig @Inject() (val config: Configuration, servicesConfig: ServicesCo
   lazy val timeInUrl: String           = loadConfig("time-in.url")
   lazy val timeOutUrl: String          = s"""/$serviceName${loadConfig("time-out.url")}"""
 
+  lazy val dstNewSolutionFeatureFlag: Boolean =
+    config.getOptional[Boolean]("feature.dstNewProposedSolution").getOrElse(false)
+
 }

@@ -68,4 +68,8 @@ class ConfigSpec extends FakeApplicationServer {
   "should load a beta feedback auth URL the configuration" in {
     appConfig.betaFeedbackUrlAuth.nonEmpty mustEqual true
   }
+
+  "should load the feature flag dstNewSolutionFeatureFlag" in {
+    appConfig.dstNewSolutionFeatureFlag mustEqual true
+  }
 }

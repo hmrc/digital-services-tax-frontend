@@ -7,12 +7,12 @@ val appName = "digital-services-tax-frontend"
 PlayKeys.playDefaultPort := 8740
 
 addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3")
-scalaVersion := "2.13.9"
+scalaVersion := "2.13.10"
 routesImport += "uk.gov.hmrc.digitalservicestax.data._"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
-  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
+  .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
     majorVersion := 0,
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test ++ Seq(ws)
