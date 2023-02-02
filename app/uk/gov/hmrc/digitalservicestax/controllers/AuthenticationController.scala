@@ -35,7 +35,9 @@ class AuthenticationController @Inject() (mcc: MessagesControllerComponents, tim
     with Logging {
 
   def signIn: Action[AnyContent] = Action {
-    logger.info("DST user logged in")
+    if (appConfig.dstNewSolutionFeatureFlag) {
+      logger.info("DST user logged in")
+    }
     Redirect(
       url = appConfig.ggLoginUrl,
       queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName))
