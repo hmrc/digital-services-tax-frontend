@@ -24,16 +24,20 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import ltbs.uniform.interpreters.playframework._
 import cats.syntax.semigroup._
+import play.api.Logging
 import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut
-
 import play.twirl.api.HtmlFormat
 
 class AuthenticationController @Inject() (mcc: MessagesControllerComponents, timeOutView: TimeOut)(implicit
   appConfig: AppConfig
 ) extends FrontendController(mcc)
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def signIn: Action[AnyContent] = Action {
+    if (appConfig.dstNewSolutionFeatureFlag) {
+      logger.info("DST user logged in")
+    }
     Redirect(
       url = appConfig.ggLoginUrl,
       queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName))
