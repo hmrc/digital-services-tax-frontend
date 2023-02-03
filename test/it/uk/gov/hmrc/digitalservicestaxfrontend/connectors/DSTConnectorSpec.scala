@@ -32,7 +32,6 @@ import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import scala.concurrent.Future
 
-
 class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
   implicit override val generatorDrivenConfig = PropertyCheckConfiguration(minSize = 1, minSuccessful = PosInt(1))
@@ -70,7 +69,7 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
         .submitRegistration(dstRegNumber)
         .recoverWith {
           case _: UpstreamErrorResponse => Future.successful(true)
-          case _ => Future.successful(false)
+          case _                        => Future.successful(false)
         }
         .map { case b: Boolean => b }
 
@@ -107,7 +106,7 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
           .submitReturn(period, ret)
           .recoverWith {
             case _: UpstreamErrorResponse => Future.successful(true)
-            case _ => Future.successful(false)
+            case _                        => Future.successful(false)
           }
           .map { case b: Boolean => b }
 
@@ -268,9 +267,11 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
         .willReturn(aResponse().withStatus(Status.INTERNAL_SERVER_ERROR))
     )
 
-    intercept[Exception]{
-      await(DSTTestConnector
-        .getTaxEnrolmentSubscriptionByGroupId("12345"))(timeout)
+    intercept[Exception] {
+      await(
+        DSTTestConnector
+          .getTaxEnrolmentSubscriptionByGroupId("12345")
+      )(timeout)
     }.getMessage mustEqual "Unexpected error response received while getting Tax enrolment subscription by groupId"
   }
 
