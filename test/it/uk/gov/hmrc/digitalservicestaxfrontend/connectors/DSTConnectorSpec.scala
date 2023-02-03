@@ -17,19 +17,21 @@
 package it.uk.gov.hmrc.digitalservicestaxfrontend.connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import it.uk.gov.hmrc.digitalservicestaxfrontend.util.WiremockServer
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalactic.anyvals.PosInt
 import play.api.libs.json.Json
+import play.api.test.Helpers.await
 import play.mvc.Http.Status
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data.{CompanyRegWrapper, Period, Postcode, Registration, Return, UTR}
-import it.uk.gov.hmrc.digitalservicestaxfrontend.util.WiremockServer
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.ConfiguredPropertyChecks
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.TestInstances._
 
 import scala.concurrent.Future
+
 
 class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
 
@@ -68,7 +70,7 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
         .submitRegistration(dstRegNumber)
         .recoverWith {
           case _: UpstreamErrorResponse => Future.successful(true)
-          case _                        => Future.successful(false)
+          case _ => Future.successful(false)
         }
         .map { case b: Boolean => b }
 
@@ -105,7 +107,7 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
           .submitReturn(period, ret)
           .recoverWith {
             case _: UpstreamErrorResponse => Future.successful(true)
-            case _                        => Future.successful(false)
+            case _ => Future.successful(false)
           }
           .map { case b: Boolean => b }
 
@@ -224,4 +226,52 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
       }
     }
   }
+
+  "should have Dst registration number when BE call returns 200" in {
+
+    stubFor(
+      get(urlPathEqualTo("/tax-enrolment/groupId/12345"))
+        .willReturn(aResponse().withStatus(Status.OK).withBody("XYDST0000000000"))
+    )
+
+    val response =
+      DSTTestConnector
+        .getTaxEnrolmentSubscriptionByGroupId("12345")
+
+    whenReady(response) { res =>
+      res mustEqual Some("XYDST0000000000")
+    }
+  }
+
+  "should return None when BE call returns 404" in {
+
+    stubFor(
+      get(urlPathEqualTo("/tax-enrolment/groupId/12345"))
+        .willReturn(aResponse().withStatus(Status.NOT_FOUND))
+    )
+
+    val response =
+      DSTTestConnector
+        .getTaxEnrolmentSubscriptionByGroupId("12345")
+
+    whenReady(response) { res =>
+      res mustEqual None
+    }
+  }
+
+  "should throw exception when BE call returns 500" in {
+    import scala.concurrent.duration._
+    val timeout: FiniteDuration = 2.seconds
+
+    stubFor(
+      get(urlPathEqualTo("/tax-enrolment/groupId/12345"))
+        .willReturn(aResponse().withStatus(Status.INTERNAL_SERVER_ERROR))
+    )
+
+    intercept[Exception]{
+      await(DSTTestConnector
+        .getTaxEnrolmentSubscriptionByGroupId("12345"))(timeout)
+    }.getMessage mustEqual "Unexpected error response received while getting Tax enrolment subscription by groupId"
+  }
+
 }

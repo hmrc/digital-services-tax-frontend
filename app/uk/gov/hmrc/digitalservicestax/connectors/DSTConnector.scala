@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
+import play.api.Logging
+import play.api.http.Status.{NOT_FOUND, OK}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.http.{HttpClient, _}
@@ -42,6 +44,17 @@ class DSTConnector(val http: HttpClient, servicesConfig: ServicesConfig)(implici
     http.POST[Return, Either[UpstreamErrorResponse, HttpResponse]](s"$backendURL/returns/$encodedKey", ret).map {
       case Right(value) => value
       case Left(e)      => throw e
+    }
+  }
+
+  def getTaxEnrolmentSubscriptionByGroupId(groupId: String): Future[Option[String]] = {
+    http.GET[HttpResponse](s"$backendURL/tax-enrolment/groupId/$groupId").map { response =>
+      response.status match {
+        case OK => Some(response.body)
+        case NOT_FOUND => None
+        case _ =>
+          throw new Exception("Unexpected error response received while getting Tax enrolment subscription by groupId")
+      }
     }
   }
 
