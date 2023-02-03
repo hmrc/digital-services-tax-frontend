@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
+import play.api.http.Status.{NOT_FOUND, OK}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.http.{HttpClient, _}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HttpClient, _}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,6 +45,16 @@ class DSTConnector(val http: HttpClient, servicesConfig: ServicesConfig)(implici
       case Left(e)      => throw e
     }
   }
+
+  def getTaxEnrolmentSubscriptionByGroupId(groupId: String): Future[Option[String]] =
+    http.GET[HttpResponse](s"$backendURL/tax-enrolment/groupId/$groupId").map { response =>
+      response.status match {
+        case OK        => Some(response.body)
+        case NOT_FOUND => None
+        case _         =>
+          throw new Exception("Unexpected error response received while getting Tax enrolment subscription by groupId")
+      }
+    }
 
   def lookupCompany(): Future[Option[CompanyRegWrapper]] =
     http.GET[Option[CompanyRegWrapper]](s"$backendURL/lookup-company")
