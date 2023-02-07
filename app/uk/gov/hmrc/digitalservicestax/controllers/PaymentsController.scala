@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, ControllerHelpers}
+import play.api.mvc.{Action, ActionBuilder, AnyContent, ControllerHelpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.data._
@@ -30,7 +30,7 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.views
 import uk.gov.hmrc.digitalservicestax.views.html.{Layout, PayYourDst}
-import uk.gov.hmrc.digitalservicestax.actions.Auth
+import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthActionFilter, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -41,6 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class PaymentsController @Inject() (
   authorisedAction: Auth,
+  authActionFilter: AuthActionFilter,
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
@@ -57,7 +58,9 @@ class PaymentsController @Inject() (
 
   def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
-  def payYourDST: Action[AnyContent] = authorisedAction.async { implicit request =>
+  def identify: ActionBuilder[AuthorisedRequest, AnyContent] = authorisedAction andThen authActionFilter
+
+  def payYourDST: Action[AnyContent] = identify.async { implicit request =>
     implicit val msg: UniformMessages[Html] =
       implicitly[Messages].convertMessagesTwirlHtml(false)
 

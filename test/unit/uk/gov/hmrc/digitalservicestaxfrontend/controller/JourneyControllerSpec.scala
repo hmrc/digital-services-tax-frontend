@@ -91,6 +91,7 @@ class JourneyControllerSpec extends FakeApplicationServer {
 
   val controller = new JourneyController(
     fakeAuthorisedAction,
+    fakeAuthActionFilter,
     httpClient,
     authConnector,
     servicesConfig,

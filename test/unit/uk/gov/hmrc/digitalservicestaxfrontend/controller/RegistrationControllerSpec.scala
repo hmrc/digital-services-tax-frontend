@@ -86,6 +86,7 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
 
   val controller = new RegistrationController(
     fakeAuthorisedAction,
+    new FakeRegistrationAuthActionFilter(),
     httpClient,
     servicesConfig,
     mongoComponent,

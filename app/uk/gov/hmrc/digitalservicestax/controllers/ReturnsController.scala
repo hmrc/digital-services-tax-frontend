@@ -24,16 +24,16 @@ import play.api.data.Form
 import play.api.data.FormBinding.Implicits._
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, ControllerHelpers}
+import play.api.mvc.{Action, ActionBuilder, AnyContent, ControllerHelpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthActionFilter, AuthorisedRequest}
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoUniformPersistence, ReturnsRepo}
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.cya.CheckYourAnswersRet
 import uk.gov.hmrc.digitalservicestax.views.html.end.ConfirmationReturn
-import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -44,6 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsController @Inject() (
   authorisedAction: Auth,
+  authActionFilter: AuthActionFilter,
   http: HttpClient,
   servicesConfig: ServicesConfig,
   mongoc: MongoComponent,
@@ -65,6 +66,8 @@ class ReturnsController @Inject() (
   import interpreter._
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 
+  private def identify: ActionBuilder[AuthorisedRequest, AnyContent] = authorisedAction andThen authActionFilter
+
   private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
     override def render(
       in: CYA[(Return, Period, CompanyName)],
@@ -83,7 +86,7 @@ class ReturnsController @Inject() (
     )(applyKey)(unapplyKey)
   )
 
-  def showAmendments(): Action[AnyContent] = authorisedAction.async { implicit request: AuthorisedRequest[AnyContent] =>
+  def showAmendments(): Action[AnyContent] = identify.async { implicit request: AuthorisedRequest[AnyContent] =>
     implicit val msg: UniformMessages[Html] = messages(request)
 
     backend.lookupRegistration().flatMap {
@@ -105,7 +108,7 @@ class ReturnsController @Inject() (
     }
   }
 
-  def postAmendments(): Action[AnyContent] = authorisedAction.async { implicit request: AuthorisedRequest[AnyContent] =>
+  def postAmendments(): Action[AnyContent] = identify.async { implicit request: AuthorisedRequest[AnyContent] =>
     implicit val msg: UniformMessages[Html] = messages(request)
     backend.lookupAmendableReturns().flatMap { outstandingPeriods =>
       outstandingPeriods.toList match {
@@ -141,7 +144,7 @@ class ReturnsController @Inject() (
       appConfig.mongoJourneyStoreExpireAfter
     )
 
-  def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = authorisedAction.async {
+  def returnAction(periodKeyString: String, targetId: String = ""): Action[AnyContent] = identify.async {
     implicit request: AuthorisedRequest[AnyContent] =>
       implicit val msg: UniformMessages[Html] = interpreter.messages(request)
       import journeys.ReturnJourney._
@@ -168,7 +171,7 @@ class ReturnsController @Inject() (
       }
   }
 
-  def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = authorisedAction.async {
+  def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = identify.async {
     implicit request =>
       implicit val msg: UniformMessages[Html] = messages(request)
       val submittedPeriodKey                  = Period.Key(submittedPeriodKeyString)

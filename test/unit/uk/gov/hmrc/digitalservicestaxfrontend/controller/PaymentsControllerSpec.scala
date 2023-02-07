@@ -34,6 +34,7 @@ class PaymentsControllerSpec extends FakeApplicationServer {
 
   val paymentsController: PaymentsController = new PaymentsController(
     fakeAuthorisedAction,
+    fakeAuthActionFilter,
     httpClient,
     authConnector,
     servicesConfig,

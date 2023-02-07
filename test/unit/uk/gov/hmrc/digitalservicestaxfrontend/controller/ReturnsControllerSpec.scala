@@ -37,6 +37,7 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
 
   val returnsController          = new ReturnsController(
     fakeAuthorisedAction,
+    fakeAuthActionFilter,
     httpClient,
     servicesConfig,
     mongoComponent,

@@ -18,8 +18,6 @@ package uk.gov.hmrc.digitalservicestax.actions
 
 import cats.syntax.semigroup._
 import com.google.inject.ImplementedBy
-
-import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import play.api.Logger
 import play.api.i18n.MessagesApi
@@ -29,7 +27,7 @@ import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.AuthProvider.{GovernmentGateway, Verify}
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, allEnrolments, credentialRole, internalId}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.controllers.routes
@@ -39,6 +37,7 @@ import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[AuthorisedAction])
@@ -58,6 +57,7 @@ class AuthorisedAction @Inject() (
     extends Auth {
 
   val logger                                                                                          = Logger(getClass)
+
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
     import ltbs.uniform.interpreters.playframework.RichPlayMessages
     implicit val req: Request[A]            = request
@@ -66,10 +66,10 @@ class AuthorisedAction @Inject() (
       messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+|
         UniformMessages.bestGuess.map(HtmlFormat.escape)
 
-    val retrieval = allEnrolments and credentialRole and internalId and affinityGroup
+    val retrieval = allEnrolments and credentialRole and internalId and affinityGroup and groupIdentifier
 
     authorised(AuthProviders(GovernmentGateway, Verify) and Organisation and User).retrieve(retrieval) {
-      case enrolments ~ _ ~ id ~ _ =>
+      case enrolments ~ _ ~ id ~ _ ~ groupId =>
         val internalIdString = id.getOrElse(throw new RuntimeException("No internal ID for user"))
         val internalId       = InternalId
           .of(internalIdString)
@@ -77,7 +77,7 @@ class AuthorisedAction @Inject() (
             throw new IllegalStateException("Invalid internal ID")
           )
 
-        Future.successful(Right(AuthorisedRequest(internalId, enrolments, request)))
+        Future.successful(Right(AuthorisedRequest(internalId, enrolments, request, groupId)))
 
     } recover {
       case af: UnsupportedAffinityGroup  =>
@@ -113,5 +113,6 @@ class AuthorisedAction @Inject() (
 case class AuthorisedRequest[A](
   internalId: InternalId,
   enrolments: Enrolments,
-  request: Request[A]
+  request: Request[A],
+  groupId: Option[String]
 ) extends WrappedRequest(request)

@@ -21,6 +21,7 @@ import data._
 import connectors._
 import cats.implicits._
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
@@ -31,7 +32,7 @@ import play.twirl.api.Html
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout}
-import uk.gov.hmrc.digitalservicestax.actions.Auth
+import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthActionFilter}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -39,6 +40,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 @Singleton
 class JourneyController @Inject() (
   authorisedAction: Auth,
+  authActionFilter: AuthActionFilter,
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
@@ -55,7 +57,7 @@ class JourneyController @Inject() (
 
   def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
-  def index: Action[AnyContent] = authorisedAction.async { implicit request =>
+  def index: Action[AnyContent] = (authorisedAction andThen authActionFilter).async { implicit request =>
     implicit val msg: UniformMessages[Html] =
       implicitly[Messages].convertMessagesTwirlHtml(false)
 

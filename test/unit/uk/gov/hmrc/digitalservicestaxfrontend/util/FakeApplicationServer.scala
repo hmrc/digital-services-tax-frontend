@@ -27,6 +27,7 @@ import play.api.libs.ws.WSClient
 import play.api.mvc.MessagesControllerComponents
 import play.api.{Application, Configuration, Environment}
 import uk.gov.hmrc.auth.core.PlayAuthConnector
+import uk.gov.hmrc.digitalservicestax.actions.AuthorisedAction
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.DSTInterpreter
@@ -34,13 +35,12 @@ import uk.gov.hmrc.digitalservicestax.test.TestConnector
 import uk.gov.hmrc.digitalservicestax.views.html.cya.{CheckYourAnswersReg, CheckYourAnswersRet}
 import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, ConfirmationReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout, PayYourDst}
-import uk.gov.hmrc.digitalservicestax.actions.AuthorisedAction
 import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.controller.FakeAuthorisedAction
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.controller.{FakeAuthActionFilter, FakeAuthorisedAction}
 
 import java.io.File
 import java.time.Clock
@@ -91,13 +91,17 @@ trait FakeApplicationServer
   lazy val mockDSTConnector: DSTConnector = mock[DSTConnector]
 
   val testConnector: TestConnector = new TestConnector(httpClient, servicesConfig)
+  def guiceApplicationBuilder(): GuiceApplicationBuilder =
+    new GuiceApplicationBuilder()
 
   override def fakeApplication(): Application =
-    GuiceApplicationBuilder(environment = environment)
+    guiceApplicationBuilder()
       .configure(Map("tax-enrolments.enabled" -> "true"))
       .build()
 
   lazy val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
   val fakeAuthorisedAction = new FakeAuthorisedAction(mcc, authConnector)(appConfig, implicitly, messagesApi)
+  val fakeAuthActionFilter = new FakeAuthActionFilter()
+
 }

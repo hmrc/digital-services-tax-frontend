@@ -34,7 +34,7 @@ class FakeAuthorisedAction(mcc: MessagesControllerComponents, val authConnector:
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
     val enrolments = TestInstances.enrolmentsArbitrary.arbitrary.sample.get
-    Future.successful(Right(AuthorisedRequest(InternalId("Int-abc"), enrolments, request)))
+    Future.successful(Right(AuthorisedRequest(InternalId("Int-abc"), enrolments, request, None)))
   }
 
   override def parser: BodyParser[AnyContent] = mcc.parsers.anyContent
