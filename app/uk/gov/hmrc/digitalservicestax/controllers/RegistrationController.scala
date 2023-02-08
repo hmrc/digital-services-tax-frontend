@@ -25,7 +25,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
+import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest, RegistrationAuthFilter}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -39,10 +39,12 @@ import data._
 import connectors.{DSTConnector, DSTService, MongoUniformPersistence}
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.mongo.MongoComponent
+
 import scala.concurrent.duration._
 
 class RegistrationController @Inject() (
   authorisedAction: Auth,
+  registrationAuthFilter: RegistrationAuthFilter,
   http: HttpClient,
   servicesConfig: ServicesConfig,
   mongoc: MongoComponent,
@@ -78,7 +80,7 @@ class RegistrationController @Inject() (
       Some(cyaReg(s"$key.reg", in.value)(messages))
   }
 
-  def registerAction(targetId: String): Action[AnyContent] = authorisedAction.async {
+  def registerAction(targetId: String): Action[AnyContent] = (authorisedAction andThen registrationAuthFilter).async {
     implicit request: AuthorisedRequest[AnyContent] =>
       import journeys.RegJourney._
 
@@ -95,7 +97,7 @@ class RegistrationController @Inject() (
       }
   }
 
-  def registrationComplete: Action[AnyContent] = authorisedAction.async { implicit request =>
+  def registrationComplete: Action[AnyContent] = (authorisedAction andThen registrationAuthFilter).async { implicit request =>
     implicit val msg: UniformMessages[Html] = messages(request)
 
     backend.lookupRegistration().flatMap {

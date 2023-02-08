@@ -40,7 +40,7 @@ import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
-import unit.uk.gov.hmrc.digitalservicestaxfrontend.controller.{FakeAuthActionFilter, FakeAuthorisedAction}
+import unit.uk.gov.hmrc.digitalservicestaxfrontend.controller.{FakeAuthActionFilter, FakeAuthorisedAction, FakeRegistrationAuthActionFilter}
 
 import java.io.File
 import java.time.Clock
@@ -103,5 +103,6 @@ trait FakeApplicationServer
 
   val fakeAuthorisedAction = new FakeAuthorisedAction(mcc, authConnector)(appConfig, implicitly, messagesApi)
   val fakeAuthActionFilter = new FakeAuthActionFilter()
+  val fakeRegistrationAuthFilter = new FakeRegistrationAuthActionFilter()
 
 }

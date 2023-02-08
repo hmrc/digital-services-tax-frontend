@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-@ImplementedBy(classOf[RegistrationAuthFilter])
+@ImplementedBy(classOf[RegistrationAuthFilterProvider])
 trait RegistrationAuthFilter extends ActionFilter[AuthorisedRequest]
 class RegistrationAuthFilterProvider @Inject() (appConfig: AppConfig,http: HttpClient, serviceConfig: ServicesConfig)(implicit
   val executionContext: ExecutionContext
