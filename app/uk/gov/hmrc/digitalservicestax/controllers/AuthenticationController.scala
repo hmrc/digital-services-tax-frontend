@@ -16,17 +16,18 @@
 
 package uk.gov.hmrc.digitalservicestax.controllers
 
-import javax.inject.Inject
+import cats.syntax.semigroup._
 import ltbs.uniform.UniformMessages
+import ltbs.uniform.interpreters.playframework._
+import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.digitalservicestax.config.AppConfig
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import ltbs.uniform.interpreters.playframework._
-import cats.syntax.semigroup._
-import play.api.Logging
-import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.digitalservicestax.config.AppConfig
+import uk.gov.hmrc.digitalservicestax.views.html.end.TimeOut
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+
+import javax.inject.Inject
 
 class AuthenticationController @Inject() (mcc: MessagesControllerComponents, timeOutView: TimeOut)(implicit
   appConfig: AppConfig
@@ -35,9 +36,6 @@ class AuthenticationController @Inject() (mcc: MessagesControllerComponents, tim
     with Logging {
 
   def signIn: Action[AnyContent] = Action {
-    if (appConfig.dstNewSolutionFeatureFlag) {
-      logger.info("DST user logged in")
-    }
     Redirect(
       url = appConfig.ggLoginUrl,
       queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName))
