@@ -32,13 +32,13 @@ import shapeless.tag
 import tag.@@
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.views.html.{FormWrapper, Layout}
+import uk.gov.hmrc.digitalservicestax.views.html.{FormWrapper, MainLayout}
 import uk.gov.hmrc.digitalservicestax.views.html.uniform._
 import uk.gov.hmrc.digitalservicestax.views.html.helpers.CountrySelect
 
 class DSTInterpreter @Inject() (
   messagesApi: play.api.i18n.MessagesApi,
-  layout: Layout,
+  layout: MainLayout,
   formWrapper: FormWrapper,
   standardField: StandardField,
   checkboxes: Checkboxes,

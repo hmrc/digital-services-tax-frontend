@@ -31,7 +31,7 @@ lazy val microservice = Project(appName, file("."))
       "ltbs.uniform.common.web.{Breadcrumbs => UfBreadcrumbs, _}",
       "ltbs.uniform.interpreters.playframework._",
       "uk.gov.hmrc.digitalservicestax.views.html.helpers._",
-      "uk.gov.hmrc.digitalservicestax.views.html.Layout",
+      "uk.gov.hmrc.digitalservicestax.views.html.MainLayout",
       "uk.gov.hmrc.govukfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.components._",
       "uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages",

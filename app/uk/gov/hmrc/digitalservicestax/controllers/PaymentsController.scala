@@ -29,7 +29,7 @@ import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.views
-import uk.gov.hmrc.digitalservicestax.views.html.{Layout, PayYourDst}
+import uk.gov.hmrc.digitalservicestax.views.html.{MainLayout, PayYourDst}
 import uk.gov.hmrc.digitalservicestax.actions.Auth
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -44,7 +44,7 @@ class PaymentsController @Inject() (
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
-  layout: Layout,
+  layout: MainLayout,
   payYourDst: PayYourDst
 )(implicit
   ec: ExecutionContext,

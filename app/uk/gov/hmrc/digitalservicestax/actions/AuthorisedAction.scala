@@ -35,7 +35,7 @@ import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.controllers.routes
 import uk.gov.hmrc.digitalservicestax.data.InternalId
 import uk.gov.hmrc.digitalservicestax.views
-import uk.gov.hmrc.digitalservicestax.views.html.Layout
+import uk.gov.hmrc.digitalservicestax.views.html.MainLayout
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -52,7 +52,7 @@ trait Auth
 @Singleton
 class AuthorisedAction @Inject() (
   mcc: MessagesControllerComponents,
-  layout: Layout,
+  layout: MainLayout,
   val authConnector: AuthConnector
 )(implicit val appConfig: AppConfig, val executionContext: ExecutionContext, val messagesApi: MessagesApi)
     extends Auth {

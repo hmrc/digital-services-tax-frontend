@@ -30,7 +30,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoUniformPersistence, ReturnsRepo}
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
+import uk.gov.hmrc.digitalservicestax.views.html.{MainLayout, ResubmitAReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.cya.CheckYourAnswersRet
 import uk.gov.hmrc.digitalservicestax.views.html.end.ConfirmationReturn
 import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
@@ -50,7 +50,7 @@ class ReturnsController @Inject() (
   interpreter: DSTInterpreter,
   checkYourAnswersRet: CheckYourAnswersRet,
   confirmationReturn: ConfirmationReturn,
-  layout: Layout,
+  layout: MainLayout,
   resubmitAReturn: ResubmitAReturn,
   val authConnector: AuthConnector,
   val messagesApi: MessagesApi,

@@ -30,7 +30,7 @@ import play.twirl.api.Html
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout}
+import uk.gov.hmrc.digitalservicestax.views.html.{Landing, MainLayout}
 import uk.gov.hmrc.digitalservicestax.actions.Auth
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -42,7 +42,7 @@ class JourneyController @Inject() (
   val http: HttpClient,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
-  layout: Layout,
+  layout: MainLayout,
   landing: Landing
 )(implicit
   ec: ExecutionContext,

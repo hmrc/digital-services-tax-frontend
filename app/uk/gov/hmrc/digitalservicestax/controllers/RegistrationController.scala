@@ -37,7 +37,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import data._
 import connectors.{DSTConnector, DSTService, MongoUniformPersistence}
-import uk.gov.hmrc.digitalservicestax.views.html.Layout
+import uk.gov.hmrc.digitalservicestax.views.html.MainLayout
 import uk.gov.hmrc.mongo.MongoComponent
 import scala.concurrent.duration._
 
@@ -51,7 +51,7 @@ class RegistrationController @Inject() (
   val messagesApi: MessagesApi,
   cyaReg: CheckYourAnswersReg,
   confirmationReg: ConfirmationReg,
-  layout: Layout
+  layout: MainLayout
 )(implicit
   ec: ExecutionContext
 ) extends ControllerHelpers

@@ -21,7 +21,6 @@ import it.uk.gov.hmrc.digitalservicestaxfrontend.util.WiremockServer
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalactic.anyvals.PosInt
 import play.api.libs.json.Json
-import play.api.test.Helpers.await
 import play.mvc.Http.Status
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._

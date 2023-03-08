@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
-import play.api.http.Status.{NOT_FOUND, OK}
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.http.HttpReads.Implicits._
