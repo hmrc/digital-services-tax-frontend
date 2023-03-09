@@ -1,13 +1,12 @@
 import play.core.PlayVersion.current
-import play.sbt.PlayImport._
-import sbt.Keys.libraryDependencies
 import sbt._
 
 object AppDependencies {
 
-  val uniformVersion   = "5.0.0-RC2"
-  val hmrcMongoVersion = "0.73.0"
-  val play             = "28"
+  val uniformVersion           = "5.0.0-RC2"
+  val hmrcMongoVersion         = "0.73.0"
+  val play                     = "28"
+  private val bootstrapVersion = "7.14.0"
 
   val compile = Seq(
     "uk.gov.hmrc"           %% "play-frontend-hmrc"             % s"6.2.0-play-$play",
@@ -16,7 +15,7 @@ object AppDependencies {
     "com.luketebbs.uniform" %% s"interpreter-play$play"         % uniformVersion,
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-play-$play"         % hmrcMongoVersion,
     "commons-validator"      % "commons-validator"              % "1.7",
-    "uk.gov.hmrc"           %% s"bootstrap-frontend-play-$play" % "7.11.0",
+    "uk.gov.hmrc"           %% s"bootstrap-frontend-play-$play" % bootstrapVersion,
     "fr.marcwrobel"          % "jbanking"                       % "4.0.0",
     "org.jsoup"              % "jsoup"                          % "1.15.3",
     "joda-time"              % "joda-time"                      % "2.12.1" // needed for hmrc-mongo
@@ -34,6 +33,7 @@ object AppDependencies {
     "com.github.tomakehurst"        % "wiremock-standalone"         % "2.27.2",
     "com.fasterxml.jackson.module" %% "jackson-module-scala"        % "2.14.0",
     "uk.gov.hmrc.mongo"            %% s"hmrc-mongo-test-play-$play" % hmrcMongoVersion,
+    "uk.gov.hmrc"                  %% s"bootstrap-test-play-$play"  % bootstrapVersion,
     "org.pegdown"                   % "pegdown"                     % "1.6.0",
     "com.vladsch.flexmark"          % "flexmark-all"                % "0.62.2",
     "org.scalatestplus.play"       %% "scalatestplus-play"          % "5.1.0",
