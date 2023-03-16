@@ -835,7 +835,15 @@ wrong-account.heading=You cannot use this service
 wrong-account.sign-out.reason=You signed in with a Government Gateway user ID for an individual or agent. We have signed you out.
 wrong-account.sign-in.reason=To use this service, sign in with the Government Gateway user ID for the company that is registering for the Digital Services Tax.
 
-wrong-creds.heading=You cannot use this service
+wrong-creds.heading=You cannot submit a Digital Services Tax return
+wrong-creds.p1=You must be an administrator of your organisation to submit a Digital Services Tax return.
+wrong-creds.p2=To become an administrator, speak to an existing administrator for your organisation.
+wrong-creds.link=Find out how to add a team member to your business tax account from Gov.uk (opens in a new tab)
+wrong-creds.p3=If your organisation does not have an administrator, contact the Digital Services Tax support team.
+wrong-creds.h2=Digital Services Tax support team
+wrong-creds.h3=Email
+wrong-creds.email=ccgdstmailbox@hmrc.gov.uk
+wrong-creds.p4=We aim to respond within 15 working days.
 wrong-creds.sign-out.reason=You need to be an administrator user to register for the Digital Services Tax.
 wrong-creds.contact-admin=Contact your company’s administrator if you need to use this service.
 

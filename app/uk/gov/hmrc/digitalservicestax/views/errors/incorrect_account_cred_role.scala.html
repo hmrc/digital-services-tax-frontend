@@ -17,11 +17,24 @@
 @()(implicit messages: UniformMessages[Html])
 
 <h1 class="govuk-heading-l">@messages("wrong-creds.heading")</h1>
-<p class="govuk-body">@messages("wrong-creds.sign-out.reason")</p>
-<p class="govuk-body">@messages("wrong-creds.contact-admin")</p>
+<p class="govuk-body" id="cred_role_p1">@messages("wrong-creds.p1")</p>
+<p class="govuk-body" id="cred_role_p2">@messages("wrong-creds.p2")</p>
 
-<p class="govuk-body">
-    <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.AuthenticationController.signIn()" class="govuk-button" role="button">
-        @messages("common.sign-in")
-    </a>
-</p>
+<li class="govuk-body">
+<a class="govuk-link" id="add_DST_govuk_link" href="https://www.gov.uk/guidance/manage-team-members-using-your-hmrc-business-tax-account" rel="noreferrer noopener" target="_blank">
+ <span aria-hidden="true">@messages("wrong-creds.link")</span>
+</a>
+</li>
+
+<p class="govuk-body" id="cred_role_p3">@messages("wrong-creds.p3")</p>
+<h2 class="govuk-heading-m" >@messages("wrong-creds.h2")</h2>
+<h3 class="govuk-heading-s">@messages("wrong-creds.h3")</h3>
+<ul class="govuk-list">
+ <li>
+  <a class="govuk-link" id="email_to_DST_support_team" href="mailto:ccgdstmailbox@@hmrc.gov.uk" rel="noreferrer noopener" target="_blank">
+  <span aria-hidden="true">@messages("wrong-creds.email")</span>
+ </a>
+ </li>
+</ul>
+
+<p class="govuk-body" id="cred_role_p4">@messages("wrong-creds.p4")</p>
