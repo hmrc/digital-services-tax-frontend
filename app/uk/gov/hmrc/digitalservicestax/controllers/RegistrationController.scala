@@ -22,7 +22,7 @@ import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, ControllerHelpers}
+import play.api.mvc.{Action, AnyContent, ControllerHelpers, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
@@ -39,6 +39,7 @@ import data._
 import connectors.{DSTConnector, DSTService, MongoUniformPersistence}
 import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.mongo.MongoComponent
+
 import scala.concurrent.duration._
 
 class RegistrationController @Inject() (
@@ -87,7 +88,16 @@ class RegistrationController @Inject() (
       backend.lookupRegistration().flatMap {
         case None =>
           interpret(registrationJourney(backend)).run(targetId) { ret =>
-            backend.submitRegistration(ret).map(_ => Redirect(routes.RegistrationController.registrationComplete))
+            backend.submitRegistration(ret).map { backendResponse =>
+              backendResponse.status match {
+                case OK =>
+                  Redirect(
+                    routes.RegistrationController.registrationComplete
+                  ).addingToSession(("companyName", ret.companyReg.company.name), ("companyEmail", ret.contact.email))
+                case _  => Redirect(routes.RegistrationController.registerAction(" "))
+              }
+
+            }
           }
 
         case Some(_) =>
@@ -98,21 +108,24 @@ class RegistrationController @Inject() (
   def registrationComplete: Action[AnyContent] = authorisedAction.async { implicit request =>
     implicit val msg: UniformMessages[Html] = messages(request)
 
-    backend.lookupRegistration().flatMap {
-      case None      =>
-        Future.successful(
-          Redirect(routes.RegistrationController.registerAction(" "))
-        )
-      case Some(reg) =>
+    (request.session.get("companyName"), request.session.get("companyEmail")) match {
+      case (Some(companyName), Some(companyEmail)) =>
         Future.successful(
           Ok(
             layout(
               pageTitle = Some(
                 s"${msg("registration-sent.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
               )
-            )(confirmationReg("registration-sent", reg.companyReg.company.name, reg.contact.email)(msg))
+            )(
+              confirmationReg(
+                "registration-sent",
+                companyName,
+                Email(companyEmail)
+              )(msg)
+            )
           )
         )
+      case _                                       => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
     }
   }
 }

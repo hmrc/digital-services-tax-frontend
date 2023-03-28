@@ -77,7 +77,9 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
         )
       )
       val result = controller.registrationComplete.apply(
-        FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        FakeRequest()
+          .withSession(("companyName", "Company A"), ("companyEmail", "test@test.com"))
+          .withHeaders("Authorization" -> "Bearer some-token")
       )
       status(result) mustBe 200
       contentAsString(result) must include(messagesApi("registration-sent.heading"))
