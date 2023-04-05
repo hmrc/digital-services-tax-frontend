@@ -111,7 +111,7 @@
                         @if(amended.nonEmpty) {
                             <li>
                                 <p class="govuk-body">
-                                    <a class="govuk-link" href="@uk.gov.hmrc.digitalservicestax.controllers.routes.ReturnsController.showAmendments()" class="govuk-link">
+                                    <a class="govuk-link" href="@uk.gov.hmrc.digitalservicestax.controllers.routes.ReturnsController.showAmendments()">
                                         @messages("landing.amendments")
                                     </a>
                                 </p>
@@ -121,7 +121,7 @@
                             <p class="govuk-body">
                             @messages(
                                 "landing.previous-payments",
-                                Html("<a class='govuk-link' href='mailto:ccgdstmailbox@hmrc.gov.uk'>ccgdstmailbox@hmrc.gov.uk</a>")
+                                Html("<a class='govuk-link text-overflow' href='mailto:ccgdstmailbox@hmrc.gov.uk'>ccgdstmailbox@hmrc.gov.uk</a>")
                             )
                             </p>
                         </li>
