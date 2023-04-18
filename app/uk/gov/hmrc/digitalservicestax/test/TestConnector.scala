@@ -31,13 +31,12 @@ class TestConnector @Inject() (
 ) {
 
   private val beUrl: String = servicesConfig.baseUrl("digital-services-tax")
-  private val taxEnrolmentUrl: String = servicesConfig.baseUrl("tax-enrolments")
 
   def trigger(url: String, param: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
     http.GET[HttpResponse](s"$beUrl/$url/$param")
 
   def triggerDeleteTaxEnrolmentsByGroupId(groupId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    http.DELETE[HttpResponse](s"$taxEnrolmentUrl/tax-enrolments/group-records/$groupId")
+    http.DELETE[HttpResponse](s"$beUrl/test-only/tax-enrolments/delete-by-groupid/$groupId")
 
 
 }
