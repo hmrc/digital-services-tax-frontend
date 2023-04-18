@@ -37,7 +37,7 @@ class TestConnector @Inject() (
     http.GET[HttpResponse](s"$beUrl/$url/$param")
 
   def triggerDeleteTaxEnrolmentsByGroupId(groupId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    http.GET[HttpResponse](s"$taxEnrolmentUrl/group-records/$groupId")
+    http.DELETE[HttpResponse](s"$taxEnrolmentUrl/tax-enrolments/group-records/$groupId")
 
 
 }
