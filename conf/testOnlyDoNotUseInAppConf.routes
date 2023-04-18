@@ -13,3 +13,6 @@
 ->         /                          prod.Routes
 
 GET        /digital-services-tax/test-only/trigger-te-callback/:seed    uk.gov.hmrc.digitalservicestax.test.TestController.triggerTaxEnrolmentCallback(seed: String)
+
+DELETE     /digital-services-tax/tax-enrolments/:groupId                uk.gov.hmrc.digitalservicestax.test.TestController.deleteGroupIdFromTaxEnrolments(groupId: String)
+

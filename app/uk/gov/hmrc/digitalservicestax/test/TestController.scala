@@ -32,7 +32,12 @@ class TestController @Inject() (
   def triggerTaxEnrolmentCallback(seed: String): Action[AnyContent] = Action.async { implicit request =>
     connector.trigger("test-only/trigger-te-callback", seed) flatMap (_ =>
       Future.successful(Ok("tax enrolment callback triggered"))
-    )
+      )
   }
 
+  def deleteGroupIdFromTaxEnrolments(groupId: String): Action[AnyContent] = Action.async { implicit request =>
+    connector.triggerDeleteTaxEnrolmentsByGroupId(groupId) flatMap (_ =>
+      Future.successful(Ok(s"tax enrolment deleted for group id ${groupId}"))
+      )
+  }
 }
