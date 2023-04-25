@@ -44,8 +44,9 @@ class PaymentsControllerSpec extends FakeApplicationServer {
   }
 
   "PaymentsController.payYourDST" must {
-    "redirect back to the start of the journey if a registration isn't found" in {
+    "redirect back to the start of the journey if a registration isn't found and pending registration not found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(None)
       val result = paymentsController
         .payYourDST()
         .apply(
@@ -53,6 +54,18 @@ class PaymentsControllerSpec extends FakeApplicationServer {
         )
       status(result) mustBe 303
       redirectLocation(result) mustBe Some(routes.RegistrationController.registerAction(" ").url)
+    }
+
+    "redirect back to the start of the journey if a registration isn't found and pending registration found" in {
+      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(Some("dstRefNumber"))
+      val result = paymentsController
+        .payYourDST()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
+      status(result) mustBe 200
+      contentAsString(result) must include(messagesApi("registration.pending.title"))
     }
 
     "show the payYourDST page when return periods and registrationNumber is defined" in {

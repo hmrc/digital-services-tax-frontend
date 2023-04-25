@@ -21,6 +21,7 @@ import cats.implicits.catsKernelOrderingForOrder
 import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
+import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.twirl.api.Html
@@ -55,6 +56,7 @@ class PaymentsController @Inject() (
     with I18nSupport
     with AuthorisedFunctions {
 
+  val logger                              = Logger(getClass)
   def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   def payYourDST: Action[AnyContent] = authorisedAction.async { implicit request =>
@@ -63,9 +65,18 @@ class PaymentsController @Inject() (
 
     backend.lookupRegistration().flatMap {
       case None                                          =>
-        Future.successful(
-          Redirect(routes.RegistrationController.registerAction(" "))
-        )
+        backend.lookupPendingRegistration().flatMap {
+          case Some(_) =>
+            logger.info("[PaymentsController] Pending registrations")
+            Future.successful(
+              Ok(
+                layout(
+                  pageTitle = Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+                )(views.html.end.pending()(msg))
+              )
+            )
+          case _       => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+        }
       case Some(reg) if reg.registrationNumber.isDefined =>
         backend.lookupOutstandingReturns().map { periods =>
           Ok(

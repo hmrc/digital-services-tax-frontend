@@ -21,9 +21,11 @@ import data._
 import connectors._
 import cats.implicits._
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
+import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.Html
@@ -53,6 +55,7 @@ class JourneyController @Inject() (
     with I18nSupport
     with AuthorisedFunctions {
 
+  val logger                              = Logger(getClass)
   def backend(implicit hc: HeaderCarrier) = new DSTConnector(http, servicesConfig)
 
   def index: Action[AnyContent] = authorisedAction.async { implicit request =>
@@ -60,11 +63,19 @@ class JourneyController @Inject() (
       implicitly[Messages].convertMessagesTwirlHtml(false)
 
     backend.lookupRegistration().flatMap {
-      case None =>
-        Future.successful(
-          Redirect(routes.RegistrationController.registerAction(" "))
-        )
-
+      case None                                          =>
+        backend.lookupPendingRegistration().flatMap {
+          case Some(_) =>
+            logger.info("[JourneyController] Pending registrations")
+            Future.successful(
+              Ok(
+                layout(
+                  pageTitle = Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+                )(views.html.end.pending()(msg))
+              )
+            )
+          case _       => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+        }
       case Some(reg) if reg.registrationNumber.isDefined =>
         for {
           outstandingPeriods <- backend.lookupOutstandingReturns()
