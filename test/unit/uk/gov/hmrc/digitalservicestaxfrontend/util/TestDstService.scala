@@ -30,7 +30,7 @@ trait TestDstService extends DSTService[Id] {
   def submitRegistration(reg: Registration): HttpResponse                    = HttpResponse(200, "")
   def submitReturn(period: Period, ret: Return): HttpResponse                = HttpResponse(200, "")
   def lookupRegistration(): Option[Registration]                             = sampleReg.some
-  def lookupPendingRegistration(): Option[String]                            = None
+  def lookupPendingRegistrationExists(): Boolean                             = false
   def lookupOutstandingReturns(): Set[Period]                                = Set.empty
   def lookupAmendableReturns(): Set[Period]                                  = Set.empty
   def lookupAllReturns(): Set[Period]                                        = Set.empty

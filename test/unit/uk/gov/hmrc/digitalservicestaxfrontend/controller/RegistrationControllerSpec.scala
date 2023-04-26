@@ -37,7 +37,7 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
   "RegistrationController.registerAction" must {
     "run the registration journey when there is no registration and no pending registration taking you to first page" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
       val result = controller
         .registerAction("")
         .apply(
@@ -48,7 +48,7 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
     }
     "load the pending registration page when there is pending registration taking you to first page" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(Some("DSTRefNumber123"))
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
       val result = controller
         .registerAction("")
         .apply(

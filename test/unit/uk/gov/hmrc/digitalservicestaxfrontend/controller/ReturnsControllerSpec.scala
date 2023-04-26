@@ -57,7 +57,7 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
   "returnsController.showAmendments" must {
     "return a 404 when a registration and pending registrations are not found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
 
       val result = returnsController
         .showAmendments()
@@ -70,7 +70,7 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
 
     "return a 404 when a registration is not found and pending registrations is found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(Some("DstRefNumber123"))
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
 
       val result = returnsController
         .showAmendments()
@@ -148,7 +148,7 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
   "ReturnsController.returnAction"   must {
     "return a 303 when a registration is not found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
 
       val result = returnsController
         .returnAction(correctPeriodKey)
@@ -161,7 +161,7 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
 
     "return a 200 with pending registration page when a registration is pending" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(Some("DSTRefNumber123"))
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
 
       val result = returnsController
         .returnAction(correctPeriodKey)

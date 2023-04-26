@@ -87,9 +87,9 @@ class RegistrationController @Inject() (
 
       backend.lookupRegistration().flatMap {
         case None    =>
-          backend.lookupPendingRegistration().flatMap {
-            case Some(dstRefNumber) =>
-              logger.info("[JourneyController] Pending registrations with DST Ref number: $dstRefNumber")
+          backend.lookupPendingRegistrationExists().flatMap {
+            case true =>
+              logger.info("[RegistrationController] Pending registration")
               Future.successful(
                 Ok(
                   layout(
@@ -97,7 +97,7 @@ class RegistrationController @Inject() (
                   )(views.html.end.pending()(msg))
                 )
               )
-            case _                  =>
+            case _    =>
               interpret(registrationJourney(backend)).run(targetId) { ret =>
                 backend.submitRegistration(ret).map { backendResponse =>
                   backendResponse.status match {

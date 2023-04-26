@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.digitalservicestax.connectors
 
+import play.api.http.Status.OK
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -53,8 +54,11 @@ class DSTConnector(val http: HttpClient, servicesConfig: ServicesConfig)(implici
   def lookupRegistration(): Future[Option[Registration]] =
     http.GET[Option[Registration]](s"$backendURL/registration")
 
-  def lookupPendingRegistration(): Future[Option[String]] =
-    http.GET[Option[String]](s"$backendURL/pending-registration")
+  def lookupPendingRegistrationExists(): Future[Boolean] =
+    http.GET[HttpResponse](s"$backendURL/pending-registration").map {
+      case resp if resp.status == OK => true
+      case _                         => false
+    }
 
   def lookupOutstandingReturns(): Future[Set[Period]] =
     http.GET[List[Period]](s"$backendURL/returns/outstanding").map(_.toSet)

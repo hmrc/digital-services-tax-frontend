@@ -43,7 +43,7 @@ class JourneyControllerSpec extends FakeApplicationServer {
 
     "redirect to register action when no registration or pending registration" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
       val result = controller.index.apply(
         FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
       )
@@ -53,7 +53,7 @@ class JourneyControllerSpec extends FakeApplicationServer {
 
     "redirect to register action when no registration and have pending registration" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(Some("dstRefNumber"))
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
       val result        = controller.index.apply(
         FakeRequest("GET", contactReportTechnicalIssueUri)
           .withSession()

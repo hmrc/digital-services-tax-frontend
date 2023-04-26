@@ -88,9 +88,9 @@ class ReturnsController @Inject() (
 
     backend.lookupRegistration().flatMap {
       case None    =>
-        backend.lookupPendingRegistration().flatMap {
-          case Some(dstRefNumber) =>
-            logger.info(s"[ReturnsController] Pending registrations with DST Ref number: $dstRefNumber")
+        backend.lookupPendingRegistrationExists().flatMap {
+          case true =>
+            logger.info("[ReturnsController] Pending registration")
             Future.successful(
               Ok(
                 layout(
@@ -98,7 +98,7 @@ class ReturnsController @Inject() (
                 )(views.html.end.pending()(msg))
               )
             )
-          case _                  => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+          case _    => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
         }
       case Some(_) =>
         backend.lookupAmendableReturns().map { outstandingPeriods =>
@@ -163,9 +163,9 @@ class ReturnsController @Inject() (
 
       backend.lookupRegistration().flatMap {
         case None      =>
-          backend.lookupPendingRegistration().flatMap {
-            case Some(dstRefNumber) =>
-              logger.info(s"[ReturnsController] Pending registrations with DST Ref number: $dstRefNumber")
+          backend.lookupPendingRegistrationExists().flatMap {
+            case true =>
+              logger.info("[ReturnsController] Pending registration")
               Future.successful(
                 Ok(
                   layout(
@@ -173,7 +173,7 @@ class ReturnsController @Inject() (
                   )(views.html.end.pending()(msg))
                 )
               )
-            case _                  => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+            case _    => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
           }
         case Some(reg) =>
           backend.lookupAllReturns().flatMap { periods =>

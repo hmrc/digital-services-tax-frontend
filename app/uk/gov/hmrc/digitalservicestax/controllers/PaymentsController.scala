@@ -65,9 +65,9 @@ class PaymentsController @Inject() (
 
     backend.lookupRegistration().flatMap {
       case None                                          =>
-        backend.lookupPendingRegistration().flatMap {
-          case Some(dstRefNumber) =>
-            logger.info(s"[PaymentsController] Pending registrations with DST Ref number: $dstRefNumber")
+        backend.lookupPendingRegistrationExists().flatMap {
+          case true =>
+            logger.info("[PaymentsController] Pending registration")
             Future.successful(
               Ok(
                 layout(
@@ -75,7 +75,7 @@ class PaymentsController @Inject() (
                 )(views.html.end.pending()(msg))
               )
             )
-          case _                  => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+          case _    => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
         }
       case Some(reg) if reg.registrationNumber.isDefined =>
         backend.lookupOutstandingReturns().map { periods =>

@@ -182,10 +182,26 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
           )
       )
 
-      val response = DSTTestConnector.lookupPendingRegistration()
+      val response = DSTTestConnector.lookupPendingRegistrationExists()
       whenReady(response) { res =>
-        res mustBe defined
-        res.value mustEqual "DstRegNumber"
+        res mustBe true
+      }
+    }
+  }
+
+  "should lookup a pending registration NotFound" in {
+    forAll { reg: Registration =>
+      stubFor(
+        get(urlPathEqualTo(s"/pending-registration"))
+          .willReturn(
+            aResponse()
+              .withStatus(404)
+          )
+      )
+
+      val response = DSTTestConnector.lookupPendingRegistrationExists()
+      whenReady(response) { res =>
+        res mustBe false
       }
     }
   }

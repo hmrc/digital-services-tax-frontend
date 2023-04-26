@@ -46,7 +46,7 @@ class PaymentsControllerSpec extends FakeApplicationServer {
   "PaymentsController.payYourDST" must {
     "redirect back to the start of the journey if a registration isn't found and pending registration not found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
       val result = paymentsController
         .payYourDST()
         .apply(
@@ -58,7 +58,7 @@ class PaymentsControllerSpec extends FakeApplicationServer {
 
     "redirect back to the start of the journey if a registration isn't found and pending registration found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
-      when(mockDSTConnector.lookupPendingRegistration()) thenReturn Future.successful(Some("dstRefNumber"))
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
       val result = paymentsController
         .payYourDST()
         .apply(
