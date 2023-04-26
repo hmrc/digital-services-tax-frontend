@@ -65,8 +65,8 @@ class JourneyController @Inject() (
     backend.lookupRegistration().flatMap {
       case None                                          =>
         backend.lookupPendingRegistration().flatMap {
-          case Some(_) =>
-            logger.info("[JourneyController] Pending registrations")
+          case Some(dstRefNumber) =>
+            logger.info(s"[JourneyController] Pending registrations with DST Ref number: $dstRefNumber")
             Future.successful(
               Ok(
                 layout(
@@ -74,7 +74,7 @@ class JourneyController @Inject() (
                 )(views.html.end.pending()(msg))
               )
             )
-          case _       => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+          case _                  => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
         }
       case Some(reg) if reg.registrationNumber.isDefined =>
         for {

@@ -86,20 +86,34 @@ class RegistrationController @Inject() (
       implicit val msg: UniformMessages[Html] = messages(request)
 
       backend.lookupRegistration().flatMap {
-        case None =>
-          interpret(registrationJourney(backend)).run(targetId) { ret =>
-            backend.submitRegistration(ret).map { backendResponse =>
-              backendResponse.status match {
-                case OK =>
-                  Redirect(
-                    routes.RegistrationController.registrationComplete
-                  ).addingToSession(("companyName", ret.companyReg.company.name), ("companyEmail", ret.contact.email))
-                case _  => Redirect(routes.RegistrationController.registerAction(" "))
+        case None    =>
+          backend.lookupPendingRegistration().flatMap {
+            case Some(dstRefNumber) =>
+              logger.info("[JourneyController] Pending registrations with DST Ref number: $dstRefNumber")
+              Future.successful(
+                Ok(
+                  layout(
+                    pageTitle = Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+                  )(views.html.end.pending()(msg))
+                )
+              )
+            case _                  =>
+              interpret(registrationJourney(backend)).run(targetId) { ret =>
+                backend.submitRegistration(ret).map { backendResponse =>
+                  backendResponse.status match {
+                    case OK =>
+                      Redirect(
+                        routes.RegistrationController.registrationComplete
+                      ).addingToSession(
+                        ("companyName", ret.companyReg.company.name),
+                        ("companyEmail", ret.contact.email)
+                      )
+                    case _  => Redirect(routes.RegistrationController.registerAction(" "))
+                  }
+
+                }
               }
-
-            }
           }
-
         case Some(_) =>
           Future.successful(Redirect(routes.JourneyController.index))
       }
