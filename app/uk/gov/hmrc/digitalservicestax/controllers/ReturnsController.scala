@@ -87,7 +87,19 @@ class ReturnsController @Inject() (
     implicit val msg: UniformMessages[Html] = messages(request)
 
     backend.lookupRegistration().flatMap {
-      case None    => Future.successful(NotFound)
+      case None    =>
+        backend.lookupPendingRegistrationExists().flatMap {
+          case true =>
+            logger.info("[ReturnsController] Pending registration")
+            Future.successful(
+              Ok(
+                layout(
+                  pageTitle = Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+                )(views.html.end.pending()(msg))
+              )
+            )
+          case _    => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+        }
       case Some(_) =>
         backend.lookupAmendableReturns().map { outstandingPeriods =>
           outstandingPeriods.toList match {
@@ -150,7 +162,19 @@ class ReturnsController @Inject() (
       implicit val p = persistence
 
       backend.lookupRegistration().flatMap {
-        case None      => Future.successful(NotFound)
+        case None      =>
+          backend.lookupPendingRegistrationExists().flatMap {
+            case true =>
+              logger.info("[ReturnsController] Pending registration")
+              Future.successful(
+                Ok(
+                  layout(
+                    pageTitle = Some(s"${msg("common.title.short")} - ${msg("common.title")}")
+                  )(views.html.end.pending()(msg))
+                )
+              )
+            case _    => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+          }
         case Some(reg) =>
           backend.lookupAllReturns().flatMap { periods =>
             periods.find(_.key == periodKey) match {

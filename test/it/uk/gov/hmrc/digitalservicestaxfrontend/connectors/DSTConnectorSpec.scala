@@ -21,7 +21,6 @@ import it.uk.gov.hmrc.digitalservicestaxfrontend.util.WiremockServer
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalactic.anyvals.PosInt
 import play.api.libs.json.Json
-import play.api.test.Helpers.await
 import play.mvc.Http.Status
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.data.BackendAndFrontendJson._
@@ -168,6 +167,41 @@ class DSTConnectorSpec extends WiremockServer with ConfiguredPropertyChecks {
       whenReady(response) { res =>
         res mustBe defined
         res.value mustEqual reg
+      }
+    }
+  }
+
+  "should lookup a pending registration successfully" in {
+    forAll { reg: Registration =>
+      stubFor(
+        get(urlPathEqualTo(s"/pending-registration"))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(Json.toJson("DstRegNumber").toString())
+          )
+      )
+
+      val response = DSTTestConnector.lookupPendingRegistrationExists()
+      whenReady(response) { res =>
+        res mustBe true
+      }
+    }
+  }
+
+  "should lookup a pending registration NotFound" in {
+    forAll { reg: Registration =>
+      stubFor(
+        get(urlPathEqualTo(s"/pending-registration"))
+          .willReturn(
+            aResponse()
+              .withStatus(404)
+          )
+      )
+
+      val response = DSTTestConnector.lookupPendingRegistrationExists()
+      whenReady(response) { res =>
+        res mustBe false
       }
     }
   }

@@ -35,8 +35,9 @@ import uk.gov.hmrc.mongo.test.MongoSupport
 class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport {
 
   "RegistrationController.registerAction" must {
-    "run the registration journey when there is no registration taking you to first page" in {
+    "run the registration journey when there is no registration and no pending registration taking you to first page" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
       val result = controller
         .registerAction("")
         .apply(
@@ -44,6 +45,17 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
         )
       status(result) mustBe 303
       redirectLocation(result) mustBe Some("/global-revenues")
+    }
+    "load the pending registration page when there is pending registration taking you to first page" in {
+      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
+      val result = controller
+        .registerAction("")
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
+      status(result) mustBe 200
+      contentAsString(result) must include(messagesApi("registration.pending.title"))
     }
     "take you back to journey controller index when these is a registration" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(

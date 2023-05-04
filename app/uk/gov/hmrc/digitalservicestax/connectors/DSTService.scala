@@ -32,6 +32,8 @@ trait DSTService[F[_]] {
 
   def lookupRegistration(): F[Option[Registration]]
 
+  def lookupPendingRegistrationExists(): F[Boolean]
+
   def lookupOutstandingReturns(): F[Set[Period]]
 
   def lookupAmendableReturns(): F[Set[Period]]
@@ -50,6 +52,8 @@ trait DSTService[F[_]] {
       def lookupOutstandingReturns(): G[Set[Period]] = nat(old.lookupOutstandingReturns())
 
       def lookupRegistration(): G[Option[Registration]] = nat(old.lookupRegistration())
+
+      def lookupPendingRegistrationExists(): G[Boolean] = nat(old.lookupPendingRegistrationExists())
 
       def submitRegistration(reg: Registration): G[HttpResponse] = nat(old.submitRegistration(reg))
 

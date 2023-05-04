@@ -41,13 +41,28 @@ class JourneyControllerSpec extends FakeApplicationServer {
 
   "JourneyController" must {
 
-    "redirect to register action when no registration" in {
+    "redirect to register action when no registration or pending registration" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
       val result = controller.index.apply(
         FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
       )
       status(result) mustBe 303
       redirectLocation(result) mustBe Some(routes.RegistrationController.registerAction(" ").url)
+    }
+
+    "redirect to register action when no registration and have pending registration" in {
+      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
+      val result        = controller.index.apply(
+        FakeRequest("GET", contactReportTechnicalIssueUri)
+          .withSession()
+          .withHeaders("Authorization" -> "Bearer some-token")
+      )
+      status(result) mustBe 200
+      implicit val lang = Lang("en")
+      contentAsString(result) must include(messagesApi("registration.pending.title"))
+      contentAsString(result) must include(contactReportTechnicalIssueUrl)
     }
 
     "return pending page with there is a registration without a registration number" in {

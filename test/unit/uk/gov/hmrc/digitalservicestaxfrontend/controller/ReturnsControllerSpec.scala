@@ -55,15 +55,30 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
   private val incorrectPeriodKey = "0003"
 
   "returnsController.showAmendments" must {
-    "return a 404 when a registration is not found" in {
+    "return a 404 when a registration and pending registrations are not found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
 
       val result = returnsController
         .showAmendments()
         .apply(
           FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
         )
-      status(result) mustBe NOT_FOUND
+      status(result) mustBe 303
+      redirectLocation(result) mustBe Some(routes.RegistrationController.registerAction(" ").url)
+    }
+
+    "return a 404 when a registration is not found and pending registrations is found" in {
+      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
+
+      val result = returnsController
+        .showAmendments()
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
+      status(result) mustBe 200
+      contentAsString(result) must include(messagesApi("registration.pending.title"))
     }
 
     "return a 404 when a registration is found, but amendableReturns are not" in {
@@ -131,15 +146,30 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
   }
 
   "ReturnsController.returnAction"   must {
-    "return a 404 when a registration is not found" in {
+    "return a 303 when a registration is not found" in {
       when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(false)
 
       val result = returnsController
         .returnAction(correctPeriodKey)
         .apply(
           FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
         )
-      status(result) mustBe NOT_FOUND
+      status(result) mustBe 303
+      redirectLocation(result) mustBe Some(routes.RegistrationController.registerAction(" ").url)
+    }
+
+    "return a 200 with pending registration page when a registration is pending" in {
+      when(mockDSTConnector.lookupRegistration()) thenReturn Future.successful(None)
+      when(mockDSTConnector.lookupPendingRegistrationExists()) thenReturn Future.successful(true)
+
+      val result = returnsController
+        .returnAction(correctPeriodKey)
+        .apply(
+          FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
+        )
+      status(result) mustBe 200
+      contentAsString(result) must include(messagesApi("registration.pending.title"))
     }
 
     "return a 404 when a registration is found, but the returned periodKey does not match what is in the uri" in {
