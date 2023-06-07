@@ -24,7 +24,7 @@ import play.api.data.Form
 import play.api.data.FormBinding.Implicits._
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, ControllerHelpers}
+import play.api.mvc.{Action, AnyContent, ControllerHelpers, RequestHeader}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoUniformPersistence, ReturnsRepo}
@@ -194,8 +194,9 @@ class ReturnsController @Inject() (
 
   def returnComplete(submittedPeriodKeyString: String): Action[AnyContent] = authorisedAction.async {
     implicit request =>
-      implicit val msg: UniformMessages[Html] = messages(request)
-      val submittedPeriodKey                  = Period.Key(submittedPeriodKeyString)
+      implicit val requestHeader: RequestHeader = request
+      implicit val msg: UniformMessages[Html]   = messages(request)
+      val submittedPeriodKey                    = Period.Key(submittedPeriodKeyString)
       for {
         ret                <- returnsCache.retrieveCachedReturn
         reg                <- backend.lookupRegistration()
@@ -219,7 +220,7 @@ class ReturnsController @Inject() (
                 period,
                 outstandingPeriods.toList.minBy(_.start),
                 printableCYA
-              )(msg)
+              )(requestHeader, msg)
             )
           )
       }
