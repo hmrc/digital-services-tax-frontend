@@ -25,13 +25,14 @@
     hmrcLayout: HmrcLayout,
     scripts: Scripts,
     hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
+    fullWidthMainContent: FullWidthMainContent,
     defaultMainContentLayout: TwoThirdsMainContent
 )
 
 @(
     pageTitle: Option[String] = None,
     useFullWidth: Boolean = false,
-)(contentBlock: Html)(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
+)(contentBlock: Html)(implicit request: RequestHeader, messages: UniformMessages[Html], appConfig: AppConfig)
 
 @content = {
     @contentBlock
@@ -59,7 +60,6 @@
     phaseBanner = None,
     additionalHeadBlock = Some(head()),
     additionalScriptsBlock = Some(scripts()),
-    nonce = CSPNonce.get,
-    mainContentLayout = if(useFullWidth) None else Some(defaultMainContentLayout(_))
+    mainContentLayout = if(useFullWidth) Some(fullWidthMainContent(_)) else Some(defaultMainContentLayout(_))
 )(content)
 

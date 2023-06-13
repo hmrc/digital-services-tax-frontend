@@ -6,10 +6,10 @@ object AppDependencies {
   val uniformVersion           = "5.0.0-RC2"
   val hmrcMongoVersion         = "0.73.0"
   val play                     = "28"
-  private val bootstrapVersion = "7.14.0"
+  private val bootstrapVersion = "7.15.0"
 
   val compile = Seq(
-    "uk.gov.hmrc"           %% "play-frontend-hmrc"             % s"6.2.0-play-$play",
+    "uk.gov.hmrc"           %% "play-frontend-hmrc"             % s"7.0.0-play-$play",
     "com.chuusai"           %% "shapeless"                      % "2.4.0-M1",
     "com.beachape"          %% "enumeratum-play-json"           % "1.7.0",
     "com.luketebbs.uniform" %% s"interpreter-play$play"         % uniformVersion,

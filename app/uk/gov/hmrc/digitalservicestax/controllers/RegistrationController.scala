@@ -22,7 +22,7 @@ import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, ControllerHelpers, Result}
+import play.api.mvc.{Action, AnyContent, ControllerHelpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}

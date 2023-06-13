@@ -19,7 +19,7 @@
     layout: Layout
 )
 
-@()(implicit request: Request[_], messages: UniformMessages[Html], appConfig: AppConfig)
+@()(implicit request: RequestHeader, messages: UniformMessages[Html], appConfig: AppConfig)
 
 @layout(pageTitle = Some(messages("time-out.title").toString())) {
     <h1 class="govuk-heading-l">@messages("time-out.title")</h1>

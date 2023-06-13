@@ -14,17 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.digitalservicestax.config.AppConfig
+@this()
 
-@this(
- layout: Layout
-)
+@(contentBlock: Html)
 
-@(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader, messages: UniformMessages[Html], appConfig: AppConfig)
-
-@mainContent = {
- <h1 class="govuk-heading-xl">@heading</h1>
- <p class="govuk-body">@message</p>
-}
-
-@layout(Some(pageTitle))(mainContent)(request, messages, appConfig)
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @contentBlock
+    </div>
+</div>

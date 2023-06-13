@@ -15,12 +15,14 @@
  *@
 
 @import uk.gov.hmrc.digitalservicestax.frontend.formatDate
+@import views.html.helper.CSPNonce
+
 
 @this(
         govukPanel : GovukPanel
 )
 
-@(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period, printableCYA: Option[Html])(implicit messages: UniformMessages[Html])
+@(key: String, companyName: CompanyName, submittedPeriod: Period, nextPeriod: Period, printableCYA: Option[Html])(implicit header: RequestHeader, messages: UniformMessages[Html])
 <div id="print-submission">
 
 @printableCYA.map { printable =>
@@ -34,8 +36,16 @@
 
 @printableCYA.map { _ =>
     <p class="govuk-body jsonly">
-        <a href="javascript:window.print()" class="govuk-link print-icon">@messages(s"$key.print-save")</a>
+        <a id="printId" href="#" class="govuk-link print-icon">@messages(s"$key.print-save")</a>
     </p>
+
+    <script @CSPNonce.attr>
+          document.getElementById("printId").addEventListener("click", function() {
+           if(window.print) {
+               window.print()
+               }
+            });
+    </script>
 }
 
 <h2 class="govuk-heading-m">@messages("confirmation.what-you-do-next.title")</h2>
