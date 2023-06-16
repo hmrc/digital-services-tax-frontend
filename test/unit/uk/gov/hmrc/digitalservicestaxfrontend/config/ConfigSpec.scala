@@ -42,11 +42,11 @@ class ConfigSpec extends FakeApplicationServer {
   }
 
   "should load a MongoDB short lived store duration" in {
-    appConfig.mongoShortLivedStoreExpireAfter mustEqual 30.days
+    appConfig.mongoShortLivedStoreExpireAfter mustEqual 15.minutes
   }
 
   "should load a MongoDB expiry config duration" in {
-    appConfig.mongoShortLivedStoreExpireAfter mustEqual 30.days
+    appConfig.mongoShortLivedStoreExpireAfter mustEqual 15.minutes
   }
 
   "should load a DST index page URL from the configuration" in {
