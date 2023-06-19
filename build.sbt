@@ -17,7 +17,6 @@ lazy val microservice = Project(appName, file("."))
     majorVersion := 0,
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test ++ Seq(ws)
   )
-  .settings(publishingSettings: _*)
   .settings(
     // To resolve a bug with version 2.x.x of the scoverage plugin - https://github.com/sbt/sbt/issues/6997
     libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
