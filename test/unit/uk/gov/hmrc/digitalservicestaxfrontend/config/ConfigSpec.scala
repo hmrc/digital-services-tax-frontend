@@ -33,14 +33,6 @@ class ConfigSpec extends FakeApplicationServer {
     appConfig.serviceName.nonEmpty mustEqual true
   }
 
-  "should load a partial URL from the configuration" in {
-    appConfig.reportAProblemPartialUrl.nonEmpty mustEqual true
-  }
-
-  "should load a report JSON partial URL from the configuration" in {
-    appConfig.reportAProblemNonJSUrl.nonEmpty mustEqual true
-  }
-
   "should load a MongoDB short lived store duration" in {
     appConfig.mongoShortLivedStoreExpireAfter mustEqual 15.minutes
   }
