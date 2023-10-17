@@ -4,7 +4,7 @@ import sbt._
 object AppDependencies {
 
   val uniformVersion           = "5.0.0-RC2"
-  val hmrcMongoVersion         = "0.73.0"
+  val hmrcMongoVersion         = "1.3.0"
   val play                     = "28"
   private val bootstrapVersion = "7.15.0"
 
