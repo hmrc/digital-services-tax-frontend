@@ -1,13 +1,12 @@
 import play.sbt.PlayImport.ws
 import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "digital-services-tax-frontend"
 
 PlayKeys.playDefaultPort := 8740
 
 addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3")
-scalaVersion := "2.13.10"
+scalaVersion := "2.13.12"
 routesImport += "uk.gov.hmrc.digitalservicestax.data._"
 
 lazy val microservice = Project(appName, file("."))
