@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package uk.gov.hmrc.digitalservicestax.actions
 
 import cats.syntax.semigroup._
 import com.google.inject.ImplementedBy
-
-import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import play.api.Logger
 import play.api.i18n.MessagesApi
@@ -27,7 +25,7 @@ import play.api.mvc.Results.{Ok, Redirect}
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
-import uk.gov.hmrc.auth.core.AuthProvider.{GovernmentGateway, Verify}
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{affinityGroup, allEnrolments, credentialRole, internalId}
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -39,6 +37,7 @@ import uk.gov.hmrc.digitalservicestax.views.html.Layout
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[AuthorisedAction])
@@ -68,7 +67,7 @@ class AuthorisedAction @Inject() (
 
     val retrieval = allEnrolments and credentialRole and internalId and affinityGroup
 
-    authorised(AuthProviders(GovernmentGateway, Verify) and Organisation and User).retrieve(retrieval) {
+    authorised(AuthProviders(GovernmentGateway) and Organisation and User).retrieve(retrieval) {
       case enrolments ~ _ ~ id ~ _ =>
         val internalIdString = id.getOrElse(throw new RuntimeException("No internal ID for user"))
         val internalId       = InternalId
