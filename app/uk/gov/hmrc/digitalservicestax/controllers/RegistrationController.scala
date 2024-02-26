@@ -22,7 +22,7 @@ import ltbs.uniform.{ErrorTree, Input, UniformMessages}
 import ltbs.uniform.common.web._
 import ltbs.uniform.interpreters.playframework._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, ControllerHelpers}
+import play.api.mvc.{Action, AnyContent, ControllerHelpers, RequestHeader}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
@@ -121,7 +121,6 @@ class RegistrationController @Inject() (
 
   def registrationComplete: Action[AnyContent] = authorisedAction.async { implicit request =>
     implicit val msg: UniformMessages[Html] = messages(request)
-
     (request.session.get("companyName"), request.session.get("companyEmail")) match {
       case (Some(companyName), Some(companyEmail)) =>
         Future.successful(
@@ -135,7 +134,7 @@ class RegistrationController @Inject() (
                 "registration-sent",
                 companyName,
                 Email(companyEmail)
-              )(msg)
+              )(request, msg)
             )
           )
         )
