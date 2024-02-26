@@ -15,12 +15,13 @@
  *@
 
 @import uk.gov.hmrc.digitalservicestax.data.Email
+@import views.html.helper.CSPNonce
 
 @this(
         govukPanel : GovukPanel
 )
 
-@(key: String, companyName: String, email: Email)(messages: UniformMessages[Html])
+@(key: String, companyName: String, email: Email)(implicit header: RequestHeader, messages: UniformMessages[Html])
 
 @govukPanel(Panel(
     title = HtmlContent(messages(s"$key.heading")),
@@ -30,7 +31,15 @@
 <p class="govuk-body">@messages(s"$key.email", email)</p>
 
 <p class="govuk-body jsonly print-hide">
-    <a href="javascript:window.print()" class="govuk-link print-icon">@messages(s"$key.print-save")</a>
+    <a id="printId" href="#" class="govuk-link print-icon">@messages(s"$key.print-save")</a>
+
+    <script @CSPNonce.attr>
+          document.getElementById("printId").addEventListener("click", function() {
+           if(window.print) {
+               window.print()
+               }
+            });
+    </script>
 </p>
 
 <h2 class="govuk-heading-m">@messages(s"$key.what-happens-next.title")</h2>
