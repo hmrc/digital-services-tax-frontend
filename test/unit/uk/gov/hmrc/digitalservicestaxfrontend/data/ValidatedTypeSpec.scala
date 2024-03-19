@@ -31,13 +31,13 @@ import java.time.LocalDate
 
 class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks {
 
-  it          should "fail to parse a validated tagged type using an of method" in {
+  it should "fail to parse a validated tagged type using an of method" in {
     intercept[IllegalArgumentException] {
       Postcode("this is not a postcode")
     }
   }
 
-  it          should "concatenate lines in a UKAddress value" in {
+  it should "concatenate lines in a UKAddress value" in {
     forAll { ukAddress: UkAddress =>
       ukAddress.lines shouldEqual List(
         ukAddress.line1,
@@ -54,13 +54,13 @@ class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropert
     ukAddress.countryCode shouldEqual CountryCode("GB")
   }
 
-  it          should "validate IBAN numbers from a series of concrete examples" in {
+  it should "validate IBAN numbers from a series of concrete examples" in {
     forAll(Gen.oneOf(ibanList), minSuccessful(PosInt(86))) { source: String =>
       IBAN.of(source) shouldBe defined
     }
   }
 
-  it          should "concatenate lines in a ForeignAddress value" in {
+  it should "concatenate lines in a ForeignAddress value" in {
     forAll { foreignAddress: ForeignAddress =>
       foreignAddress.lines shouldEqual List(
         foreignAddress.line1,
@@ -72,7 +72,7 @@ class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropert
     }
   }
 
-  it          should "return an appropriate paymentDue date" in {
+  it should "return an appropriate paymentDue date" in {
     forAll { (p1: Period, p2: Period) =>
       List(p1, p2).sortBy(_.end) shouldEqual List(p1, p2).sortBy(_.paymentDue)
     }
@@ -82,15 +82,15 @@ class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropert
     }
   }
 
-  it          should "correctly define the class name of a validated type" in {
+  it should "correctly define the class name of a validated type" in {
     AccountNumber.className shouldEqual "AccountNumber$"
   }
 
-  it          should "store percentages as floats and initialise percent monoids with float monoids" in {
+  it should "store percentages as floats and initialise percent monoids with float monoids" in {
     Monoid[Percent].empty shouldEqual Monoid[Float].empty
   }
 
-  it          should "add up percentages using monoidal syntax" in {
+  it should "add up percentages using monoidal syntax" in {
 
     val generator = for {
       p1 <- Gen.chooseNum[Float](0f, 100f)
@@ -106,25 +106,25 @@ class ValidatedTypeSpec extends AnyFlatSpec with Matchers with ConfiguredPropert
     }
   }
 
-  it            should "fail to construct a type with a scale of more than 3" in {
+  it should "fail to construct a type with a scale of more than 3" in {
     an[IllegalArgumentException] should be thrownBy Percent.apply(1.1234f)
   }
 
-  it            should "allow comparing local dates with cats syntax" in {
+  it should "allow comparing local dates with cats syntax" in {
     import cats.syntax.order._
 
     val comparison = LocalDate.now.plusDays(1) compare LocalDate.now()
     comparison shouldEqual 1
   }
 
-  it            should "encode an Activity as a URL" in {
+  it should "encode an Activity as a URL" in {
     forAll(Gen.oneOf(Activity.values)) { a =>
       val expected = a.toString.replaceAll("(^[A-Z].*)([A-Z])", "$1-$2").toLowerCase
       Activity.toUrl(a) shouldEqual expected
     }
   }
 
-  it            should "combine and empty Money correctly" in {
+  it should "combine and empty Money correctly" in {
     import Money.mon
     forAll { (a: Money, b: Money) =>
       a.combine(b) - a     shouldEqual b

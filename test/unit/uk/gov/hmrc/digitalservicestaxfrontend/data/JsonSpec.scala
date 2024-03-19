@@ -124,7 +124,7 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
     }
   }
 
-  it             should "fail to validate a percentage from a non numeric value" in {
+  it should "fail to validate a percentage from a non numeric value" in {
     forAll(Sample.generator[ShortString]) { sample =>
       val parsed = Json.parse(s""" "${sample.value}" """).validate[Percent]
 
@@ -142,7 +142,7 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
 
         val parsed = js.validate[DB]
         parsed.isSuccess shouldEqual true
-      // parsed.asOpt.value should contain theSameElementsAs sample
+        // parsed.asOpt.value should contain theSameElementsAs sample
       }
     }
 
@@ -157,11 +157,11 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
     }
   }
 
-  it             should "serialize and de-serialise a GroupCompany instance" in {
+  it should "serialize and de-serialise a GroupCompany instance" in {
     testJsonRoundtrip[GroupCompany](genGroupCo)
   }
 
-  it             should "serialize and de-serialise a Money instance" in {
+  it should "serialize and de-serialise a Money instance" in {
     testJsonRoundtrip[Money]
   }
 
@@ -178,43 +178,43 @@ class JsonSpec extends AnyFlatSpec with Matchers with ConfiguredPropertyChecks w
     assert(parsed.isError)
   }
 
-  it             should "serialize and de-serialise an Activity instance" in {
+  it should "serialize and de-serialise an Activity instance" in {
     testJsonRoundtrip[Activity]
   }
 
-  it             should "serialize and de-serialise a Company instance" in {
+  it should "serialize and de-serialise a Company instance" in {
     testJsonRoundtrip[Company]
   }
 
-  it             should "serialize and de-serialise a Map[GroupCompany, Money]" in {
+  it should "serialize and de-serialise a Map[GroupCompany, Money]" in {
     testJsonRoundtrip[scala.collection.immutable.ListMap[GroupCompany, Money]](gencomap)
   }
 
-  it             should "serialize and de-serialise a LocalDate" in {
+  it should "serialize and de-serialise a LocalDate" in {
     testJsonRoundtrip[LocalDate]
   }
 
-  it             should "serialize and de-serialise a CompanyRegWrapper" in {
+  it should "serialize and de-serialise a CompanyRegWrapper" in {
     testJsonRoundtrip[CompanyRegWrapper]
   }
 
-  it             should "serialize and de-serialise an optional LocalDate" in {
+  it should "serialize and de-serialise an optional LocalDate" in {
     testJsonRoundtrip[Option[LocalDate]]
   }
 
-  it             should "serialize and de-serialise a set of Enrolments" in {
+  it should "serialize and de-serialise a set of Enrolments" in {
     testJsonRoundtrip[Set[Enrolment]]
   }
 
-  it             should "serialize and de-serialise a Map[Activity, Percent]" in {
+  it should "serialize and de-serialise a Map[Activity, Percent]" in {
     testJsonRoundtrip[Map[Activity, Percent]](genActivityPercentMap)
   }
 
-  it             should "serialize and de-serialise a CompanyRegFormat" in {
+  it should "serialize and de-serialise a CompanyRegFormat" in {
     testJsonRoundtrip[CompanyRegWrapper]
   }
 
-  it             should "serialize an enum entry as a string" in {
+  it should "serialize an enum entry as a string" in {
     val jsValue = Json.toJson(Activity.SocialMedia)
     jsValue shouldEqual JsString("SocialMedia")
   }
