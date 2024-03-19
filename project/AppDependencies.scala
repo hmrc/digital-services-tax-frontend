@@ -14,15 +14,14 @@ object AppDependencies {
     "com.beachape"          %% "enumeratum-play-json"      % "1.7.0",
     "com.luketebbs.uniform" %% s"interpreter-play28"       % uniformVersion, // The most recent edition of the uniform is play 28, and the play 30 version has not been released yet.
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$play"         % hmrcMongoVersion,
-    "commons-validator"      % "commons-validator"         % "1.7",
+    "commons-validator"      % "commons-validator"         % "1.8.0",
     "uk.gov.hmrc"           %% s"bootstrap-frontend-$play" % bootstrapVersion,
-    "fr.marcwrobel"          % "jbanking"                  % "4.0.0",
-    "org.jsoup"              % "jsoup"                     % "1.15.3"
+    "fr.marcwrobel"          % "jbanking"                  % "4.2.0",
+    "org.jsoup"              % "jsoup"                     % "1.17.1"
   )
 
   val test: Seq[ModuleID] = Seq(
     "org.scalatest"          %% "scalatest"              % "3.2.17",
-    "org.jsoup"               % "jsoup"                  % "1.15.4",
     "org.scalacheck"         %% "scalacheck"             % "1.17.0",
     "io.chrisdavenport"      %% "cats-scalacheck"        % "0.3.2",
     "com.beachape"           %% "enumeratum-scalacheck"  % "1.7.2",
