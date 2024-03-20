@@ -58,7 +58,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.companiesAmount shouldBe Symbol("empty")
   }
 
-  "If the registration is for a group we"     should "see manage-companies questions" in {
+  "If the registration is for a group we" should "see manage-companies questions" in {
     val ret: Return = LogicTableInterpreter
       .interpret(
         ReturnJourney.returnJourney(
@@ -73,7 +73,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.companiesAmount shouldBe Symbol("nonEmpty")
   }
 
-  "Return.alternativeCharge length"           should "be the same as length of reported activities" in {
+  "Return.alternativeCharge length" should "be the same as length of reported activities" in {
     implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
     val ret: Return                   = LogicTableInterpreter
       .interpret(
@@ -88,7 +88,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.alternateCharge.size shouldBe 1
   }
 
-  "Return.alternateCharge "                   should "be empty when no alternate charge is reported" in {
+  "Return.alternateCharge " should "be empty when no alternate charge is reported" in {
     implicit val sampleBooleanAsk = instancesF {
       case "report-alternative-charge" => List(false)
       case _                           => List(true)
@@ -106,7 +106,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.alternateCharge should be(Symbol("empty"))
   }
 
-  "Return.alternateCharge "                   should "not be empty when an alternate charge is reported" in {
+  "Return.alternateCharge " should "not be empty when an alternate charge is reported" in {
     val ret: Return = LogicTableInterpreter
       .interpret(
         ReturnJourney.returnJourney(
@@ -121,7 +121,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.alternateCharge should be(Symbol("nonEmpty"))
   }
 
-  "Return.crossBorderReliefAmount"            should "be zero when report-cross-border-transaction-relief is false" in {
+  "Return.crossBorderReliefAmount" should "be zero when report-cross-border-transaction-relief is false" in {
     implicit val sampleBooleanAsk = instancesF {
       case "report-cross-border-transaction-relief" => List(false)
       case _                                        => List(true)
@@ -140,7 +140,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.crossBorderReliefAmount shouldEqual BigDecimal(0)
   }
 
-  "Return.repayment"                          should "be nonEmpty when the user has asked for a repayment" in {
+  "Return.repayment" should "be nonEmpty when the user has asked for a repayment" in {
     val ret: Return = LogicTableInterpreter
       .interpret(
         ReturnJourney.returnJourney(
@@ -155,7 +155,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.repayment should be(Symbol("nonEmpty"))
   }
 
-  "Return.repayment"                          should "be empty when the user has not asked for a repayment" in {
+  "Return.repayment" should "be empty when the user has not asked for a repayment" in {
     implicit val sampleBooleanAsk = instancesF {
       case "repayment" => List(false)
       case _           => List(true)
@@ -173,7 +173,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.repayment should be(Symbol("empty"))
   }
 
-  "Return.allowanceAmount"                    should "not be asked when activity doesn't apply alternative charge" in {
+  "Return.allowanceAmount" should "not be asked when activity doesn't apply alternative charge" in {
     // social media only
     implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
     // no to alternative charge
@@ -194,7 +194,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.allowanceAmount should be(Symbol("empty"))
   }
 
-  "Return.allowanceAmount"                    should "not be asked when 0 Percentage supplied for activity" in {
+  "Return.allowanceAmount" should "not be asked when 0 Percentage supplied for activity" in {
     // social media only
     implicit val sampleActivitySetAsk: SampleData[Set[Activity]] = instances(Set[Activity](SocialMedia))
     implicit val sampleBooleanAsk: SampleData[Boolean]           = instancesF {
@@ -218,7 +218,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.allowanceAmount should be(Symbol("empty"))
   }
 
-  "Return.allowanceAmount"                    should "be asked when activity does apply alternative charge" in {
+  "Return.allowanceAmount" should "be asked when activity does apply alternative charge" in {
     // social media only
     implicit val sampleActivitySetAsk = instances(Set[Activity](SocialMedia))
     // no to alternative charge
@@ -235,7 +235,7 @@ class ReturnJourneySpec extends AnyFlatSpec with Matchers {
     ret.allowanceAmount should be(Symbol("nonEmpty"))
   }
 
-  "Return.allowanceAmount"                    should "be asked when positve Percentage supplied for activity" in {
+  "Return.allowanceAmount" should "be asked when positve Percentage supplied for activity" in {
     // social media only
     implicit val sampleActivitySetAsk: SampleData[Set[Activity]] = instances(Set[Activity](SocialMedia))
     implicit val sampleBooleanAsk: SampleData[Boolean]           = instancesF {
