@@ -9,7 +9,7 @@ object AppDependencies {
   private val bootstrapVersion = "8.6.0"
 
   val compile: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$play" % "8.5.0",
+    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$play" % "9.11.0",
     "com.chuusai"           %% "shapeless"                 % "2.4.0-M1",
     "com.beachape"          %% "enumeratum-play-json"      % "1.8.0",
     "com.luketebbs.uniform" %% s"interpreter-play28"       % uniformVersion, // The most recent edition of the uniform is play 28, and the play 30 version has not been released yet.
