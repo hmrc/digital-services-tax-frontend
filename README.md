@@ -24,7 +24,7 @@ If you need to setup SSH, see [the github guide to setting up SSH](https://help.
 
 Run the code from source using 
 
-`sbt run`
+`./run.sh`
 
 Open your browser and navigate to the following url:
 
@@ -47,7 +47,7 @@ password=PASSWORD
 
 Ensure your service manager config is up to date, and run the following command:
 
-`sm --start DST_ALL -f`
+`sm2 --start DST_ALL`
 
 This will start all the required services
 
