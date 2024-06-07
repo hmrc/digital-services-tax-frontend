@@ -10,7 +10,7 @@ scalaVersion := "2.13.13"
 routesImport += "uk.gov.hmrc.digitalservicestax.data._"
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
     majorVersion := 0,
