@@ -832,8 +832,8 @@ confirmation.index=Go to your Digital Services Tax details
 
 #error pages
 wrong-account.heading=You cannot use this service
-wrong-account.sign-out.reason=You signed in with a Government Gateway user ID for an individual or agent. We have signed you out.
-wrong-account.sign-in.reason=To use this service, sign in with the Government Gateway user ID for the company that is registering for the Digital Services Tax.
+wrong-account.sign-out.reason=You signed in with the HMRC sign in details for an individual or agent. We have signed you out.
+wrong-account.sign-in.reason=To use this service, sign in with the HMRC sign in details for the company that is registering for the Digital Services Tax.
 
 wrong-creds.heading=You cannot submit a Digital Services Tax return
 wrong-creds.p1=You must be an administrator of your organisation to submit a Digital Services Tax return.
