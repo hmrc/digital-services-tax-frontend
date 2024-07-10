@@ -65,7 +65,7 @@ class ReturnsController @Inject() (
   import interpreter._
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 
-  private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
+  private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, Compa_nyName)]] {
     override def render(
       in: CYA[(Return, Period, CompanyName)],
       key: String,
