@@ -95,6 +95,10 @@ class RegistrationControllerSpec extends FakeApplicationServer with MongoSupport
       )
       status(result) mustBe 200
       contentAsString(result) must include(messagesApi("registration-sent.heading"))
+      contentAsString(result) must include("Before you go")
+      contentAsString(result) must include("Your feedback helps us make our service better.")
+      contentAsString(result) must include("Take a short survey")
+      contentAsString(result) must include("to share your feedback on this service.")
     }
   }
 

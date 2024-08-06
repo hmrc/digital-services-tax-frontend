@@ -58,10 +58,9 @@
     </a>
 </p>
 
+<h2 class="govuk-heading-m">@messages("common.feedback.title")</h2>
+<p class="govuk-body">@messages("common.feedback.p1")</p>
 <p class="govuk-body">
-    <a href="@uk.gov.hmrc.digitalservicestax.controllers.routes.AuthenticationController.signOut()" class="govuk-link">
-    @messages("common.feedback")
-    </a>
-    @messages("common.thirty-seconds")
+    <a class="govuk-link" href="@uk.gov.hmrc.digitalservicestax.controllers.routes.AuthenticationController.signOut()">@messages("common.feedback.link")</a> @messages("common.feedback.p2")
 </p>
 </div>

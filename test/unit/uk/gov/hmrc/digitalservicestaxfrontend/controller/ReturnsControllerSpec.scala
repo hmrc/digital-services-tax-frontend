@@ -225,6 +225,10 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
           )
         status(result) mustBe OK
         contentAsString(result) must include(messagesApi("confirmation.heading"))
+        contentAsString(result) must include("Before you go")
+        contentAsString(result) must include("Your feedback helps us make our service better.")
+        contentAsString(result) must include("Take a short survey")
+        contentAsString(result) must include("to share your feedback on this service.")
       }
   }
 }

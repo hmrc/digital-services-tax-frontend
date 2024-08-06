@@ -41,9 +41,11 @@
             "https://www.gov.uk/guidance/register-for-digital-services-tax-and-change-your-details"
         )
     </p>
-    <h2 class="govuk-heading-m">@messages.get(s"$key.kickout.tax-return.heading")</h2>
-    <p class="govuk-body">@messages.get(s"$key.kickout.tax-return.p1")</p>
-    <p class="govuk-body">@messages.get(s"$key.kickout.tax-return.p2", "https://www.gov.uk/log-in-file-self-assessment-tax-return")</p>
+    @messages.get(s"$key.kickout.tax-return.heading").map { h =>
+        <h2 class="govuk-heading-m">@h</h2>
+        <p class="govuk-body">@messages.get(s"$key.kickout.tax-return.p1")</p>
+        <p class="govuk-body">@messages.get(s"$key.kickout.tax-return.p2", "https://www.gov.uk/log-in-file-self-assessment-tax-return")</p>
+    }
 
     @messages.get(s"$key.kickout.other-services-links.heading").map{ h =>
         <h2 class="govuk-heading-m">@h</h2>
@@ -83,4 +85,10 @@
             @messages("common.try-again")
         </a>
     }
+
+    <h2 class="govuk-heading-m">@messages("common.feedback.title")</h2>
+    <p class="govuk-body">@messages("common.feedback.p1")</p>
+    <p class="govuk-body">
+        <a class="govuk-link" href="@uk.gov.hmrc.digitalservicestax.controllers.routes.AuthenticationController.signOut()">@messages("common.feedback.link")</a> @messages("common.feedback.p2")
+    </p>
 
