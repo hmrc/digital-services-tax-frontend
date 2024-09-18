@@ -51,7 +51,6 @@ class DSTConnector(val http: HttpClient, servicesConfig: ServicesConfig)(implici
   def lookupCompany(utr: UTR, postcode: Postcode): Future[Option[CompanyRegWrapper]] =
     http.GET[Option[CompanyRegWrapper]](s"$backendURL/lookup-company/$utr/$postcode")
 
-
   def lookupRegistration(): Future[Option[Registration]] =
     http.GET[Option[Registration]](s"$backendURL/registration")
 
