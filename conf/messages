@@ -182,16 +182,18 @@ contact-international-address.line3.heading=Address line 3 (optional)
 contact-international-address.line4.heading=Address line 4 (optional)
 contact-international-address.countryCode.heading=Country
 
-check-if-group.heading=Is the company you want to register part of a VAT group?
+check-if-group.heading=Is the company you want to register part of a group?
 check-if-group.heading.hint=Your company details
-check-if-group.hint=<p class="govuk-body govuk-!-margin-top-6">Two or more companies can register as a single taxable person or VAT group if they:</p>\
-  <ul class="govuk-list govuk-list--bullet govuk-body">\
-    <li>have their main or registered offices in the UK</li>\
-    <li>are under common control, such as one or more company being a subsidiary of a parent company</li>\
+check-if-group.details=What we mean by a ‘group’
+check-if-group.details.text=<p>For the Digital Services Tax, a group is a parent company and all its consolidated subsidiaries.</p>\
+  <p>A parent company is an entity that is (one of the following):</p>\
+  <ul class="list list-bullet">\
+    <li>a member of a Generally Accepted Accounting Principles (GAAP) group and not a consolidated subsidiary of another entity</li>\
+    <li>not a member of a GAAP group</li>\
   </ul>\
-    <a href="https://www.gov.uk/guidance/vat-registration-for-groups-divisions-and-joint-ventures" rel="noreferrer noopener"\
-     target="_blank" class="govuk-link govuk-!-font-size-16">Find out more about how to register a group of companies for VAT from gov.uk\
-      (opens in a new window or tab)</a>
+  <p>You can find a list of acceptable GAAP in the \
+    <a href="https://www.gov.uk/hmrc-internal-manuals/digital-services-tax" target="_blank" class="govuk-link">Digital Services Tax Manual (opens in a new window or tab)</a>\
+  </p>
 check-if-group.TRUE=Yes
 check-if-group.FALSE=No
 
