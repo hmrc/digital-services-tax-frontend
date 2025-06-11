@@ -31,6 +31,7 @@ class AppConfig @Inject() (val config: Configuration, servicesConfig: ServicesCo
   lazy val analyticsHost: String  = loadConfig(s"google-analytics.host")
 
   lazy val appName: String                        = loadConfig("appName")
+  private lazy val basGatewayUrl: String          = servicesConfig.getConfString("bas-gateway.host", "")
   private lazy val companyAuthFrontend: String    = servicesConfig.getConfString("company-auth.url", "")
   private lazy val companyAuthSignInPath: String  = servicesConfig.getConfString("company-auth.sign-in-path", "")
   private lazy val companyAuthSignOutPath: String = servicesConfig.getConfString("company-auth.sign-out-path", "")
@@ -43,7 +44,7 @@ class AppConfig @Inject() (val config: Configuration, servicesConfig: ServicesCo
   val mongoJourneyStoreExpireAfter: Duration    = servicesConfig.getDuration("mongodb.journeyStore.expireAfter")
 
   lazy val dstIndexPage: String        = loadConfig("dst-index-page-url")
-  lazy val signOutDstUrl: String       = s"$companyAuthFrontend$companyAuthSignOutPath?continue=$feedbackSurveyUrl"
+  lazy val signOutDstUrl: String       = s"$basGatewayUrl$companyAuthSignOutPath?continue=$feedbackSurveyUrl"
   lazy val feedbackSurveyUrl: String   = loadConfig("microservice.services.feedback-survey.url")
   lazy val betaFeedbackUrlAuth: String = s"$contactHost/contact/beta-feedback?service=$serviceName"
   lazy val timeInUrl: String           = loadConfig("time-in.url")

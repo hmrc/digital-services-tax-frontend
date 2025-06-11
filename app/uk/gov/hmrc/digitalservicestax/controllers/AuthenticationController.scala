@@ -43,7 +43,7 @@ class AuthenticationController @Inject() (mcc: MessagesControllerComponents, tim
   }
 
   def signOut: Action[AnyContent] = Action {
-    Redirect(appConfig.signOutDstUrl).withNewSession
+    Redirect(appConfig.signOutDstUrl)
   }
 
   def timeIn(referrer: String): Action[AnyContent] = Action {
@@ -55,6 +55,6 @@ class AuthenticationController @Inject() (mcc: MessagesControllerComponents, tim
       messagesApi.preferred(request).convertMessagesTwirlHtml(escapeHtml = false) |+| UniformMessages.bestGuess.map(
         HtmlFormat.escape
       )
-    Ok(timeOutView()).withNewSession
+    Ok(timeOutView())
   }
 }
