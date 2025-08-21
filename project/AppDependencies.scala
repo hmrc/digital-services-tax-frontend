@@ -4,12 +4,12 @@ import sbt._
 object AppDependencies {
 
   val uniformVersion           = "5.0.0-RC2"
-  val hmrcMongoVersion         = "2.6.0"
+  val hmrcMongoVersion         = "2.7.0"
   val play                     = "play-30"
-  private val bootstrapVersion = "8.6.0"
+  private val bootstrapVersion = "10.1.0"
 
   val compile: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$play" % "9.11.0",
+    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$play" % "12.8.0",
     "com.chuusai"           %% "shapeless"                 % "2.4.0-M1",
     "com.beachape"          %% "enumeratum-play-json"      % "1.8.0",
     "com.luketebbs.uniform" %% s"interpreter-play28"       % uniformVersion, // The most recent edition of the uniform is play 28, and the play 30 version has not been released yet.
