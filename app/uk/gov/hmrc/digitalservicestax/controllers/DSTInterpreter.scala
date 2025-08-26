@@ -22,15 +22,19 @@ import enumeratum.{Enum, EnumEntry}
 
 import java.time.LocalDate
 import javax.inject.Inject
-import ltbs.uniform._, validation._, common.web._
+import ltbs.uniform._
+import validation._
+import common.web._
 import ltbs.uniform.interpreters.playframework.{PlayInterpreter, RichPlayMessages}
 import org.jsoup.Jsoup
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
-import play.twirl.api.{Html, HtmlFormat}, HtmlFormat.Appendable
+import play.twirl.api.{Html, HtmlFormat}
+import HtmlFormat.Appendable
 import shapeless.tag
 import tag.@@
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
+import uk.gov.hmrc.digitalservicestax.data
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.views.html.{FormWrapper, Layout}
 import uk.gov.hmrc.digitalservicestax.views.html.uniform._
@@ -92,9 +96,9 @@ class DSTInterpreter @Inject() (
       }
     }
 
-  implicit lazy val twirlBoolField = new WebAsk[Html, Boolean] {
-    val True  = true.toString.toUpperCase
-    val False = false.toString.toUpperCase
+  implicit lazy val twirlBoolField: WebAsk[Html, Boolean] = new WebAsk[Html, Boolean] {
+    val True: String  = true.toString.toUpperCase
+    val False: String = false.toString.toUpperCase
 
     def decode(out: Input): Either[ErrorTree, Boolean] =
       out
@@ -125,9 +129,9 @@ class DSTInterpreter @Inject() (
     }
   }
 
-  implicit val twirlStringField = twirlStringFields()
+  implicit val twirlStringField: WebAsk[Html, String] = twirlStringFields()
 
-  implicit val twirlCountryCodeField = new WebAsk[Html, CountryCode] {
+  implicit val twirlCountryCodeField: WebAsk[Html, CountryCode] = new WebAsk[Html, CountryCode] {
 
     override def render(
       pageKey: List[String],
@@ -182,7 +186,7 @@ class DSTInterpreter @Inject() (
     }
   }
 
-  implicit lazy val phoneField =
+  implicit lazy val phoneField: WebAsk[Html, String @@ data.PhoneNumber.Tag] =
     validatedString(
       PhoneNumber,
       24
@@ -372,13 +376,15 @@ class DSTInterpreter @Inject() (
     ): Option[Html] = Some(standardField(pageKey, errors, messages)(tell.getOrElse(Html(""))))
   }
 
-  def tellList[A](f: A => Html) = new WebTell[Html, WebAskList.ListingTable[A]] {
-    def render(in: WebAskList.ListingTable[A], key: String, messages: UniformMessages[Html]): Option[Html] =
-      Some(listing(key, in.value.map(f), messages))
-  }
+  def tellList[A](f: A => Html): WebTell[Html, WebAskList.ListingTable[A]] =
+    new WebTell[Html, WebAskList.ListingTable[A]] {
+      def render(in: WebAskList.ListingTable[A], key: String, messages: UniformMessages[Html]): Option[Html] =
+        Some(listing(key, in.value.map(f), messages))
+    }
 
-  implicit val tellListGroupCompany = tellList { groupCompany: GroupCompany =>
-    Html(groupCompany.name)
+  implicit val tellListGroupCompany: WebTell[Html, WebAskList.ListingTable[GroupCompany]] = tellList {
+    groupCompany: GroupCompany =>
+      Html(groupCompany.name)
   }
 
   def renderAnd(
@@ -527,26 +533,30 @@ class DSTInterpreter @Inject() (
     )
   )
 
-  implicit lazy val nesField                       = validatedVariant(NonEmptyString)
-  implicit lazy val utrField                       = validatedString(UTR)
-  implicit lazy val safeIdField                    = validatedString(SafeId)
-  implicit lazy val emailField                     = validatedString(Email, 132)
-  implicit lazy val percentField                   = validatedVariant(Percent)
-  implicit lazy val moneyField                     = validatedBigDecimal(Money, 15)
-  implicit lazy val accountNumberField             = validatedString(AccountNumber)
-  implicit lazy val BuildingSocietyRollNumberField = inlineOptionString(BuildingSocietyRollNumber, 18)
-  implicit lazy val accountNameField               = validatedString(AccountName, 35)
-  implicit lazy val sortCodeField                  = validatedString(SortCode)(
+  implicit lazy val nesField: WebAsk[Html, String @@ data.NonEmptyString.Tag]                                          = validatedVariant(NonEmptyString)
+  implicit lazy val utrField: WebAsk[Html, String @@ data.UTR.Tag]                                                     = validatedString(UTR)
+  implicit lazy val safeIdField: WebAsk[Html, String @@ data.SafeId.Tag]                                               = validatedString(SafeId)
+  implicit lazy val emailField: WebAsk[Html, String @@ data.Email.Tag]                                                 = validatedString(Email, 132)
+  implicit lazy val percentField: WebAsk[Html, Float @@ data.Percent.Tag]                                              = validatedVariant(Percent)
+  implicit lazy val moneyField: WebAsk[Html, BigDecimal @@ data.Money.Tag]                                             = validatedBigDecimal(Money, 15)
+  implicit lazy val accountNumberField: WebAsk[Html, String @@ data.AccountNumber.Tag]                                 = validatedString(AccountNumber)
+  implicit lazy val BuildingSocietyRollNumberField: WebAsk[Html, Option[String @@ data.BuildingSocietyRollNumber.Tag]] =
+    inlineOptionString(BuildingSocietyRollNumber, 18)
+  implicit lazy val accountNameField: WebAsk[Html, String @@ data.AccountName.Tag]                                     = validatedString(AccountName, 35)
+  implicit lazy val sortCodeField: WebAsk[Html, String @@ data.SortCode.Tag]                                           = validatedString(SortCode)(
     twirlStringFields(
       customRender = Some(stringField(_, _, _, _, _, "form-control form-control-1-4"))
     )
   )
 
-  implicit lazy val ibanField             = validatedString(IBAN, 34)
-  implicit lazy val companyNameField      = validatedString(CompanyName, 105)
-  implicit lazy val mandatoryAddressField = validatedString(AddressLine, 35)
-  implicit lazy val optAddressField       = inlineOptionString(AddressLine, 35)
-  implicit lazy val restrictField         = validatedString(RestrictiveString, 35)
+  implicit lazy val ibanField: WebAsk[Html, String @@ data.IBAN.Tag]                      = validatedString(IBAN, 34)
+  implicit lazy val companyNameField: WebAsk[Html, String @@ data.CompanyName.Tag]        = validatedString(CompanyName, 105)
+  implicit lazy val mandatoryAddressField: WebAsk[Html, String @@ data.AddressLine.Tag]   =
+    validatedString(AddressLine, 35)
+  implicit lazy val optAddressField: WebAsk[Html, Option[String @@ data.AddressLine.Tag]] =
+    inlineOptionString(AddressLine, 35)
+  implicit lazy val restrictField: WebAsk[Html, String @@ data.RestrictiveString.Tag]     =
+    validatedString(RestrictiveString, 35)
 
   implicit lazy val optUtrField: WebAsk[Html, Option[UTR]] = inlineOptionString(UTR)
 

@@ -28,7 +28,7 @@ trait Widgets {
 
   implicit val appConfig: AppConfig
 
-  implicit val addressTell = new WebTell[Html, Address] {
+  implicit val addressTell: WebTell[Html, Address] = new WebTell[Html, Address] {
     override def render(in: Address, key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(
         Html(
@@ -39,17 +39,17 @@ trait Widgets {
       )
   }
 
-  implicit val kickoutTell = new WebTell[Html, Kickout] {
+  implicit val kickoutTell: WebTell[Html, Kickout] = new WebTell[Html, Kickout] {
     override def render(in: Kickout, key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(views.html.end.kickout(key)(messages, appConfig))
   }
 
-  implicit val groupCoTell = new WebTell[Html, GroupCompany] {
+  implicit val groupCoTell: WebTell[Html, GroupCompany] = new WebTell[Html, GroupCompany] {
     override def render(in: GroupCompany, key: String, messages: UniformMessages[Html]): Option[Html] =
       None /// ????
   }
 
-  implicit val companyTell = new WebTell[Html, Company] {
+  implicit val companyTell: WebTell[Html, Company] = new WebTell[Html, Company] {
     override def render(in: Company, key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(
         Html(
@@ -63,7 +63,7 @@ trait Widgets {
       )
   }
 
-  implicit val booleanTell = new WebTell[Html, Boolean] {
+  implicit val booleanTell: WebTell[Html, Boolean] = new WebTell[Html, Boolean] {
     override def render(in: Boolean, key: String, messages: UniformMessages[Html]): Option[Html] =
       Some(Html(in.toString))
   }

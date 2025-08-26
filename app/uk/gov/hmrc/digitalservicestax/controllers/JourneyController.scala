@@ -17,31 +17,31 @@
 package uk.gov.hmrc.digitalservicestax
 package controllers
 
-import data._
-import connectors._
 import cats.implicits._
-import config.AppConfig
-
-import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
 import ltbs.uniform.interpreters.playframework.RichPlayMessages
 import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.Html
-
-import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout}
 import uk.gov.hmrc.digitalservicestax.actions.Auth
+import uk.gov.hmrc.digitalservicestax.config.AppConfig
+import uk.gov.hmrc.digitalservicestax.connectors._
+import uk.gov.hmrc.digitalservicestax.data._
+import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class JourneyController @Inject() (
   authorisedAction: Auth,
-  val http: HttpClient,
+  val http: HttpClientV2,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
   layout: Layout,

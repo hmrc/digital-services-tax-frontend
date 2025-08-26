@@ -27,6 +27,7 @@ import play.api.libs.ws.WSClient
 import play.api.mvc.MessagesControllerComponents
 import play.api.{Application, Configuration, Environment}
 import uk.gov.hmrc.auth.core.PlayAuthConnector
+import uk.gov.hmrc.digitalservicestax.actions.AuthorisedAction
 import uk.gov.hmrc.digitalservicestax.config.AppConfig
 import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.DSTInterpreter
@@ -34,12 +35,11 @@ import uk.gov.hmrc.digitalservicestax.test.TestConnector
 import uk.gov.hmrc.digitalservicestax.views.html.cya.{CheckYourAnswersReg, CheckYourAnswersRet}
 import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, ConfirmationReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout, PayYourDst}
-import uk.gov.hmrc.digitalservicestax.actions.AuthorisedAction
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
+import uk.gov.hmrc.play.bootstrap.http.HttpClientV2Provider
 import unit.uk.gov.hmrc.digitalservicestaxfrontend.controller.FakeAuthorisedAction
 
 import java.io.File
@@ -65,7 +65,7 @@ trait FakeApplicationSetup
   lazy val messagesApi: MessagesApi                         = app.injector.instanceOf[MessagesApi]
   lazy val wsClient: WSClient                               = app.injector.instanceOf[WSClient]
   lazy val httpAuditing: HttpAuditing                       = app.injector.instanceOf[HttpAuditing]
-  lazy val httpClient: HttpClient                           = new DefaultHttpClient(configuration, httpAuditing, wsClient, actorSystem)
+  lazy val httpClient: HttpClientV2                         = new HttpClientV2Provider(configuration, httpAuditing, wsClient, actorSystem).get()
   lazy val authorisedAction: AuthorisedAction               = app.injector.instanceOf[AuthorisedAction]
   lazy val authConnector: PlayAuthConnector                 = new DefaultAuthConnector(httpClient, servicesConfig)
   lazy val layoutInstance: Layout                           = app.injector.instanceOf[Layout]

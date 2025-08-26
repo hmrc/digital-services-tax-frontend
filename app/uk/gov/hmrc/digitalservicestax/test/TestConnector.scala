@@ -16,23 +16,24 @@
 
 package uk.gov.hmrc.digitalservicestax.test
 
-import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
+import java.net.URI
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TestConnector @Inject() (
-  http: HttpClient,
+  http: HttpClientV2,
   servicesConfig: ServicesConfig
 ) {
 
   private val beUrl: String = servicesConfig.baseUrl("digital-services-tax")
 
   def trigger(url: String, param: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    http.GET[HttpResponse](s"$beUrl/$url/$param")
+    http.get(new URI(s"$beUrl/$url/$param").toURL).execute[HttpResponse]
 
 }
