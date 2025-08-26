@@ -16,25 +16,29 @@
 
 package uk.gov.hmrc.digitalservicestax.config
 
-import javax.inject.{Inject, Singleton}
 import ltbs.uniform.UniformMessages
-import ltbs.uniform.interpreters.playframework._
+import ltbs.uniform.interpreters.playframework.RichPlayMessages
 import play.api.i18n.MessagesApi
-import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import play.twirl.api.Html
-import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import uk.gov.hmrc.digitalservicestax.views.html.ErrorTemplate
+import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ErrorHandler @Inject() (
   val messagesApi: MessagesApi,
   implicit val appConfig: AppConfig,
   errorTemplate: ErrorTemplate
-) extends FrontendErrorHandler {
+)(implicit val ec: ExecutionContext)
+    extends FrontendErrorHandler {
+
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
-    request: Request[_]
-  ): Html = {
+    request: RequestHeader
+  ): Future[Html] = {
     implicit val messages: UniformMessages[Html] = messagesApi.preferred(request).convertMessagesTwirlHtml()
-    errorTemplate(pageTitle, heading, message)
+    Future.successful(errorTemplate(pageTitle, heading, message))
   }
 }

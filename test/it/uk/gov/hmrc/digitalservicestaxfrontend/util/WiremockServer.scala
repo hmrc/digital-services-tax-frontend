@@ -49,7 +49,7 @@ trait WiremockServer extends FakeApplicationSetup with BeforeAndAfterEach with B
     mockServer.stop()
   }
 
-  val fakeAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig) {
-    override val serviceUrl = mockServerUrl
+  val fakeAuthConnector: DefaultAuthConnector = new DefaultAuthConnector(httpClient, servicesConfig) {
+    override val serviceUrl: String = mockServerUrl
   }
 }

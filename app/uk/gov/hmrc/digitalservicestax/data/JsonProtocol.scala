@@ -26,21 +26,23 @@ import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import scala.collection.immutable.ListMap
 import play.api.libs.json.Json.fromJson
+import uk.gov.hmrc.digitalservicestax.data
 
 trait SimpleJson {
 
-  def validatedStringFormat(A: ValidatedType[String], name: String) = new Format[String @@ A.Tag] {
-    override def reads(json: JsValue): JsResult[String @@ A.Tag] = json match {
-      case JsString(value) =>
-        A.validateAndTransform(value) match {
-          case Some(v) => JsSuccess(A(v))
-          case None    => JsError(s"Expected a valid $name, got $value instead")
-        }
-      case xs: JsValue     => JsError(JsPath -> JsonValidationError(Seq(s"""Expected a valid $name, got $xs instead""")))
-    }
+  def validatedStringFormat(A: ValidatedType[String], name: String): Format[String @@ A.Tag] =
+    new Format[String @@ A.Tag] {
+      override def reads(json: JsValue): JsResult[String @@ A.Tag] = json match {
+        case JsString(value) =>
+          A.validateAndTransform(value) match {
+            case Some(v) => JsSuccess(A(v))
+            case None    => JsError(s"Expected a valid $name, got $value instead")
+          }
+        case xs: JsValue     => JsError(JsPath -> JsonValidationError(Seq(s"""Expected a valid $name, got $xs instead""")))
+      }
 
-    override def writes(o: String @@ A.Tag): JsValue = JsString(o)
-  }
+      override def writes(o: String @@ A.Tag): JsValue = JsString(o)
+    }
 
   implicit val nonEmptyStringFormat: Format[NonEmptyString] = new Format[NonEmptyString] {
     override def reads(json: JsValue): JsResult[NonEmptyString] = json match {
@@ -51,25 +53,35 @@ trait SimpleJson {
     override def writes(o: NonEmptyString): JsValue = JsString(o)
   }
 
-  implicit val postcodeFormat                  = validatedStringFormat(Postcode, "postcode")
-  implicit val phoneNumberFormat               = validatedStringFormat(PhoneNumber, "phone number")
-  implicit val utrFormat                       = validatedStringFormat(UTR, "UTR")
-  implicit val safeIfFormat                    = validatedStringFormat(SafeId, "SafeId")
-  implicit val formBundleNoFormat              = validatedStringFormat(FormBundleNumber, "FormBundleNumber")
-  implicit val internalIdFormat                = validatedStringFormat(InternalId, "internal id")
-  implicit val emailFormat                     = validatedStringFormat(Email, "email")
-  implicit val countryCodeFormat               = validatedStringFormat(CountryCode, "country code")
-  implicit val sortCodeFormat                  = validatedStringFormat(SortCode, "sort code")
-  implicit val accountNumberFormat             = validatedStringFormat(AccountNumber, "account number")
-  implicit val buildingSocietyRollNumberFormat =
+  implicit val postcodeFormat: Format[String @@ data.Postcode.Tag]                                   = validatedStringFormat(Postcode, "postcode")
+  implicit val phoneNumberFormat: Format[String @@ data.PhoneNumber.Tag]                             =
+    validatedStringFormat(PhoneNumber, "phone number")
+  implicit val utrFormat: Format[String @@ data.UTR.Tag]                                             = validatedStringFormat(UTR, "UTR")
+  implicit val safeIfFormat: Format[String @@ data.SafeId.Tag]                                       = validatedStringFormat(SafeId, "SafeId")
+  implicit val formBundleNoFormat: Format[String @@ data.FormBundleNumber.Tag]                       =
+    validatedStringFormat(FormBundleNumber, "FormBundleNumber")
+  implicit val internalIdFormat: Format[String @@ data.InternalId.Tag]                               =
+    validatedStringFormat(InternalId, "internal id")
+  implicit val emailFormat: Format[String @@ data.Email.Tag]                                         = validatedStringFormat(Email, "email")
+  implicit val countryCodeFormat: Format[String @@ data.CountryCode.Tag]                             =
+    validatedStringFormat(CountryCode, "country code")
+  implicit val sortCodeFormat: Format[String @@ data.SortCode.Tag]                                   = validatedStringFormat(SortCode, "sort code")
+  implicit val accountNumberFormat: Format[String @@ data.AccountNumber.Tag]                         =
+    validatedStringFormat(AccountNumber, "account number")
+  implicit val buildingSocietyRollNumberFormat: Format[String @@ data.BuildingSocietyRollNumber.Tag] =
     validatedStringFormat(BuildingSocietyRollNumber, "building society roll number")
-  implicit val accountNameFormat               = validatedStringFormat(AccountName, "account name")
-  implicit val ibanFormat                      = validatedStringFormat(IBAN, "IBAN number")
-  implicit val periodKeyFormat                 = validatedStringFormat(Period.Key, "Period Key")
-  implicit val restrictiveFormat               = validatedStringFormat(RestrictiveString, "name")
-  implicit val companyNameFormat               = validatedStringFormat(CompanyName, "company name")
-  implicit val mandatoryAddressLineFormat      = validatedStringFormat(AddressLine, "address line")
-  implicit val dstRegNoFormat                  = validatedStringFormat(DSTRegNumber, "Digital Services Tax Registration Number")
+  implicit val accountNameFormat: Format[String @@ data.AccountName.Tag]                             =
+    validatedStringFormat(AccountName, "account name")
+  implicit val ibanFormat: Format[String @@ data.IBAN.Tag]                                           = validatedStringFormat(IBAN, "IBAN number")
+  implicit val periodKeyFormat: Format[String @@ Period.Key.Tag]                                     = validatedStringFormat(Period.Key, "Period Key")
+  implicit val restrictiveFormat: Format[String @@ data.RestrictiveString.Tag]                       =
+    validatedStringFormat(RestrictiveString, "name")
+  implicit val companyNameFormat: Format[String @@ data.CompanyName.Tag]                             =
+    validatedStringFormat(CompanyName, "company name")
+  implicit val mandatoryAddressLineFormat: Format[String @@ data.AddressLine.Tag]                    =
+    validatedStringFormat(AddressLine, "address line")
+  implicit val dstRegNoFormat: Format[String @@ data.DSTRegNumber.Tag]                               =
+    validatedStringFormat(DSTRegNumber, "Digital Services Tax Registration Number")
 
   implicit val moneyFormat: Format[Money] = new Format[Money] {
     override def reads(json: JsValue): JsResult[Money] =
@@ -122,7 +134,7 @@ object BackendAndFrontendJson extends SimpleJson {
   implicit val groupCompanyFormat: Format[GroupCompany]            = Json.format[GroupCompany]
 
   import Enrolment.idFormat
-  implicit val enrolmentWrites = Json.format[Enrolment]
+  implicit val enrolmentWrites: OFormat[Enrolment] = Json.format[Enrolment]
 
   implicit val activityMapFormat: Format[Map[Activity, Percent]] = new Format[Map[Activity, Percent]] {
     override def reads(json: JsValue): JsResult[Map[Activity, Percent]] =
@@ -185,7 +197,7 @@ object BackendAndFrontendJson extends SimpleJson {
 
   implicit val periodFormat: OFormat[Period] = Json.format[Period]
 
-  val readCompanyReg = new Reads[CompanyRegWrapper] {
+  val readCompanyReg: Reads[CompanyRegWrapper] = new Reads[CompanyRegWrapper] {
     override def reads(json: JsValue): JsResult[CompanyRegWrapper] =
       JsSuccess(
         CompanyRegWrapper(
@@ -273,7 +285,7 @@ object BackendAndFrontendJson extends SimpleJson {
       }
     }
 
-  implicit def optFormat[A](implicit in: Format[A]) = new Format[Option[A]] {
+  implicit def optFormat[A](implicit in: Format[A]): Format[Option[A]] = new Format[Option[A]] {
     def reads(json: JsValue): JsResult[Option[A]] = json match {
       case JsNull => JsSuccess(None)
       case x      => in.reads(x).map(Some(_))
@@ -281,7 +293,7 @@ object BackendAndFrontendJson extends SimpleJson {
     def writes(o: Option[A]): JsValue             = o.fold(JsNull: JsValue)(in.writes)
   }
 
-  implicit val unitFormat = new Format[Unit] {
+  implicit val unitFormat: Format[Unit] = new Format[Unit] {
     def reads(json: JsValue): JsResult[Unit] = json match {
       case JsNull                   => JsSuccess(())
       case JsObject(e) if e.isEmpty => JsSuccess(())
