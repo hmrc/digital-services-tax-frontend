@@ -27,15 +27,15 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers, RequestHeader}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoUniformPersistence, ReturnsRepo}
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.cya.CheckYourAnswersRet
 import uk.gov.hmrc.digitalservicestax.views.html.end.ConfirmationReturn
-import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider

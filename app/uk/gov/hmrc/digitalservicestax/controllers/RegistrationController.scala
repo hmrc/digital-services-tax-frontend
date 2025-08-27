@@ -29,7 +29,6 @@ import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.http.HttpClient
 import views.html.cya._
 import views.html.end._
 
