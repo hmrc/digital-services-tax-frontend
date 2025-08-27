@@ -60,9 +60,10 @@ class DSTConnector(val http: HttpClientV2, servicesConfig: ServicesConfig)(impli
   def lookupCompany(): Future[Option[CompanyRegWrapper]] =
     http.get(new URI(s"$backendURL/lookup-company").toURL).execute[Option[CompanyRegWrapper]]
 
-  def lookupCompany(utr: UTR, postcode: Postcode): Future[Option[CompanyRegWrapper]] = {
-    http.get(new URI(s"$backendURL/lookup-company/$utr/${postcode.mkString("").replace(" ", "")}").toURL).execute[Option[CompanyRegWrapper]]
-  }
+  def lookupCompany(utr: UTR, postcode: Postcode): Future[Option[CompanyRegWrapper]] =
+    http
+      .get(new URI(s"$backendURL/lookup-company/$utr/${postcode.mkString("").replace(" ", "")}").toURL)
+      .execute[Option[CompanyRegWrapper]]
 
   def lookupRegistration(): Future[Option[Registration]] =
     http.get(new URI(s"$backendURL/registration").toURL).execute[Option[Registration]]
