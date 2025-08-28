@@ -32,7 +32,7 @@ class ErrorHandler @Inject() (
   val messagesApi: MessagesApi,
   implicit val appConfig: AppConfig,
   errorTemplate: ErrorTemplate
-)(implicit override val ec: ExecutionContext)
+)(implicit val ec: ExecutionContext)
     extends FrontendErrorHandler {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit

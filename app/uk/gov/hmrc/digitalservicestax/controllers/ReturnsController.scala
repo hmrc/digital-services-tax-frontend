@@ -27,14 +27,15 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, ControllerHelpers, RequestHeader}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
 import uk.gov.hmrc.digitalservicestax.connectors.{DSTConnector, DSTService, MongoUniformPersistence, ReturnsRepo}
 import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
-import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.cya.CheckYourAnswersRet
 import uk.gov.hmrc.digitalservicestax.views.html.end.ConfirmationReturn
-import uk.gov.hmrc.digitalservicestax.actions.{Auth, AuthorisedRequest}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -44,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsController @Inject() (
   authorisedAction: Auth,
-  http: HttpClient,
+  http: HttpClientV2,
   servicesConfig: ServicesConfig,
   mongoc: MongoComponent,
   interpreter: DSTInterpreter,
@@ -65,14 +66,15 @@ class ReturnsController @Inject() (
   import interpreter._
   def backend(implicit hc: HeaderCarrier): DSTService[Future] = new DSTConnector(http, servicesConfig)
 
-  private implicit val cyaRetTell = new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
-    override def render(
-      in: CYA[(Return, Period, CompanyName)],
-      key: String,
-      messages: UniformMessages[Html]
-    ): Option[Html] =
-      Some(checkYourAnswersRet(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
-  }
+  private implicit val cyaRetTell: WebTell[Html, CYA[(Return, Period, CompanyName)]] =
+    new WebTell[Html, CYA[(Return, Period, CompanyName)]] {
+      override def render(
+        in: CYA[(Return, Period, CompanyName)],
+        key: String,
+        messages: UniformMessages[Html]
+      ): Option[Html] =
+        Some(checkYourAnswersRet(s"$key.ret", in.value._1, in.value._2, in.value._3)(messages))
+    }
 
   private def applyKey(key: Key): Period.Key           = key
   private def unapplyKey(arg: Period.Key): Option[Key] = Option(arg)

@@ -11,7 +11,7 @@ object AppDependencies {
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"           %% s"play-frontend-hmrc-$play" % "12.8.0",
     "com.chuusai"           %% "shapeless"                 % "2.4.0-M1",
-    "com.beachape"          %% "enumeratum-play-json"      % "1.8.0",
+    "com.beachape"          %% "enumeratum-play-json"      % "1.9.0",
     "com.luketebbs.uniform" %% s"interpreter-play28"       % uniformVersion, // The most recent edition of the uniform is play 28, and the play 30 version has not been released yet.
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$play"         % hmrcMongoVersion,
     "commons-validator"      % "commons-validator"         % "1.8.0",

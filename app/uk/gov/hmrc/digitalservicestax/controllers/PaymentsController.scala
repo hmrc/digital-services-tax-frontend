@@ -35,14 +35,14 @@ import uk.gov.hmrc.digitalservicestax.actions.Auth
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PaymentsController @Inject() (
   authorisedAction: Auth,
-  val http: HttpClient,
+  val http: HttpClientV2,
   val authConnector: AuthConnector,
   servicesConfig: ServicesConfig,
   layout: Layout,
