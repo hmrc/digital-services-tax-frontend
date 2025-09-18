@@ -1,5 +1,6 @@
 $govuk-assets-path: "/digital-services-tax/assets/lib/govuk-frontend/dist/govuk/assets/";
 $hmrc-assets-path: "/digital-services-tax/assets/lib/hmrc-frontend/hmrc/";
+$govuk-new-organisation-colours: true;
 
 @import "lib/govuk-frontend/dist/govuk/all";
 @import "lib/hmrc-frontend/hmrc/all";

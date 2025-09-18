@@ -37,7 +37,7 @@ class JourneyControllerSpec extends FakeApplicationServer {
   private val expectedContactReportTechnicalIssueUri = "%2Ftest-uri-for-referrer"
 
   private val contactReportTechnicalIssueUrl =
-    s"http://localhost:9250/contact/report-technical-problem?newTab=true&amp;service=digital-services-tax-frontend&amp;referrerUrl=$expectedContactReportTechnicalIssueUri"
+    s"http://localhost:9250/contact/report-technical-problem?service=digital-services-tax-frontend&amp;referrerUrl=$expectedContactReportTechnicalIssueUri"
 
   "JourneyController" must {
 
