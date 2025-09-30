@@ -33,7 +33,7 @@ import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.DSTInterpreter
 import uk.gov.hmrc.digitalservicestax.test.TestConnector
 import uk.gov.hmrc.digitalservicestax.views.html.cya.{CheckYourAnswersReg, CheckYourAnswersRet}
-import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, ConfirmationReturn,SubmitNewReturn}
+import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, ConfirmationReturn, SubmitNewReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout, PayYourDst}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.audit.http.HttpAuditing
