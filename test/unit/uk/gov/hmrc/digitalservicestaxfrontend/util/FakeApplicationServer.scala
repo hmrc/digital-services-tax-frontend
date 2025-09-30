@@ -32,7 +32,7 @@ import uk.gov.hmrc.digitalservicestax.connectors.DSTConnector
 import uk.gov.hmrc.digitalservicestax.controllers.DSTInterpreter
 import uk.gov.hmrc.digitalservicestax.test.TestConnector
 import uk.gov.hmrc.digitalservicestax.views.html.cya.{CheckYourAnswersReg, CheckYourAnswersRet}
-import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, ConfirmationReturn}
+import uk.gov.hmrc.digitalservicestax.views.html.end.{ConfirmationReg, ConfirmationReturn,SubmitNewReturn}
 import uk.gov.hmrc.digitalservicestax.views.html.{Landing, Layout, PayYourDst}
 import uk.gov.hmrc.digitalservicestax.actions.AuthorisedAction
 import uk.gov.hmrc.http.HttpClient
@@ -84,6 +84,7 @@ trait FakeApplicationServer
   lazy val checkYourAnswersRetInstance: CheckYourAnswersRet = app.injector.instanceOf[CheckYourAnswersRet]
   lazy val confirmationRegInstance: ConfirmationReg         = app.injector.instanceOf[ConfirmationReg]
   lazy val confirmationRetInstance: ConfirmationReturn      = app.injector.instanceOf[ConfirmationReturn]
+    lazy val SubmitNewReturnInst: SubmitNewReturn             = app.injector.instanceOf[SubmitNewReturn]
   lazy val payYourDst: PayYourDst                           = app.injector.instanceOf[PayYourDst]
   lazy val interpreter: DSTInterpreter                      = app.injector.instanceOf[DSTInterpreter]
 

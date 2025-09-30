@@ -33,6 +33,7 @@ import uk.gov.hmrc.digitalservicestax.data.Period.Key
 import uk.gov.hmrc.digitalservicestax.data._
 import uk.gov.hmrc.digitalservicestax.views.html.cya.CheckYourAnswersRet
 import uk.gov.hmrc.digitalservicestax.views.html.end.ConfirmationReturn
+import uk.gov.hmrc.digitalservicestax.views.html.end.SubmitNewReturn
 import uk.gov.hmrc.digitalservicestax.views.html.{Layout, ResubmitAReturn}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -51,6 +52,7 @@ class ReturnsController @Inject() (
   interpreter: DSTInterpreter,
   checkYourAnswersRet: CheckYourAnswersRet,
   confirmationReturn: ConfirmationReturn,
+  submitNewReturnsPage: SubmitNewReturn,
   layout: Layout,
   resubmitAReturn: ResubmitAReturn,
   val authConnector: AuthConnector,
@@ -175,12 +177,13 @@ class ReturnsController @Inject() (
                   )(views.html.end.pending()(msg))
                 )
               )
-            case _    => Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
+            case _    =>
+              Future.successful(Redirect(routes.RegistrationController.registerAction(" ")))
           }
         case Some(reg) =>
           backend.lookupAllReturns().flatMap { periods =>
             periods.find(_.key == periodKey) match {
-              case None         => Future.successful(NotFound)
+              case None         => Future.successful(Redirect(routes.ReturnsController.submitNewReturn(periodKeyString)))
               case Some(period) =>
                 interpret(returnJourney(period, reg)).run(targetId) { ret =>
                   val purgeStateUponCompletion = true
@@ -226,5 +229,21 @@ class ReturnsController @Inject() (
             )
           )
       }
+  }
+
+  def submitNewReturn(periodKey: String): Action[AnyContent] = authorisedAction.async { implicit request =>
+    implicit val msg: UniformMessages[Html]   = messages(request)
+    implicit val requestHeader: RequestHeader = request
+
+    Future.successful(
+      Ok(
+        layout(
+          pageTitle = Some(s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
+        )(
+          submitNewReturnsPage(periodKey)(requestHeader, msg)
+        )
+      )
+    )
+
   }
 }

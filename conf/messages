@@ -838,6 +838,12 @@ confirmation.what-you-do-next.p1=Your next return will be for {0} to {1}.
 confirmation.what-you-do-next.p2=You must pay any Digital Services Tax you owe for your next return period by {0} and submit a return by {1}.
 confirmation.index=Go to your Digital Services Tax details
 
+#Resumit 
+heading.need-to-resubmit= You need to sumit a new return for this period
+resumitreturn.info-on-prev-return= Infomation on your previous return for this period cannot be generated due to a cacheing error. 
+resumitreturn.need-redo-return-for-period= You will need to sumit a new return for this period. 
+resumitreturn.btn-for-this-period= Resumit for this period 
+
 #error pages
 wrong-account.heading=You cannot use this service
 wrong-account.sign-out.reason=You signed in with the HMRC sign in details for an individual or agent. We have signed you out.
