@@ -29,3 +29,5 @@ GET        /time-in                            uk.gov.hmrc.digitalservicestax.co
 GET        /time-out                           uk.gov.hmrc.digitalservicestax.controllers.AuthenticationController.timeOut()
 
 GET        /pay-your-digital-services-tax      uk.gov.hmrc.digitalservicestax.controllers.PaymentsController.payYourDST()
+GET        /resumit-new-returns/:periodKey      uk.gov.hmrc.digitalservicestax.controllers.ReturnsController.submitNewReturn(periodKey:String)
+

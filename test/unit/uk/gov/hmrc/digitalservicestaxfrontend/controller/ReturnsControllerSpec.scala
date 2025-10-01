@@ -43,6 +43,7 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
     interpreter,
     checkYourAnswersRetInstance,
     confirmationRetInstance,
+    SubmitNewReturnInst,
     layoutInstance,
     app.injector.instanceOf[ResubmitAReturn],
     authConnector,
@@ -181,7 +182,7 @@ class ReturnsControllerSpec extends FakeApplicationServer with PrivateMethodTest
         .apply(
           FakeRequest().withSession().withHeaders("Authorization" -> "Bearer some-token")
         )
-      status(result) mustBe NOT_FOUND
+      status(result) mustBe 303
     }
 
     "return a 303 when a registration is found, periodKey matches what is in the uri and the journey is started" in {
