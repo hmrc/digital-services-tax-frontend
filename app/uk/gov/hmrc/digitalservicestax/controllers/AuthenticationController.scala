@@ -38,7 +38,11 @@ class AuthenticationController @Inject() (mcc: MessagesControllerComponents, tim
   def signIn: Action[AnyContent] = Action {
     Redirect(
       url = appConfig.ggLoginUrl,
-      queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName))
+      queryStringParams = Map(
+        "continue"    -> Seq(appConfig.dstIndexPage),
+        "origin"      -> Seq(appConfig.appName),
+        "accountType" -> Seq("Organisation")
+      )
     )
   }
 
@@ -47,7 +51,10 @@ class AuthenticationController @Inject() (mcc: MessagesControllerComponents, tim
   }
 
   def timeIn(referrer: String): Action[AnyContent] = Action {
-    Redirect(appConfig.ggLoginUrl, Map("continue" -> Seq(referrer), "origin" -> Seq(appConfig.appName)))
+    Redirect(
+      appConfig.ggLoginUrl,
+      Map("continue" -> Seq(referrer), "origin" -> Seq(appConfig.appName), "accountType" -> Seq("Organisation"))
+    )
   }
 
   def timeOut: Action[AnyContent] = Action { implicit request =>
