@@ -40,7 +40,8 @@ class AuthenticationControllerSpec extends FakeApplicationServer {
             .withSession()
             .withHeaders(
               "continue" -> appConfig.dstIndexPage,
-              "origin"   -> appConfig.appName
+              "origin"   -> appConfig.appName,
+              "accountType" -> "Organisation"
             )
         )
 
@@ -50,7 +51,7 @@ class AuthenticationControllerSpec extends FakeApplicationServer {
           Future.successful(
             Redirect(
               url = appConfig.ggLoginUrl,
-              queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName))
+              queryStringParams = Map("continue" -> Seq(appConfig.dstIndexPage), "origin" -> Seq(appConfig.appName), "accountType" -> Seq("Organisation"))
             )
           )
         )
@@ -76,7 +77,8 @@ class AuthenticationControllerSpec extends FakeApplicationServer {
             .withSession()
             .withHeaders(
               "continue" -> referrer,
-              "origin"   -> appConfig.appName
+              "origin"   -> appConfig.appName,
+              "accountType" -> "Organisation"
             )
         )
 
@@ -85,7 +87,7 @@ class AuthenticationControllerSpec extends FakeApplicationServer {
         Future.successful(
           Redirect(
             appConfig.ggLoginUrl,
-            Map("continue" -> Seq(referrer), "origin" -> Seq(appConfig.appName))
+            Map("continue" -> Seq(referrer), "origin" -> Seq(appConfig.appName), "accountType" -> Seq("Organisation"))
           )
         )
       )
