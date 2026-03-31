@@ -45,7 +45,7 @@
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = s"$serviceUrl/${if(in.companyReg.useSafeId){"company-name"} else {"confirm-company-details"}}",
+                        href = s"$serviceUrl/${if(in.companyReg.useSafeId){"check-company-registered-office-address"} else {"confirm-company-details"}}",
                         content = HtmlContent(messages("common.change")),
                         visuallyHiddenText = Some(messages(s"$key.company-name-and-reg-address.change").toString)
                     )
