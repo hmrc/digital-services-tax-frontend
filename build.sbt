@@ -19,7 +19,6 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(integrationTestSettings ++ unitTestSettings)
   .settings(
-    resolvers ++= Seq(Resolver.jcenterRepo),
     TwirlKeys.templateImports ++= Seq(
       "ltbs.uniform.{Input => UfInput, _}",
       "ltbs.uniform.common.web.{Breadcrumbs => UfBreadcrumbs, _}",
