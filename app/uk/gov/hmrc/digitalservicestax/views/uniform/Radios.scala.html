@@ -46,6 +46,8 @@
     key.head == "ultimate-parent-company-address"
 }
 @isListing = @{key.contains("manage-companies")}
+@isTopLevelQuestion = @{key.length == 1 && !isListing}
+@useLargeLegend = @{isTopLevelQuestion || messages.get(s"$keyWithDots.legend.large").isDefined}
 
 @indexedOptions=@{if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}}
 @radios=@{indexedOptions.map{case (opt,num) =>
@@ -120,8 +122,8 @@
                             Some(
                                 Legend(
                                     content = headHintAndLegend,
-                                    classes = if(!isListing) "govuk-fieldset__legend--l" else "",
-                                    isPageHeading = !isListing
+                                    classes = if(useLargeLegend) "govuk-fieldset__legend govuk-fieldset__legend--l" else "",
+                                    isPageHeading = isTopLevelQuestion
                                 )
                             )
                         },
