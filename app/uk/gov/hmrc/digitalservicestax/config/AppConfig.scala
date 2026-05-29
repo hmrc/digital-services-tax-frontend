@@ -48,5 +48,7 @@ class AppConfig @Inject() (val config: Configuration, servicesConfig: ServicesCo
   lazy val betaFeedbackUrlAuth: String = s"$contactHost/contact/beta-feedback?service=$serviceName"
   lazy val timeInUrl: String           = loadConfig("time-in.url")
   lazy val timeOutUrl: String          = s"""/$serviceName${loadConfig("time-out.url")}"""
+  lazy val largeLegendKeys: Seq[String] =
+    config.getOptional[Seq[String]]("accessibility.largeLegendKeys").getOrElse(Seq.empty)
 
 }
