@@ -15,9 +15,11 @@
  *@
 
 @import uk.gov.hmrc.digitalservicestax.views.html.helpers._
+@import uk.gov.hmrc.digitalservicestax.config.AppConfig
 @import play.twirl.api.HtmlFormat
 
 @this(
+        appConfig: AppConfig,
         standard_field: StandardField,
         govukRadios : GovukRadios,
         govukDetails: GovukDetails
@@ -46,6 +48,8 @@
     key.head == "ultimate-parent-company-address"
 }
 @isListing = @{key.contains("manage-companies")}
+@isTopLevelQuestion = @{key.length == 1 && !isListing}
+@useLargeLegend = @{isTopLevelQuestion || appConfig.largeLegendKeys.contains(keyWithDots)}
 
 @indexedOptions=@{if(reverseRadios){options.reverse.zipWithIndex} else {options.zipWithIndex}}
 @radios=@{indexedOptions.map{case (opt,num) =>
@@ -120,8 +124,8 @@
                             Some(
                                 Legend(
                                     content = headHintAndLegend,
-                                    classes = if(!isListing) "govuk-fieldset__legend--l" else "",
-                                    isPageHeading = !isListing
+                                    classes = if(useLargeLegend) "govuk-fieldset__legend govuk-fieldset__legend--l" else "",
+                                    isPageHeading = isTopLevelQuestion
                                 )
                             )
                         },
