@@ -15,6 +15,9 @@ For details about the digital services tax see [the GOV.UK guidance](https://www
 
 ## Running the service
 ### Service manager
+*You need to be on the VPN*
+Ensure your service manager config is up to date.
+
 The whole service can be started with:
 
 `sm2 --start DST_ALL`
@@ -22,6 +25,8 @@ The whole service can be started with:
 or specifically for only the frontend
 
 `sm2 --start DST_FRONTEND`
+
+This will start all the required services.
 
 ### Locally
 
