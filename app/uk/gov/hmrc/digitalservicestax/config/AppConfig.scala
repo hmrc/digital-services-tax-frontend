@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.digitalservicestax.config
 
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 
 @Singleton
 class AppConfig @Inject() (val config: Configuration, servicesConfig: ServicesConfig) {
 
   private def loadConfig(key: String) = config.get[String](key)
-
-  lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
-  lazy val analyticsHost: String  = loadConfig(s"google-analytics.host")
 
   lazy val appName: String                        = loadConfig("appName")
   private lazy val companyAuthFrontend: String    = servicesConfig.getConfString("company-auth.url", "")
@@ -50,5 +47,10 @@ class AppConfig @Inject() (val config: Configuration, servicesConfig: ServicesCo
   lazy val timeOutUrl: String           = s"""/$serviceName${loadConfig("time-out.url")}"""
   lazy val largeLegendKeys: Seq[String] =
     config.getOptional[Seq[String]]("accessibility.largeLegendKeys").getOrElse(Seq.empty)
+
+  lazy val userResearchBannerEnabled: Boolean =
+    config.getOptional[Boolean]("features.user-research-banner").getOrElse(false)
+
+  lazy val userResearchBannerUrl: String = config.get[String]("external-url.user-research-banner")
 
 }

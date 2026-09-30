@@ -217,7 +217,8 @@ class ReturnsController @Inject() (
           Ok(
             layout(
               pageTitle =
-                Some(s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}")
+                Some(s"${msg("confirmation.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"),
+              displayUserResearchBanner = true
             )(
               confirmationReturn(
                 "confirmation",

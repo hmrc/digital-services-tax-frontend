@@ -17,12 +17,14 @@
 @import uk.gov.hmrc.digitalservicestax.config.AppConfig
 @import uk.gov.hmrc.digitalservicestax.views.AdaptMessages.ufMessagesToPlayMessages
 @import uk.gov.hmrc.digitalservicestax.views.html.components.Scripts
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.{Banners, HmrcStandardPageParams, ServiceURLs, TemplateOverrides}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.userresearchbanner.UserResearchBanner
 @import views.html.helper.CSPNonce
 
 @this(
     head: Head,
-    hmrcLayout: HmrcLayout,
+    hmrcStandardPage: HmrcStandardPage,
     scripts: Scripts,
     hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
     fullWidthMainContent: FullWidthMainContent,
@@ -32,7 +34,14 @@
 @(
     pageTitle: Option[String] = None,
     useFullWidth: Boolean = false,
+    displayUserResearchBanner: Boolean = false
 )(contentBlock: Html)(implicit request: RequestHeader, messages: UniformMessages[Html], appConfig: AppConfig)
+
+@banners = @{
+    Banners(userResearchBanner = Option.when(displayUserResearchBanner && appConfig.userResearchBannerEnabled)(
+        UserResearchBanner(url = appConfig.userResearchBannerUrl, hideCloseButton = true))
+    )
+}
 
 @content = {
     @contentBlock
@@ -50,16 +59,21 @@
     )
 }
 
-@hmrcLayout(
-    serviceName = Some(messages("service.name").toString()),
-    pageTitle = pageTitle,
-    isWelshTranslationAvailable = false,
-    signOutUrl = Some(appConfig.signOutDstUrl),
-    serviceUrl = Some(messages("service.homePageUrl").toString()),
-    displayHmrcBanner = false,
-    phaseBanner = None,
-    additionalHeadBlock = Some(head()),
-    additionalScriptsBlock = Some(scripts()),
-    mainContentLayout = if(useFullWidth) Some(fullWidthMainContent(_)) else Some(defaultMainContentLayout(_))
+@hmrcStandardPage(
+    HmrcStandardPageParams(
+        serviceName = Some(messages("service.name").toString()),
+        pageTitle = pageTitle,
+        isWelshTranslationAvailable = false,
+        serviceURLs = ServiceURLs(
+            serviceUrl = Some(messages("service.homePageUrl").toString()),
+            signOutUrl = Some(appConfig.signOutDstUrl)
+        ),
+        banners = banners,
+        templateOverrides = TemplateOverrides(
+            additionalHeadBlock = Some(head()),
+            additionalScriptsBlock = Some(scripts()),
+            mainContentLayout = if (useFullWidth) Some(fullWidthMainContent(_)) else Some(defaultMainContentLayout(_))
+        )
+    )
 )(content)
 
