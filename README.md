@@ -30,7 +30,7 @@ This will start all the required services.
 
 ### Locally
 
-`sbt 'run 8740 -Dapplication.router=testOnlyDoNotUseInAppConf.Routes'` or `./run.sh`
+`sbt 'run 8740 -Dplay.http.router=testOnlyDoNotUseInAppConf.Routes'` or `./run.sh`
 
 * Visit http://localhost:9949/auth-login-stub/gg-sign-in
 * You may need to add some user details to the form:

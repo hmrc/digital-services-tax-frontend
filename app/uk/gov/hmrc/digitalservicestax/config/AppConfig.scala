@@ -49,8 +49,8 @@ class AppConfig @Inject() (val config: Configuration, servicesConfig: ServicesCo
     config.getOptional[Seq[String]]("accessibility.largeLegendKeys").getOrElse(Seq.empty)
 
   lazy val userResearchBannerEnabled: Boolean =
-    config.getOptional[Boolean]("microservice.services.features.user-research-banner").getOrElse(false)
+    config.getOptional[Boolean]("features.user-research-banner").getOrElse(false)
 
-  lazy val userResearchBannerUrl: String = config.get[String]("microservice.services.external-url.user-research-banner")
+  lazy val userResearchBannerUrl: String = config.get[String]("external-url.user-research-banner")
 
 }

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-sbt "run 8740 -Dapplication.router=testOnlyDoNotUseInAppConf.Routes"
+sbt "run 8740 -Dplay.http.router=testOnlyDoNotUseInAppConf.Routes"
