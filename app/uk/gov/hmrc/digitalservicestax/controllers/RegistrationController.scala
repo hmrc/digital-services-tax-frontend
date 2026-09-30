@@ -128,7 +128,8 @@ class RegistrationController @Inject() (
             layout(
               pageTitle = Some(
                 s"${msg("registration-sent.heading")} - ${msg("common.title")} - ${msg("common.title.suffix")}"
-              )
+              ),
+              displayUserResearchBanner = true
             )(
               confirmationReg(
                 "registration-sent",

@@ -53,11 +53,19 @@ class ConfigSpec extends FakeApplicationServer {
     appConfig.dstIndexPage.nonEmpty mustEqual true
   }
 
-  "should load a Feedback URL the configuration" in {
+  "should load a Feedback URL from the configuration" in {
     appConfig.feedbackSurveyUrl.nonEmpty mustEqual true
   }
 
-  "should load a beta feedback auth URL the configuration" in {
+  "should load a beta feedback auth URL from the configuration" in {
     appConfig.betaFeedbackUrlAuth.nonEmpty mustEqual true
+  }
+
+  "should load userResearchBannerEnabled from the configuration" in {
+    appConfig.userResearchBannerEnabled mustEqual false
+  }
+
+  "should load a userResearchBannerUrl URL from the configuration" in {
+    appConfig.userResearchBannerUrl.nonEmpty mustEqual true
   }
 }
